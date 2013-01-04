@@ -814,4 +814,7 @@ source "package/vim/Config.in"
 endif
 endmenu
 
+# Raspberry Pi specific
+source "package/raspberrypi/Config.in"
+
 endmenu

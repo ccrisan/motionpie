@@ -1,0 +1,7 @@
+config BR2_PACKAGE_RPI_USERLAND
+        bool "rpi-userland"
+        help
+          Raspberry Pi Userland
+
+          https://github.com/raspberrypi/userland/
+

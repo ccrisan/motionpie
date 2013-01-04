@@ -1,0 +1,6 @@
+menu "Raspberry Pi"
+	menu "Libraries"
+		source package/raspberrypi/rpi-userland/Config.in
+	endmenu
+endmenu
+

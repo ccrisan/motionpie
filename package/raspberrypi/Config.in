@@ -1,4 +1,5 @@
 menu "Raspberry Pi"
+	depends on BR2_arm
 	menu "Libraries"
 		source package/raspberrypi/rpi-userland/Config.in
 	endmenu

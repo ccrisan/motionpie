@@ -2,10 +2,11 @@
 
 TARGET="${1}"
 
-# move kernel
-cp ${TARGET}/../build/linux-*/System.map ${TARGET}/boot/System.map
+# copy System.map
 cp ${TARGET}/../build/linux-*/System.map ${TARGET}/System.map
-mv ${TARGET}/boot/zImage ${TARGET}/boot/kernel.img 2> /dev/null
+
+# move kernel
+mv ${TARGET}/../images/zImage ${TARGET}/../images/boot/kernel.img
 
 exit 0
 

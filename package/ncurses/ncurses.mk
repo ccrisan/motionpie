@@ -27,7 +27,8 @@ NCURSES_CONF_OPT = \
 	--enable-echo \
 	--enable-const \
 	--enable-overwrite \
-	--enable-pc-files
+	--enable-pc-files \
+	$(if $(BR2_HAVE_DOCUMENTATION),,--without-manpages)
 
 ifneq ($(BR2_ENABLE_DEBUG),y)
 NCURSES_CONF_OPT += --without-debug
@@ -115,7 +116,11 @@ define HOST_NCURSES_BUILD_CMDS
 endef
 
 HOST_NCURSES_CONF_OPT = \
-	--without-shared --without-gpm
+	--without-shared --without-gpm \
+	--without-manpages \
+	--without-cxx \
+	--without-cxx-binding \
+	--without-ada
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

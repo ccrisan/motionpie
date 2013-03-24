@@ -21,7 +21,7 @@ choice
 	prompt "Kernel version"
 
 config BR2_LINUX_KERNEL_3_8
-	bool "3.8.2"
+	bool "3.8.3"
 
 config BR2_LINUX_KERNEL_SAME_AS_HEADERS
 	bool "Same as toolchain kernel headers"
@@ -76,7 +76,7 @@ config BR2_LINUX_KERNEL_CUSTOM_GIT_VERSION
 
 config BR2_LINUX_KERNEL_VERSION
 	string
-	default "3.8.2" if BR2_LINUX_KERNEL_3_8
+	default "3.8.3" if BR2_LINUX_KERNEL_3_8
 	default BR2_DEFAULT_KERNEL_HEADERS if BR2_LINUX_KERNEL_SAME_AS_HEADERS
 	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE if BR2_LINUX_KERNEL_CUSTOM_VERSION
 	default "custom" if BR2_LINUX_KERNEL_CUSTOM_TARBALL
@@ -212,6 +212,19 @@ config BR2_LINUX_KERNEL_IMAGE_TARGET_NAME
 	help
 	  Specify the kernel make target to build the kernel that you
 	  need.
+
+config BR2_LINUX_KERNEL_UIMAGE_LOADADDR
+	string "load address (for 3.7+ multi-platform image)"
+	depends on BR2_arm || BR2_armeb
+	depends on BR2_LINUX_KERNEL_UIMAGE || BR2_LINUX_KERNEL_APPENDED_UIMAGE
+	help
+	  If your ARM system's Linux kernel is configured with the new (3.7+)
+	  multi-architecture support (CONFIG_ARCH_MULTIPLATFORM=y in your
+	  kernel config), then it is necessary to specify a kernel load address
+	  when building the uImage. This should be a hexadecimal string
+	  beginning with 0x, for example: 0x00008000.
+
+	  If unsure, let this option empty.
 
 config BR2_LINUX_KERNEL_DTS_SUPPORT
 	bool "Device tree support"

@@ -131,21 +131,26 @@ if ! $SHELL --version 2>&1 | grep -q '^GNU bash'; then
 fi;
 
 # Check that a few mandatory programs are installed
-for prog in awk bison flex msgfmt makeinfo patch gzip bzip2 perl tar wget cpio python unzip rsync ${DL_TOOLS} ; do
+missing_progs="no"
+for prog in patch perl tar wget cpio python unzip rsync ${DL_TOOLS} ; do
     if ! which $prog > /dev/null ; then
-	/bin/echo -e "\nYou must install '$prog' on your build machine";
-	if test $prog = "makeinfo" ; then
-	    /bin/echo -e "makeinfo is usually part of the texinfo package in your distribution\n"
-	elif test $prog = "msgfmt" ; then
-	    /bin/echo -e "msgfmt is usually part of the gettext package in your distribution\n"
-	elif test $prog = "svn" ; then
-	    /bin/echo -e "svn is usually part of the subversion package in your distribution\n"
-	else
-	    /bin/echo -e "\n"
+	/bin/echo -e "You must install '$prog' on your build machine";
+	missing_progs="yes"
+	if test $prog = "svn" ; then
+	    /bin/echo -e "  svn is usually part of the subversion package in your distribution"
+	elif test $prog = "hg" ; then
+            /bin/echo -e "  hg is usually part of the mercurial package in your distribution"
+	elif test $prog = "zcat" ; then
+            /bin/echo -e "  zcat is usually part of the gzip package in your distribution"
+	elif test $prog = "bzcat" ; then
+            /bin/echo -e "  bzcat is usually part of the bzip2 package in your distribution"
 	fi
-	exit 1;
     fi
 done
+
+if test "${missing_progs}" = "yes" ; then
+    exit 1
+fi
 
 if grep ^BR2_TOOLCHAIN_BUILDROOT=y $BUILDROOT_CONFIG > /dev/null && \
    grep ^BR2_ENABLE_LOCALE=y       $BUILDROOT_CONFIG > /dev/null ; then
@@ -186,4 +191,21 @@ if grep -q ^BR2_HOSTARCH_NEEDS_IA32_LIBS=y $BUILDROOT_CONFIG ; then
 	/bin/echo -e "compatibility libraries."
 	exit 1
     fi
+fi
+
+# Check that the Perl installation is complete enough to build
+# host-autoconf.
+if ! perl  -e "require Data::Dumper" > /dev/null 2>&1 ; then
+    /bin/echo -e "Your Perl installation is not complete enough, at least Data::Dumper is missing."
+    /bin/echo -e "On Debian/Ubuntu distributions, install the 'perl' package."
+    exit 1
+fi
+
+# Check that we have the SSL certificates to make https:// downloads
+# work.
+if ! test -d /etc/ssl/certs; then
+    /bin/echo -e "Your system lacks Common CA certificates for SSL."
+    /bin/echo -e "This prevents https:// downloads from succeeding."
+    /bin/echo -e "On Debian/Ubuntu distributions, install 'ca-certificates' package."
+    exit 1
 fi

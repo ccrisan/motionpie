@@ -4,7 +4,7 @@
 #
 #############################################################
 
-OPENVPN_VERSION = 2.3.0
+OPENVPN_VERSION = 2.3.1
 OPENVPN_SITE = http://swupdate.openvpn.net/community/releases
 OPENVPN_DEPENDENCIES = host-pkgconf
 OPENVPN_CONF_OPT = --disable-plugin-auth-pam --enable-iproute2
@@ -17,10 +17,14 @@ OPENVPN_CONF_OPT += --enable-small --disable-plugins \
 	--disable-debug --disable-eurephia
 endif
 
+# Busybox 1.21+ places the ip applet in the "correct" place
+# but previous versions didn't.
 ifeq ($(BR2_PACKAGE_IPROUTE2),y)
 OPENVPN_CONF_ENV += IPROUTE=/sbin/ip
-else
+else ifeq ($(BR2_BUSYBOX_VERSION_1_19_X)$(BR2_BUSYBOX_VERSION_1_20_X),y)
 OPENVPN_CONF_ENV += IPROUTE=/bin/ip
+else
+OPENVPN_CONF_ENV += IPROUTE=/sbin/ip
 endif
 
 ifeq ($(BR2_PACKAGE_OPENVPN_LZO),y)

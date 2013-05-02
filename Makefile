@@ -501,19 +501,16 @@ endif
 		echo "PRETTY_NAME=\"Buildroot $(BR2_VERSION)\"" \
 	) >  $(TARGET_DIR)/etc/os-release
 
-	@for dir in $(call qstrip,$(BR2_ROOTFS_OVERLAY)); do \
-		$(call MESSAGE,"Copying overlay $${dir}"); \
+	@$(foreach d, $(call qstrip,$(BR2_ROOTFS_OVERLAY)), \
+		$(call MESSAGE,"Copying overlay $(d)"); \
 		rsync -a \
 			--exclude .empty --exclude .svn --exclude .git \
 			--exclude .hg --exclude '*~' \
-			$${dir}/ $(TARGET_DIR); \
-	done
+			$(d)/ $(TARGET_DIR)$(sep))
 
-ifneq ($(BR2_ROOTFS_POST_BUILD_SCRIPT),"")
-	@$(call MESSAGE,"Executing post-build script\(s\)")
 	@$(foreach s, $(call qstrip,$(BR2_ROOTFS_POST_BUILD_SCRIPT)), \
+		$(call MESSAGE,"Executing post-build script $(s)"); \
 		$(s) $(TARGET_DIR)$(sep))
-endif
 
 ifeq ($(BR2_ENABLE_LOCALE_PURGE),y)
 LOCALE_WHITELIST=$(BUILD_DIR)/locales.nopurge
@@ -557,11 +554,9 @@ target-generatelocales: host-localedef
 endif
 
 target-post-image:
-ifneq ($(BR2_ROOTFS_POST_IMAGE_SCRIPT),"")
-	@$(call MESSAGE,"Executing post-image script\(s\)")
 	@$(foreach s, $(call qstrip,$(BR2_ROOTFS_POST_IMAGE_SCRIPT)), \
+		$(call MESSAGE,"Executing post-image script $(s)"); \
 		$(s) $(BINARIES_DIR)$(sep))
-endif
 
 toolchain-eclipse-register:
 	./support/scripts/eclipse-register-toolchain `readlink -f $(O)` $(notdir $(TARGET_CROSS)) $(BR2_ARCH)

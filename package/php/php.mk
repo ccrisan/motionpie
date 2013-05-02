@@ -4,7 +4,7 @@
 #
 #############################################################
 
-PHP_VERSION = 5.3.23
+PHP_VERSION = 5.3.24
 PHP_SOURCE = php-$(PHP_VERSION).tar.bz2
 PHP_SITE = http://www.php.net/distributions
 PHP_INSTALL_STAGING = YES
@@ -66,6 +66,7 @@ ifeq ($(BR2_PACKAGE_PHP_EXT_OPENSSL),y)
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_LIBXML2),y)
+	PHP_CONF_ENV += php_cv_libxml_build_works=yes
 	PHP_CONF_OPT += --enable-libxml --with-libxml-dir=${STAGING_DIR}/usr
 	PHP_DEPENDENCIES += libxml2
 endif

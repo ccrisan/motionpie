@@ -3,10 +3,11 @@
 # rpi-userland
 #
 #############################################################
+
 RPI_USERLAND_VERSION = rpi-buildroot
 RPI_USERLAND_SITE = git://github.com/gamaral/rpi-userland.git
 RPI_USERLAND_LICENSE = BSD-3c
-RPI_USERLAND_LICENSE_FILE = LICENCE
+RPI_USERLAND_LICENSE_FILES = LICENCE
 RPI_USERLAND_INSTALL_STAGING = YES
 RPI_USERLAND_INSTALL_TARGET = YES
 

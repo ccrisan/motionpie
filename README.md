@@ -56,20 +56,6 @@ Building
 	make nconfig         # if you want to add packages or fiddle around with it
 	make                 # build (NOTICE: Don't use the **-j** switch, it's set to auto-detect)
 
-Updating
---------
-
-Since I keep this overlay fork rebased to buildroot master, you will need to
-replace your local branch completely:
-
-	git fetch origin
-	git checkout origin/rpi
-	git checkout -B rpi
-
-I added a little helper script to the base directory that can do the legwork:
-
-	./rpi-buildroot-update.sh
-
 Deploying
 ---------
 

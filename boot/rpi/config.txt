@@ -4,11 +4,11 @@
 # See http://buildroot.org/downloads/manual/manual.html#rootfs-custom
 # and http://elinux.org/RPiconfig for a description of config.txt syntax
 
-# arm_freq=700
-# core_freq=250
-# disable_overscan=1
-# sdram_freq=400
-# over_voltage=0
+# Turbo
+#arm_freq=1000
+#core_freq=500
+#sdram_freq=500
+#over_voltage=6
 
 gpu_mem_256=128
 gpu_mem_512=256

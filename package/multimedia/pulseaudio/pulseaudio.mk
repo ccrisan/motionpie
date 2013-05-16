@@ -28,9 +28,22 @@ PULSEAUDIO_DEPENDENCIES = \
 	$(if $(BR2_PACKAGE_UDEV),udev) \
 	$(if $(BR2_PACKAGE_OPENSSL),openssl) \
 	$(if $(BR2_PACKAGE_FFTW),fftw) \
-	$(if $(BR2_PACKAGE_ORC),orc) \
 	$(if $(BR2_PACKAGE_WEBRTC_AUDIO_PROCESSING),webrtc-audio-processing) \
 	$(if $(BR2_PACKAGE_SYSTEMD),systemd)
+
+# One patch touches configure.ac. We unconditionnally need libglib2
+# because configure.ac uses AM_GLIB_GNU_GETTEXT. This unconditionnal
+# dependency can be removed once the patch is removed.
+PULSEAUDIO_AUTORECONF = YES
+PULSEAUDIO_DEPENDENCIES += libglib2
+
+ifeq ($(BR2_PACKAGE_ORC),y)
+PULSEAUDIO_DEPENDENCIES += orc
+PULSEAUDIO_CONF_ENV += ORCC=$(HOST_DIR)/usr/bin/orcc
+PULSEAUDIO_CONF_OPT += --enable-orc
+else
+PULSEAUDIO_CONF_OPT += --disable-orc
+endif
 
 ifneq ($(BR2_INSTALL_LIBSTDCPP),y)
 # The optional webrtc echo canceller is written in C++, causing auto* to want
@@ -82,6 +95,18 @@ define PULSEAUDIO_REMOVE_VALA
 endef
 
 PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_REMOVE_VALA
+endif
+
+ifeq ($(BR2_PACKAGE_PULSEAUDIO_DAEMON),y)
+define PULSEAUDIO_USERS
+	pulse -1 pulse -1 * /var/run/pulse - audio,pulse-access
+endef
+
+define PULSEAUDIO_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 755 package/multimedia/pulseaudio/S50pulseaudio \
+		$(TARGET_DIR)/etc/init.d/S50pulseaudio
+endef
+
 endif
 
 $(eval $(autotools-package))

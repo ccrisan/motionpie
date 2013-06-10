@@ -25,6 +25,15 @@ Index: b/mkspecs/devices/linux-buildroot-g++/qmake.conf
 +
 +load(device_config)
 +
++MODULE_VERSION = 5.0.2
++
++QMAKE_INCDIR_EGL        = $$[QT_SYSROOT]/opt/vc/include $$[QT_SYSROOT]/opt/vc/include/interface/vcos/pthreads
++QMAKE_INCDIR_OPENGL_ES2 = $${QMAKE_INCDIR_EGL}
++QMAKE_LFLAGS            += -Wl,-rpath-link,$$[QT_SYSROOT]/opt/vc/lib
++QMAKE_LIBDIR_EGL        = $$[QT_SYSROOT]/opt/vc/lib
++QMAKE_LIBDIR_OPENGL_ES2 = $$QMAKE_LIBDIR_EGL
++QMAKE_LIBS_EGL          = -lEGL -lGLESv2
++QMAKE_LIBS_OPENGL_ES2   = -lEGL -lGLESv2
 +QT_QPA_DEFAULT_PLATFORM = eglfs
 +
 +BUILDROOT_CROSS_COMPILE =

@@ -1,3 +1,20 @@
+2013.05, Released May 31th, 2013:
+
+	Minor fixes.
+
+	External toolchain wrapper fix for if host/usr/bin is placed
+	in the patch.
+
+	Updated/fixed packages: acpid, at91bootstrap, czmq, elf2flt,
+	flex, jamvm, kmod, libplayer, libtirpc, libv4,
+	lttng-babeltrace, opengl, qt5jsbackend, udpcast, wvstreams
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#4868: Buildroot compile failure for toolchain/gdb-7.4/intl/reloc...
+	#4988: flex and m4 problems
+	#5912: obsolete CVS files
+
 2013.05-rc3, Released May 25th, 2013:
 
 	Minor fixes.

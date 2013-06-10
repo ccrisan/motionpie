@@ -1,7 +1,7 @@
 # Makefile for buildroot2
 #
 # Copyright (C) 1999-2005 by Erik Andersen <andersen@codepoet.org>
-# Copyright (C) 2006-2012 by the Buildroot developers <buildroot@uclibc.org>
+# Copyright (C) 2006-2013 by the Buildroot developers <buildroot@uclibc.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2013.05-rc3
+export BR2_VERSION:=2013.05
 
 # Check for minimal make version (note: this check will break at make 10.x)
 MIN_MAKE_VERSION=3.81

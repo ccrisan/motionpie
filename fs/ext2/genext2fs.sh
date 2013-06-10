@@ -49,6 +49,14 @@ e2tunefsck() {
         tune2fs "$@" "${IMG}"
     fi
 
+    # genext2fs does not generate a UUID, but fsck will whine if one is
+    # is missing, so we need to add a UUID.
+    # Of course, this has to happend _before_ we run fsck.
+    # Although a random UUID may seem bad for reproducibility, there
+    # already are so many things that are not reproducible in a
+    # filesystem: file dates, file ordering, content of the files...
+    tune2fs -U random "${IMG}"
+
     # After changing filesystem options, running fsck is required
     # (see: man tune2fs). Running e2fsck in other cases will ensure
     # coherency of the filesystem, although it is not required.
@@ -69,12 +77,10 @@ e2tunefsck() {
     printf "\ne2fsck was successfully run on '%s' (ext%d)\n\n"  \
            "${IMG##*/}" "${GEN}"
 
-    # e2fsck will force a *random* UUID, which is bad
-    # for reproducibility, so we do not want it.
     # Remove count- and time-based checks, they are not welcome
     # on embedded devices, where they can cause serious boot-time
     # issues by tremendously slowing down the boot.
-    tune2fs -U clear -c 0 -i 0 "${IMG}"
+    tune2fs -c 0 -i 0 "${IMG}"
 }
 
 # Check we know what generation to generate

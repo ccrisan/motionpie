@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # directfb
 #
-#############################################################
+################################################################################
+
 DIRECTFB_VERSION_MAJOR = 1.6
 DIRECTFB_VERSION = $(DIRECTFB_VERSION_MAJOR).3
 DIRECTFB_SITE = http://www.directfb.org/downloads/Core/DirectFB-$(DIRECTFB_VERSION_MAJOR)
@@ -43,7 +44,7 @@ endif
 ifeq ($(BR2_PACKAGE_XSERVER),y)
 DIRECTFB_CONF_OPT += --enable-x11
 else
-DIRECTFB_CONF_OPT += -disable-x11
+DIRECTFB_CONF_OPT += --disable-x11
 endif
 
 ifeq ($(BR2_PACKAGE_DIRECTFB_UNIQUE),y)
@@ -106,6 +107,14 @@ DIRECTFB_CONF_OPT += --enable-jpeg
 DIRECTFB_DEPENDENCIES += jpeg
 else
 DIRECTFB_CONF_OPT += --disable-jpeg
+endif
+
+ifeq ($(BR2_PACKAGE_DIRECTFB_IMLIB2),y)
+DIRECTFB_CONF_OPT += --enable-imlib2
+DIRECTFB_DEPENDENCIES += imlib2
+DIRECTFB_CONF_ENV += ac_cv_path_IMLIB2_CONFIG=$(STAGING_DIR)/usr/bin/imlib2-config
+else
+DIRECTFB_CONF_OPT += --disable-imlib2
 endif
 
 ifeq ($(BR2_PACKAGE_DIRECTFB_DITHER_RGB16),y)

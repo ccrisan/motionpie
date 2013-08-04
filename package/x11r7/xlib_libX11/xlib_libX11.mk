@@ -1,6 +1,6 @@
 ################################################################################
 #
-# xlib_libX11 -- X.Org X11 library
+# xlib_libX11
 #
 ################################################################################
 
@@ -43,6 +43,7 @@ define XLIB_LIBX11_DISABLE_MAKEKEYS_X11_CFLAGS
 endef
 
 XLIB_LIBX11_POST_PATCH_HOOKS += XLIB_LIBX11_DISABLE_MAKEKEYS_X11_CFLAGS
+HOST_XLIB_LIBX11_POST_PATCH_HOOKS += XLIB_LIBX11_DISABLE_MAKEKEYS_X11_CFLAGS
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

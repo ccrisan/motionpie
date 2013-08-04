@@ -1,6 +1,9 @@
-# Include files required for the internal toolchain backend
+# Triggerring the build of the host-gcc-final will automaticaly do the
+# build of binutils, uClibc, kernel headers and all the intermediate
+# gcc steps.
 
-include toolchain/elf2flt/elf2flt.mk
-include toolchain/gcc/gcc-uclibc-4.x.mk
-include toolchain/kernel-headers/kernel-headers.mk
-include toolchain/uClibc/uclibc.mk
+include toolchain/helpers.mk
+
+BUILDROOT_LIBC = $(call qstrip,$(BR2_TOOLCHAIN_BUILDROOT_LIBC))
+
+toolchain-buildroot: host-gcc-final

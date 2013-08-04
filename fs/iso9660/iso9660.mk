@@ -1,14 +1,14 @@
-#############################################################
+################################################################################
 #
 # Build the iso96600 root filesystem image
 #
 # Cannot be converted to the ROOTFS_TARGET infrastructure, because of
 # the temporary construction in ISO9660_TARGET_DIR.
 #
-#############################################################
+################################################################################
 
-ISO9660_TARGET_DIR=$(BUILD_DIR)/iso9660
-ISO9660_BOOT_MENU:=$(call qstrip,$(BR2_TARGET_ROOTFS_ISO9660_BOOT_MENU))
+ISO9660_TARGET_DIR = $(BUILD_DIR)/iso9660
+ISO9660_BOOT_MENU := $(call qstrip,$(BR2_TARGET_ROOTFS_ISO9660_BOOT_MENU))
 
 ISO9660_CPIO_EXT-$(BR2_TARGET_ROOTFS_CPIO_GZIP)  = .gz
 ISO9660_CPIO_EXT-$(BR2_TARGET_ROOTFS_CPIO_BZIP2) = .bz2
@@ -36,11 +36,11 @@ $(BINARIES_DIR)/rootfs.iso9660: host-cdrkit host-fakeroot linux rootfs-cpio grub
 
 rootfs-iso9660: $(BINARIES_DIR)/rootfs.iso9660
 
-#############################################################
+################################################################################
 #
 # Toplevel Makefile options
 #
-#############################################################
+################################################################################
 ifeq ($(BR2_TARGET_ROOTFS_ISO9660),y)
 TARGETS+=rootfs-iso9660
 endif

@@ -1,16 +1,22 @@
-#############################################################
+################################################################################
 #
 # kmod
 #
-#############################################################
+################################################################################
 
-KMOD_VERSION = 13
+KMOD_VERSION = 14
 KMOD_SOURCE = kmod-$(KMOD_VERSION).tar.xz
 KMOD_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/kmod/
-KMOD_LICENSE = GPLv2+ LGPLv2.1+
-KMOD_LICENSE_FILES = COPYING libkmod/COPYING
 KMOD_INSTALL_STAGING = YES
 KMOD_DEPENDENCIES = host-pkgconf
+
+# license info for libkmod only, conditionally add more below
+KMOD_LICENSE = LGPLv2.1+
+KMOD_LICENSE_FILES = libkmod/COPYING
+
+# static linking not supported, see
+# https://git.kernel.org/cgit/utils/kernel/kmod/kmod.git/commit/?id=b7016153ec8
+KMOD_CONF_OPT = --disable-static --enable-shared
 
 ifneq ($(BR2_HAVE_DOCUMENTATION),y)
 KMOD_CONF_OPT += --disable-manpages
@@ -27,6 +33,11 @@ KMOD_CONF_OPT += --with-xz
 endif
 
 ifeq ($(BR2_PACKAGE_KMOD_TOOLS),y)
+
+# add license info for kmod tools
+KMOD_LICENSE += GPLv2+
+KMOD_LICENSE_FILES += COPYING
+
 # take precedence over busybox / module-init-tools implementations
 KMOD_DEPENDENCIES += \
 	$(if $(BR2_PACKAGE_BUSYBOX),busybox) \

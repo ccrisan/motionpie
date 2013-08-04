@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# OpenCV (Open Source Computer Vision)
+# opencv
 #
-#############################################################
+################################################################################
+
 OPENCV_VERSION = 2.4.2
 OPENCV_SITE    = http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/$(OPENCV_VERSION)
 OPENCV_SOURCE  = OpenCV-$(OPENCV_VERSION).tar.bz2
@@ -168,12 +169,10 @@ endef
 OPENCV_POST_INSTALL_TARGET_HOOKS += OPENCV_CLEAN_INSTALL_DOC
 endif
 
-ifneq ($(BR2_HAVE_DEVFILES),y)
 define OPENCV_CLEAN_INSTALL_CMAKE
 	$(RM) -f $(TARGET_DIR)/usr/share/OpenCV/OpenCVConfig*.cmake
 endef
 OPENCV_POST_INSTALL_TARGET_HOOKS += OPENCV_CLEAN_INSTALL_CMAKE
-endif
 
 ifneq ($(BR2_PACKAGE_OPENCV_INSTALL_DATA),y)
 define OPENCV_CLEAN_INSTALL_DATA

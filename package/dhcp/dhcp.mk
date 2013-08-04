@@ -1,11 +1,12 @@
-#############################################################
+################################################################################
 #
 # dhcp
 #
-#############################################################
+################################################################################
 
 DHCP_VERSION = 4.1-ESV-R8
 DHCP_SITE = http://ftp.isc.org/isc/dhcp/$(DHCP_VERSION)
+DHCP_INSTALL_STAGING = YES
 DHCP_LICENSE = ISC
 DHCP_LICENSE_FILES = LICENSE
 DHCP_CONF_ENV = ac_cv_file__dev_random=yes
@@ -16,6 +17,10 @@ DHCP_CONF_OPT = \
 	--with-srv-pid-file=/var/run/dhcpd.pid \
 	--with-cli-pid-file=/var/run/dhclient.pid \
 	--with-relay-pid-file=/var/run/dhcrelay.pid
+
+ifeq ($(BR2_PACKAGE_DHCP_SERVER_DELAYED_ACK),y)
+        DHCP_CONF_OPT += --enable-delayed-ack
+endif
 
 ifneq ($(BR2_INET_IPV6),y)
         DHCP_CONF_OPT += --disable-dhcpv6

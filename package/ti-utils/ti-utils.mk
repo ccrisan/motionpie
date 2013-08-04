@@ -1,11 +1,11 @@
-#############################################################
+################################################################################
 #
 # ti-utils
 #
-#############################################################
+################################################################################
 
 TI_UTILS_VERSION = 06dbdb2
-TI_UTILS_SITE = http://github.com/gxk/ti-utils/tarball/master
+TI_UTILS_SITE = http://github.com/gxk/ti-utils/tarball/$(TI_UTILS_VERSION)
 TI_UTILS_DEPENDENCIES = libnl
 
 define TI_UTILS_BUILD_CMDS

@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # dialog
 #
-#############################################################
+################################################################################
 
 DIALOG_VERSION = 1.1-20111020
 DIALOG_SOURCE = dialog-$(DIALOG_VERSION).tgz
@@ -14,7 +14,7 @@ DIALOG_LICENSE = LGPLv2.1
 DIALOG_LICENSE_FILES = COPYING
 
 ifneq ($(BR2_ENABLE_LOCALE),y)
-DIALOG_DEPENDENCIES+=libiconv
+DIALOG_DEPENDENCIES += libiconv
 endif
 
 define DIALOG_INSTALL_TARGET_CMDS

@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # gpsd
 #
-#############################################################
+################################################################################
 
 GPSD_VERSION = 3.9
 GPSD_SITE = http://download-mirror.savannah.gnu.org/releases/gpsd/
@@ -221,5 +221,18 @@ define GPSD_INSTALL_STAGING_CMDS
 		$(GPSD_SCONS_OPTS) \
 		install)
 endef
+
+ifeq ($(BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV),y)
+define GPSD_INSTALL_UDEV_RULES
+	(cd $(@D); \
+		$(GPSD_SCONS_ENV) \
+		DESTDIR=$(TARGET_DIR) \
+		$(SCONS) \
+		$(GPSD_SCONS_OPTS) \
+		udev-install)
+endef
+
+GPSD_POST_INSTALL_TARGET_HOOKS += GPSD_INSTALL_UDEV_RULES
+endif
 
 $(eval $(generic-package))

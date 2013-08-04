@@ -38,11 +38,72 @@ comment "Please look at the options which have been selected "
 comment "and read their help text.                           "
 comment "As long as these options stay selected, the build   "
 comment "will fail.                                          "
+comment "Note: at some point in the future, the oldest legacy"
+comment "options will be removed, and configuration files    "
+comment "that still have those options set, will fail to     "
+comment "build, or run, in unpredictable ways.               "
 endif
 
-#
-# Legacy options since 2013.02
-#
+###############################################################################
+comment "Legacy options removed in 2013.08"
+
+config BR2_PACKAGE_DOSFSTOOLS_DOSFSCK
+	bool "dosfstools dosfsck renamed to fsck.fat"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT
+	help
+	  dosfsck was renamed upstream to fsck.fat for consistency.
+
+config BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL
+	bool "dosfstools dosfslabel renamed to fatlabel"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOSFSTOOLS_FATLABEL
+	help
+	  doslabel was renamed upstream to fatlabel for consistency.
+
+config BR2_PACKAGE_DOSFSTOOLS_MKDOSFS
+	bool "dosfstools mkdosfs renamed to mkfs.fat"
+	select BR2_LEGACY
+	select BR2_PACKAGE_DOSFSTOOLS_MKFS_FAT
+	help
+	  mkdosfs was renamed upstream to mkfs.fat for consistency.
+
+config BR2_ELF2FLT
+	bool "the elf2flt option has been renamed"
+	select BR2_LEGACY
+	help
+	  The BR2_ELF2FLT option has been renamed to
+	  BR2_PACKAGE_HOST_ELF2FLT due to the conversion of elf2flt to
+	  the package infrastructure.
+
+config BR2_VFP_FLOAT
+	bool "the ARM VFP floating point option has been renamed"
+	select BR2_LEGACY
+	help
+	  Due to a major refactoring of the floating-point handling of
+	  the ARM architecture support, the BR2_VFP_FLOAT option has
+	  been replaced with a choice of options that allows to select
+	  between various VFP versions/capabilities.
+
+###############################################################################
+comment "Legacy options removed in 2013.05"
+
+config BR2_PACKAGE_LINUX_FIRMWARE_RTL_8192
+	bool "Realtek 8192 replaced by Realtek 81xx"
+	select BR2_LEGACY
+	select BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX
+	help
+	  Now covers the whole Realtek 81xx familly: 8188/8192.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_RTL_8712
+	bool "Realtek 8712 replaced by Realtek 87xx"
+	select BR2_LEGACY
+	select BR2_PACKAGE_LINUX_FIRMWARE_RTL_87XX
+	help
+	  Now covers the whole Realtek 87xx familly: 8712/8723.
+
+###############################################################################
+comment "Legacy options removed in 2013.02"
 
 config BR2_sa110
 	bool "sa110 ARM target switched to strongarm"
@@ -108,9 +169,9 @@ config BR2_PACKAGE_DIRECTB_TESTS
 	  The option has been renamed
 	  BR2_PACKAGE_DIRECTFB_TESTS.
 
-#
-# Legacy options since 2012.11
-#
+###############################################################################
+comment "Legacy options removed in 2012.11"
+
 config BR2_PACKAGE_CUSTOMIZE
 	bool "customize package has been removed"
 	select BR2_LEGACY
@@ -145,10 +206,8 @@ config BR2_PACKAGE_PTHREAD_STUBS
 	  For consistency reason, the pthread-stubs package has been
 	  renamed to xlib_libpthread-stubs.
 
-
-#
-# Legacy options since 2012.08
-#
+###############################################################################
+comment "Legacy options removed in 2012.08"
 
 config BR2_PACKAGE_GETTEXT_STATIC
 	bool "libgettext.a is now selected by BR2_PREFER_STATIC_LIB"

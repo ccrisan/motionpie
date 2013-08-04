@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # python3
 #
-#############################################################
+################################################################################
+
 PYTHON3_VERSION_MAJOR = 3.3
 PYTHON3_VERSION       = $(PYTHON3_VERSION_MAJOR).0
 PYTHON3_SOURCE        = Python-$(PYTHON3_VERSION).tar.bz2
@@ -23,12 +24,8 @@ HOST_PYTHON3_CONF_OPT += 	\
 	--disable-codecs-cjk	\
 	--disable-nis		\
 	--disable-unicodedata	\
-	--disable-dbm		\
-	--disable-gdbm		\
-	--disable-bsddb		\
 	--disable-test-modules	\
-	--disable-bz2		\
-	--disable-ssl
+	--disable-idle3
 
 HOST_PYTHON3_MAKE_ENV = \
 	PYTHON_MODULES_INCLUDE=$(HOST_DIR)/usr/include \
@@ -61,6 +58,8 @@ endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_CURSES),y)
 PYTHON3_DEPENDENCIES += ncurses
+else
+PYTHON3_CONF_OPT += --disable-curses
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_PYEXPAT),y)
@@ -76,14 +75,24 @@ endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_SQLITE),y)
 PYTHON3_DEPENDENCIES += sqlite
+else
+PYTHON3_CONF_OPT += --disable-sqlite3
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_SSL),y)
-PYTHON_DEPENDENCIES += openssl
+PYTHON3_DEPENDENCIES += openssl
+endif
+
+ifneq ($(BR2_PACKAGE_PYTHON3_CODECSCJK),y)
+PYTHON3_CONF_OPT += --disable-codecs-cjk
+endif
+
+ifneq ($(BR2_PACKAGE_PYTHON3_UNICODEDATA),y)
+PYTHON3_CONF_OPT += --disable-unicodedata
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_BZIP2),y)
-PYTHON_DEPENDENCIES += bzip2
+PYTHON3_DEPENDENCIES += bzip2
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_ZLIB),y)
@@ -105,10 +114,9 @@ PYTHON3_CONF_OPT += \
 	--disable-pydoc		\
 	--disable-test-modules	\
 	--disable-lib2to3	\
-	--disable-gdbm		\
 	--disable-tk		\
 	--disable-nis		\
-	--disable-dbm
+	--disable-idle3
 
 PYTHON3_MAKE_ENV = \
 	_PROJECT_BASE=$(PYTHON3_DIR) \
@@ -126,22 +134,14 @@ endef
 PYTHON3_POST_INSTALL_STAGING_HOOKS += PYTHON3_FIXUP_LIBDIR
 
 #
-# Development files removal
-#
-define PYTHON3_REMOVE_DEVFILES
-	rm -f $(TARGET_DIR)/usr/bin/python$(PYTHON3_VERSION_MAJOR)-config
-	rm -f $(TARGET_DIR)/usr/bin/python3-config
-endef
-
-ifneq ($(BR2_HAVE_DEVFILES),y)
-PYTHON3_POST_INSTALL_TARGET_HOOKS += PYTHON3_REMOVE_DEVFILES
-endif
-
-#
 # Remove useless files. In the config/ directory, only the Makefile
 # and the pyconfig.h files are needed at runtime.
 #
 define PYTHON3_REMOVE_USELESS_FILES
+	rm -f $(TARGET_DIR)/usr/bin/python$(PYTHON3_VERSION_MAJOR)-config
+	rm -f $(TARGET_DIR)/usr/bin/python$(PYTHON3_VERSION_MAJOR)m-config
+	rm -f $(TARGET_DIR)/usr/bin/python3-config
+	rm -f $(TARGET_DIR)/usr/bin/smtpd.py.3
 	for i in `find $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/config-3.3m/ \
 		-type f -not -name pyconfig.h -a -not -name Makefile` ; do \
 		rm -f $$i ; \

@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # libvncserver
 #
-#############################################################
+################################################################################
 
 LIBVNCSERVER_VERSION = 0.9.9
 LIBVNCSERVER_SOURCE = LibVNCServer-$(LIBVNCSERVER_VERSION).tar.gz
@@ -10,6 +10,7 @@ LIBVNCSERVER_SITE = http://downloads.sourceforge.net/project/libvncserver/libvnc
 LIBVNCSERVER_LICENSE = GPLv2+
 LIBVNCSERVER_LICENSE_FILES = COPYING
 LIBVNCSERVER_INSTALL_STAGING = YES
+LIBVNCSERVER_CONFIG_SCRIPTS = libvncserver-config
 
 # only used for examples
 LIBVNCSERVER_CONF_OPT += --with-sdl-config=/bin/false

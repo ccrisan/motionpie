@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # libdnet
 #
-#############################################################
+################################################################################
 
 LIBDNET_VERSION = 1.11
 LIBDNET_SOURCE = libdnet-$(LIBDNET_VERSION).tar.gz
@@ -34,8 +34,6 @@ define LIBDNET_REMOVE_CONFIG_SCRIPT
 	$(RM) -f $(TARGET_DIR)/usr/bin/dnet-config
 endef
 
-ifneq ($(BR2_HAVE_DEVFILES),y)
 LIBDNET_POST_INSTALL_TARGET_HOOKS += LIBDNET_REMOVE_CONFIG_SCRIPT
-endif
 
 $(eval $(autotools-package))

@@ -1,5 +1,8 @@
 config BR2_ARCH_IS_64
-       bool
+	bool
+
+config BR2_SOFT_FLOAT
+	bool
 
 choice
 	prompt "Target Architecture"
@@ -190,6 +193,24 @@ config BR2_GCC_TARGET_CPU
 	string
 
 config BR2_GCC_TARGET_CPU_REVISION
+	string
+
+# The value of this option will be passed as --with-fpu=<value> when
+# building gcc (internal backend) or -mfpu=<value> in the toolchain
+# wrapper (external toolchain)
+config BR2_GCC_TARGET_FPU
+	string
+
+# The value of this option will be passed as --with-float=<value> when
+# building gcc (internal backend) or -mfloat-abi=<value> in the toolchain
+# wrapper (external toolchain)
+config BR2_GCC_TARGET_FLOAT_ABI
+	string
+
+# The value of this option will be passed as --with-mode=<value> when
+# building gcc (internal backend) or -m<value> in the toolchain
+# wrapper (external toolchain)
+config BR2_GCC_TARGET_MODE
 	string
 
 # Set up target binary format

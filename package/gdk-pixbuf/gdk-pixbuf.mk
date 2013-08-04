@@ -1,13 +1,15 @@
-#############################################################
+################################################################################
 #
 # gdk-pixbuf
 #
-#############################################################
+################################################################################
 
-GDK_PIXBUF_MAJOR_VERSION = 2.24
+GDK_PIXBUF_MAJOR_VERSION = 2.28
 GDK_PIXBUF_VERSION = $(GDK_PIXBUF_MAJOR_VERSION).1
 GDK_PIXBUF_SOURCE = gdk-pixbuf-$(GDK_PIXBUF_VERSION).tar.xz
 GDK_PIXBUF_SITE = http://ftp.gnome.org/pub/gnome/sources/gdk-pixbuf/$(GDK_PIXBUF_MAJOR_VERSION)
+GDK_PIXBUF_LICENSE = LGPLv2+
+GDK_PIXBUF_LICENSE_FILES = COPYING
 GDK_PIXBUF_INSTALL_STAGING = YES
 
 GDK_PIXBUF_CONF_ENV = \
@@ -40,7 +42,6 @@ GDK_PIXBUF_DEPENDENCIES += xlib_libX11
 endif
 
 GDK_PIXBUF_DEPENDENCIES += \
-	$(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) \
 	$(if $(BR2_ENABLE_LOCALE),,libiconv) \
 	host-pkgconf libglib2
 

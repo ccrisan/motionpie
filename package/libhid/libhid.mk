@@ -1,12 +1,12 @@
-#############################################################
+################################################################################
 #
 # libhid
 #
-#############################################################
+################################################################################
 
 LIBHID_VERSION = 0.2.16
 LIBHID_SOURCE = libhid-$(LIBHID_VERSION).tar.gz
-LIBHID_SITE = http://alioth.debian.org/frs/download.php/1958
+LIBHID_SITE = http://alioth.debian.org/frs/download.php/file/1958
 LIBHID_DEPENDENCIES = libusb-compat libusb
 LIBHID_INSTALL_STAGING = YES
 LIBHID_AUTORECONF = YES

@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# MatchBox Common
+# matchbox-common
 #
-#############################################################
+################################################################################
+
 MATCHBOX_COMMON_VERSION_MAJOR = 0.9
 MATCHBOX_COMMON_VERSION = $(MATCHBOX_COMMON_VERSION_MAJOR).1
 MATCHBOX_COMMON_SOURCE = matchbox-common-$(MATCHBOX_COMMON_VERSION).tar.bz2
@@ -15,6 +16,6 @@ ifeq ($(strip $(BR2_PACKAGE_MATCHBOX_COMMON_PDA)),y)
 	MATCHBOX_COMMON_CONF_OPT += --enable-pda-folders
 endif
 
-#############################################################
+################################################################################
 
 $(eval $(autotools-package))

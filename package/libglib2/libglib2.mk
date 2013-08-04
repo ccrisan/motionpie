@@ -1,13 +1,16 @@
-#############################################################
+################################################################################
 #
 # libglib2
 #
-#############################################################
-LIBGLIB2_VERSION_MAJOR = 2.30
+################################################################################
+
+LIBGLIB2_VERSION_MAJOR = 2.36
 LIBGLIB2_VERSION_MINOR = 3
 LIBGLIB2_VERSION = $(LIBGLIB2_VERSION_MAJOR).$(LIBGLIB2_VERSION_MINOR)
 LIBGLIB2_SOURCE = glib-$(LIBGLIB2_VERSION).tar.xz
 LIBGLIB2_SITE = http://ftp.gnome.org/pub/gnome/sources/glib/$(LIBGLIB2_VERSION_MAJOR)
+LIBGLIB2_LICENSE = LGPLv2+
+LIBGLIB2_LICENSE_FILES = COPYING
 
 LIBGLIB2_AUTORECONF = YES
 HOST_LIBGLIB2_AUTORECONF = YES
@@ -44,10 +47,12 @@ LIBGLIB2_CONF_ENV = \
 		ac_cv_path_GLIB_GENMARSHAL=$(HOST_DIR)/usr/bin/glib-genmarshal ac_cv_prog_F77=no \
 		ac_cv_func_posix_getgrgid_r=no glib_cv_long_long_format=ll \
 		ac_cv_func_printf_unix98=yes ac_cv_func_vsnprintf_c99=yes \
+		ac_cv_func_newlocale=no ac_cv_func_uselocale=no \
+		ac_cv_func_strtod_l=no ac_cv_func_strtoll_l=no ac_cv_func_strtoull_l=no \
 		gt_cv_c_wchar_t=$(if $(BR2_USE_WCHAR),yes,no)
 
 # old uClibc versions don't provide qsort_r
-ifeq ($(BR2_UCLIBC_VERSION_0_9_31)$(BR2_UCLIBC_VERSION_0_9_32)$(BR2_TOOLCHAIN_CTNG_uClibc)$(BR2_TOOLCHAIN_EXTERNAL_UCLIBC)$(BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEEL_V2)$(BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEBE_V2),y)
+ifeq ($(BR2_UCLIBC_VERSION_0_9_32)$(BR2_TOOLCHAIN_CTNG_uClibc)$(BR2_TOOLCHAIN_EXTERNAL_UCLIBC)$(BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEEL_V2)$(BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEBE_V2),y)
 LIBGLIB2_CONF_ENV += glib_cv_have_qsort_r=no
 else
 LIBGLIB2_CONF_ENV += glib_cv_have_qsort_r=yes
@@ -64,9 +69,9 @@ HOST_LIBGLIB2_CONF_OPT = \
 		--disable-dtrace \
 		--disable-systemtap \
 		--disable-gcov \
-		--disable-tests
+		--disable-modular-tests
 
-LIBGLIB2_CONF_OPT += --disable-tests
+LIBGLIB2_CONF_OPT += --disable-modular-tests
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),)
 	LIBGLIB2_CONF_OPT += --with-threads=none --disable-threads
 endif
@@ -98,9 +103,7 @@ define LIBGLIB2_REMOVE_DEV_FILES
 	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,glib-genmarshal glib-gettextize glib-mkenums gobject-query gtester gtester-report)
 endef
 
-ifneq ($(BR2_HAVE_DEVFILES),y)
 LIBGLIB2_POST_INSTALL_TARGET_HOOKS += LIBGLIB2_REMOVE_DEV_FILES
-endif
 
 define LIBGLIB2_REMOVE_GDB_FILES
 	rm -rf $(TARGET_DIR)/usr/share/glib-2.0/gdb

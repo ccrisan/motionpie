@@ -1,10 +1,13 @@
 config BR2_PACKAGE_GSTREAMER
 	bool "gstreamer"
 	depends on BR2_USE_WCHAR # glib2
-	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_TOOLCHAIN_HAS_THREADS # glib2
 	select BR2_PACKAGE_LIBGLIB2
 	help
 	  GStreamer is an open source multimedia framework.
+
+	  This 0.10.x version of GStreamer is incompatible with
+	  GStreamer 1.X.
 
 	  http://gstreamer.freedesktop.org/
 

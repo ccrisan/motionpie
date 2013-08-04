@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# libarchive (reusable C library for archive formats)
+# libarchive
 #
-#############################################################
+################################################################################
+
 LIBARCHIVE_VERSION = 3.0.4
 LIBARCHIVE_SITE = http://github.com/downloads/libarchive/libarchive
 LIBARCHIVE_SOURCE = libarchive-$(LIBARCHIVE_VERSION).tar.gz

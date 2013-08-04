@@ -1,10 +1,10 @@
-#############################################################
+################################################################################
 #
 # iptables
 #
-#############################################################
+################################################################################
 
-IPTABLES_VERSION = 1.4.18
+IPTABLES_VERSION = 1.4.19.1
 IPTABLES_SOURCE = iptables-$(IPTABLES_VERSION).tar.bz2
 IPTABLES_SITE = http://ftp.netfilter.org/pub/iptables
 IPTABLES_INSTALL_STAGING = YES
@@ -12,7 +12,7 @@ IPTABLES_DEPENDENCIES = host-pkgconf
 IPTABLES_LICENSE = GPLv2
 IPTABLES_LICENSE_FILES = COPYING
 
-IPTABLES_CONF_OPT = --libexecdir=/usr/lib --with-kernel=$(LINUX_HEADERS_DIR)
+IPTABLES_CONF_OPT = --libexecdir=/usr/lib --with-kernel=$(STAGING_DIR)/usr
 
 define IPTABLES_TARGET_SYMLINK_CREATE
 	ln -sf xtables-multi $(TARGET_DIR)/usr/sbin/iptables

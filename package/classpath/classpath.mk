@@ -1,3 +1,9 @@
+################################################################################
+#
+# classpath
+#
+################################################################################
+
 CLASSPATH_VERSION = 0.98
 CLASSPATH_SITE = $(BR2_GNU_MIRROR)/classpath
 CLASSPATH_CONF_OPT = \
@@ -11,10 +17,14 @@ CLASSPATH_CONF_OPT = \
 # classpath assumes qt runs on top of X11, but we
 # don't support qt4 on X11
 CLASSPATH_CONF_OPT += --disable-qt-peer
-
 CLASSPATH_DEPENDENCIES = host-pkgconf
+CLASSPATH_AUTORECONF = YES
+CLASSPATH_LICENSE = GPLv2+ with exception
+CLASSPATH_LICENSE_FILES = COPYING
 
-ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
+# Needs ALSA pcm and sequencer (midi) support
+# pcm is always on for alsa-lib
+ifeq ($(BR2_PACKAGE_ALSA_LIB_SEQ),y)
 CLASSPATH_CONF_OPT += --enable-alsa
 CLASSPATH_DEPENDENCIES += alsa-lib
 else
@@ -22,7 +32,7 @@ CLASSPATH_CONF_OPT += --disable-alsa
 endif
 
 ifeq ($(BR2_PACKAGE_GMP),y)
-CLASSPATH_CONF_OPT += --enable-gmp
+CLASSPATH_CONF_OPT += --enable-gmp --with-gmp="$(STAGING_DIR)/usr"
 CLASSPATH_DEPENDENCIES += gmp
 else
 CLASSPATH_CONF_OPT += --disable-gmp

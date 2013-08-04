@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# xapp_xman - Manual page display program for the X Window System
+# xapp_xman
 #
-#############################################################
+################################################################################
+
 XAPP_XMAN_VERSION = 1.0.3
 XAPP_XMAN_SOURCE = xman-$(XAPP_XMAN_VERSION).tar.bz2
 XAPP_XMAN_SITE = http://xorg.freedesktop.org/releases/individual/app

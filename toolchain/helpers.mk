@@ -181,7 +181,7 @@ create_lib64_symlinks = \
 # $2: feature description
 #
 check_glibc_feature = \
-	if [ x$($(1)) != x"y" ] ; then \
+	if [ "$($(1))" != "y" ] ; then \
 		echo "$(2) available in C library, please enable $(1)" ; \
 		exit 1 ; \
 	fi
@@ -236,11 +236,11 @@ check_glibc = \
 #
 check_uclibc_feature = \
 	IS_IN_LIBC=`grep -q "\#define $(1) 1" $(3) && echo y` ; \
-	if [ x$($(2)) != x"y" -a x$${IS_IN_LIBC} = x"y" ] ; then \
+	if [ "$($(2))" != "y" -a "$${IS_IN_LIBC}" = "y" ] ; then \
 		echo "$(4) available in C library, please enable $(2)" ; \
 		exit 1 ; \
 	fi ; \
-	if [ x$($(2)) = x"y" -a x$${IS_IN_LIBC} != x"y" ] ; then \
+	if [ "$($(2))" = "y" -a "$${IS_IN_LIBC}" != "y" ] ; then \
 		echo "$(4) not available in C library, please disable $(2)" ; \
 		exit 1 ; \
 	fi
@@ -279,18 +279,24 @@ check_uclibc = \
 #
 check_arm_abi = \
 	__CROSS_CC=$(strip $1) ; \
+	__CROSS_READELF=$(strip $2) ; \
 	EXT_TOOLCHAIN_TARGET=`LANG=C $${__CROSS_CC} -v 2>&1 | grep ^Target | cut -f2 -d ' '` ; \
-	if echo $${EXT_TOOLCHAIN_TARGET} | grep -qE 'eabi(hf)?$$' ; then \
-		EXT_TOOLCHAIN_ABI="eabi" ; \
-	else \
-		EXT_TOOLCHAIN_ABI="oabi" ; \
-	fi ; \
-	if [ x$(BR2_ARM_OABI) = x"y" -a $${EXT_TOOLCHAIN_ABI} = "eabi" ] ; then \
-		echo "Incorrect ABI setting" ; \
+	if ! echo $${EXT_TOOLCHAIN_TARGET} | grep -qE 'eabi(hf)?$$' ; then \
+		echo "External toolchain uses the unsuported OABI" ; \
 		exit 1 ; \
 	fi ; \
-	if [ x$(BR2_ARM_EABI) = x"y" -a $${EXT_TOOLCHAIN_ABI} = "oabi" ] ; then \
-		echo "Incorrect ABI setting" ; \
+	EXT_TOOLCHAIN_CRT1=`LANG=C $${__CROSS_CC} -print-file-name=crt1.o` ; \
+	if $${__CROSS_READELF} -A $${EXT_TOOLCHAIN_CRT1} | grep -q "Tag_ABI_VFP_args:" ; then \
+		EXT_TOOLCHAIN_ABI="eabihf" ; \
+	else \
+		EXT_TOOLCHAIN_ABI="eabi" ; \
+	fi ; \
+	if [ "$(BR2_ARM_EABI)" = "y" -a "$${EXT_TOOLCHAIN_ABI}" = "eabihf" ] ; then \
+		echo "Incorrect ABI setting: EABI selected, but toolchain uses EABIhf" ; \
+		exit 1 ; \
+	fi ; \
+	if [ "$(BR2_ARM_EABIHF)" = "y" -a "$${EXT_TOOLCHAIN_ABI}" = "eabi" ] ; then \
+		echo "Incorrect ABI setting: EABIhf selected, but toolchain uses EABI" ; \
 		exit 1 ; \
 	fi
 

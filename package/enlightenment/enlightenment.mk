@@ -1,10 +1,10 @@
-#############################################################
+################################################################################
 #
 # enlightenment
 #
-#############################################################
+################################################################################
 
-ENLIGHTENMENT_VERSION = 0.17.0-omega
+ENLIGHTENMENT_VERSION = 0.17.3
 ENLIGHTENMENT_SITE = http://download.enlightenment.org/releases/
 ENLIGHTENMENT_LICENSE = BSD-2c
 ENLIGHTENMENT_LICENSE_FILES = COPYING

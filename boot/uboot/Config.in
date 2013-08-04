@@ -18,7 +18,7 @@ choice
 	  Select the specific U-Boot version you want to use
 
 config BR2_TARGET_UBOOT_LATEST_VERSION
-	bool "2013.04"
+	bool "2013.07"
 
 config BR2_TARGET_UBOOT_CUSTOM_VERSION
        bool "Custom version"
@@ -46,7 +46,7 @@ endif
 
 config BR2_TARGET_UBOOT_VERSION
 	string
-	default "2013.04"	if BR2_TARGET_UBOOT_LATEST_VERSION
+	default "2013.07"	if BR2_TARGET_UBOOT_LATEST_VERSION
 	default $BR2_TARGET_UBOOT_CUSTOM_VERSION_VALUE if BR2_TARGET_UBOOT_CUSTOM_VERSION
 	default "custom"	if BR2_TARGET_UBOOT_CUSTOM_TARBALL
 	default $BR2_TARGET_UBOOT_CUSTOM_GIT_VERSION if BR2_TARGET_UBOOT_CUSTOM_GIT
@@ -98,7 +98,30 @@ config BR2_TARGET_UBOOT_FORMAT_LDR
 	depends on BR2_bfin
 	bool "u-boot.ldr"
 
+config BR2_TARGET_UBOOT_FORMAT_ELF
+	bool "u-boot.elf"
+
+config BR2_TARGET_UBOOT_FORMAT_SB
+	depends on BR2_arm
+	bool "u-boot.sb"
+
+config BR2_TARGET_UBOOT_FORMAT_CUSTOM
+	bool "Custom (specify below)"
+	help
+	  On some platforms, the standard U-Boot binary is not called
+	  u-boot.bin, but u-boot<something>.bin. If this is your case,
+	  you should select this option and specify the correct name
+	  in BR2_TARGET_UBOOT_FORMAT_CUSTOM_NAME.
+
 endchoice
+
+config BR2_TARGET_UBOOT_FORMAT_CUSTOM_NAME
+	string "U-Boot binary format: custom name"
+	depends on BR2_TARGET_UBOOT_FORMAT_CUSTOM
+	help
+	  Specify the correct name of the output binary created by
+	  U-Boot, if it is not one of the default names. For example:
+	  u-boot_magic.bin
 
 config BR2_TARGET_UBOOT_OMAP_IFT
 	depends on BR2_TARGET_UBOOT_FORMAT_BIN

@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # elfutils
 #
-#############################################################
+################################################################################
+
 ELFUTILS_VERSION = 0.155
 ELFUTILS_SOURCE = elfutils-$(ELFUTILS_VERSION).tar.bz2
 ELFUTILS_SITE = https://fedorahosted.org/releases/e/l/elfutils/$(ELFUTILS_VERSION)
@@ -36,7 +37,7 @@ endif
 ELFUTILS_CONF_ENV += \
 	LDFLAGS="$(ELFUTILS_LDFLAGS)"
 
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT)$(BR2_TOOLCHAIN_EXTERNAL_UCLIBC)$(BR2_TOOLCHAIN_CTNG_uClibc),y)
+ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
  ELFUTILS_DEPENDENCIES += argp-standalone
 endif
 

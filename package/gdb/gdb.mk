@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # gdb
 #
-#############################################################
+################################################################################
 
 GDB_VERSION = $(call qstrip,$(BR2_GDB_VERSION))
 GDB_SITE    = $(BR2_GNU_MIRROR)/gdb
@@ -19,6 +19,10 @@ GDB_VERSION = 6.7.1-avr32-2.1.5
 else
 GDB_VERSION = 7.5.1
 endif
+endif
+
+ifeq ($(BR2_arc),y)
+GDB_SITE = $(BR2_ARC_SITE)
 endif
 
 ifeq ($(GDB_VERSION),6.7.1-avr32-2.1.5)
@@ -48,6 +52,7 @@ define GDB_XTENSA_PRE_PATCH
 	tar xf $(BR2_XTENSA_OVERLAY_DIR)/xtensa_$(XTENSA_CORE_NAME).tar \
 		-C $(@D) --strip-components=1 gdb
 endef
+GDB_PRE_PATCH_HOOKS += GDB_XTENSA_PRE_PATCH
 HOST_GDB_PRE_PATCH_HOOKS += GDB_XTENSA_PRE_PATCH
 endif
 

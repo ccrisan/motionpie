@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-## IMLIB2
+# imlib2
 #
-##############################################################
+################################################################################
+
 IMLIB2_VERSION = 1.4.5
 IMLIB2_SOURCE = imlib2-$(IMLIB2_VERSION).tar.bz2
 IMLIB2_SITE = http://downloads.sourceforge.net/project/enlightenment/imlib2-src/$(IMLIB2_VERSION)/
@@ -12,6 +13,7 @@ IMLIB2_LICENSE_FILES = COPYING
 IMLIB2_INSTALL_STAGING = YES
 IMLIB2_DEPENDENCIES = host-pkgconf freetype
 IMLIB2_CONF_OPT = --with-freetype-config=$(STAGING_DIR)/usr/bin/freetype-config
+IMLIB2_CONFIG_SCRIPTS = imlib2-config
 
 ifeq ($(BR2_PACKAGE_IMLIB2_X),y)
 	IMLIB2_CONF_OPT += --with-x
@@ -57,10 +59,7 @@ endif
 
 # drop -L<dir> from linker flags
 define IMLIB2_FIXUP_IMLIB2_CONFIG
-	$(SED) "s,^prefix=.*,prefix=\'$(STAGING_DIR)/usr\',g" \
-		-e "s,^exec_prefix=.*,exec_prefix=\'$(STAGING_DIR)/usr\',g" \
-		-e  's/-L[^ ]*//g' \
-		$(STAGING_DIR)/usr/bin/imlib2-config
+	$(SED) 's/-L[^ ]*//g' $(STAGING_DIR)/usr/bin/imlib2-config
 endef
 
 IMLIB2_POST_INSTALL_STAGING_HOOKS += IMLIB2_FIXUP_IMLIB2_CONFIG

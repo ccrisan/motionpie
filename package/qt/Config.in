@@ -3,6 +3,7 @@ comment "qt requires a toolchain with C++ support enabled"
 
 menuconfig BR2_PACKAGE_QT
 	bool "Qt"
+	depends on !BR2_avr32 # lacks TLS
 	depends on BR2_INSTALL_LIBSTDCPP
 	help
 	  Qt is a cross-platform application and UI framework for
@@ -280,6 +281,14 @@ config BR2_PACKAGE_QT_PHONON_BACKEND
 	help
 	  Build the platform Phonon plugin.
 	  If unsure, say n.
+
+config BR2_PACKAGE_QT_OPENGL_ES
+	bool "OpenGL ES v2.x support"
+	depends on BR2_PACKAGE_HAS_OPENGL_ES
+	depends on BR2_PACKAGE_HAS_OPENGL_EGL
+	help
+	  Enable the OpenGL ES v2.x support.
+
 endif
 
 config BR2_PACKAGE_QT_DBUS

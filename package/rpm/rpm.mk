@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # rpm
 #
-#############################################################
+################################################################################
+
 RPM_VERSION = 5.2.0
 RPM_SITE = http://rpm5.org/files/rpm/rpm-5.2/
 RPM_DEPENDENCIES = zlib beecrypt neon popt
@@ -33,16 +34,16 @@ RPM_CONF_OPT += --with-file=no
 endif
 
 ifeq ($(BR2_PACKAGE_RPM_XZ_PAYLOADS),y)
-RPM_CONF_OPT+=--with-xz
+RPM_CONF_OPT += --with-xz
 endif
 
 ifeq ($(BR2_PACKAGE_RPM_BZIP2_PAYLOADS),y)
-RPM_CONF_OPT+=--with-bzip2
-RPM_DEPENDENCIES+=bzip2
+RPM_CONF_OPT += --with-bzip2
+RPM_DEPENDENCIES += bzip2
 endif
 
 RPM_MAKE = $(MAKE1)
 
-RPM_INSTALL_TARGET_OPT=DESTDIR=$(TARGET_DIR) program_transform_name= install
+RPM_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) program_transform_name= install
 
 $(eval $(autotools-package))

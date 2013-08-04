@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
-# Boost
+# boost
 #
-#############################################################
+################################################################################
 
 BOOST_VERSION = 1.53.0
 BOOST_FILE_VERSION = $(subst .,_,$(BOOST_VERSION))
@@ -12,7 +12,7 @@ BOOST_INSTALL_STAGING = YES
 
 TARGET_CC_VERSION = $(shell $(TARGET_CC) -dumpversion)
 
-BOOST_DEPENDENCIES = bzip2 zlib
+BOOST_DEPENDENCIES =
 
 BOOST_FLAGS =
 
@@ -48,6 +48,10 @@ else
 BOOST_FLAGS += --without-icu
 endif
 
+ifeq ($(BR2_PACKAGE_BOOST_IOSTREAMS),y)
+BOOST_DEPENDENCIES += bzip2 zlib
+endif
+
 BOOST_OPT += toolset=gcc \
 	     threading=multi \
 	     variant=$(if $(BR2_ENABLE_DEBUG),debug,release) \
@@ -55,7 +59,7 @@ BOOST_OPT += toolset=gcc \
 	     runtime-link=$(if $(BR2_PREFER_STATIC_LIB),static,shared)
 
 ifeq ($(BR2_PACKAGE_BOOST_LOCALE),y)
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT)$(BR2_TOOLCHAIN_EXTERNAL_UCLIBC)$(BR2_TOOLCHAIN_CTNG_uClibc),y)
+ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
 # posix backend needs monetary.h which isn't available on uClibc
 BOOST_OPT += boost.locale.posix=off
 endif

@@ -1,9 +1,9 @@
-#############################################################
+################################################################################
 #
-# Sqlcipher extension of sqlite
-# http://sqlcipher.net
+# sqlcipher
 #
-#############################################################
+################################################################################
+
 SQLCIPHER_VERSION = 1.1.9
 SQLCIPHER_SITE = http://github.com/sjlombardo/sqlcipher/tarball/v$(SQLCIPHER_VERSION)
 SQLCIPHER_DEPENDENCIES = openssl host-tcl

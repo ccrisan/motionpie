@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # busybox
 #
-#############################################################
+################################################################################
 
 ifeq ($(BR2_PACKAGE_BUSYBOX_SNAPSHOT),y)
 BUSYBOX_VERSION = snapshot
@@ -16,8 +16,7 @@ BUSYBOX_LICENSE = GPLv2
 BUSYBOX_LICENSE_FILES = LICENSE
 
 BUSYBOX_CFLAGS = \
-	$(TARGET_CFLAGS) \
-	-I$(LINUX_HEADERS_DIR)/include
+	$(TARGET_CFLAGS)
 
 BUSYBOX_LDFLAGS = \
 	$(TARGET_LDFLAGS)

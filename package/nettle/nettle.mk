@@ -1,4 +1,10 @@
-NETTLE_VERSION = 2.7
+################################################################################
+#
+# nettle
+#
+################################################################################
+
+NETTLE_VERSION = 2.7.1
 NETTLE_SITE = http://www.lysator.liu.se/~nisse/archive
 NETTLE_DEPENDENCIES = gmp
 NETTLE_INSTALL_STAGING = YES

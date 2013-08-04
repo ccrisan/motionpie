@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
-# mtd provides jffs2 utilities
+# mtd
 #
-#############################################################
+################################################################################
+
 MTD_VERSION = 1.5.0
 MTD_SOURCE = mtd-utils-$(MTD_VERSION).tar.bz2
 MTD_SITE = ftp://ftp.infradead.org/pub/mtd-utils
@@ -11,6 +12,10 @@ MTD_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_MTD_MKFSJFFS2),y)
 MTD_DEPENDENCIES = zlib lzo
+endif
+
+ifeq ($(BR2_PACKAGE_MTD_MKFSUBIFS),y)
+MTD_DEPENDENCIES += util-linux zlib lzo
 endif
 
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
@@ -71,6 +76,7 @@ MTD_TARGETS_UBI_$(BR2_PACKAGE_MTD_UBIRSVOL)	+= ubirsvol
 MTD_TARGETS_UBI_$(BR2_PACKAGE_MTD_UBIUPDATEVOL)	+= ubiupdatevol
 
 MTD_TARGETS_y += $(addprefix ubi-utils/,$(MTD_TARGETS_UBI_y))
+MTD_TARGETS_$(BR2_PACKAGE_MTD_MKFSUBIFS) += mkfs.ubifs/mkfs.ubifs
 
 # only call make if atleast a single tool is enabled
 ifneq ($(MTD_TARGETS_y),)

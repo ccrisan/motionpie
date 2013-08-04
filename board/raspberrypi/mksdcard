@@ -103,13 +103,13 @@ p
 1
 
 ${BOOT_SIZE}
-t
-c
 n
 p
 2
 
 
+t
+c
 a
 1
 w
@@ -135,8 +135,7 @@ mkdir .mnt
 section "Populating boot partition..."
 
 mount "${SDCARD}1" .mnt || exit 2
-cp ${OUTPUT_PREFIX}images/rpi-firmware/* .mnt
-cp ${OUTPUT_PREFIX}images/zImage .mnt
+cp ${OUTPUT_PREFIX}images/boot/* .mnt
 umount .mnt
 sync
 

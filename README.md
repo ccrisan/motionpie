@@ -5,10 +5,6 @@ This buildroot fork will produce a very light-weight and trimmed down
 toolchain, rootfs and kernel for the Raspberry Pi. It's intended for advanced
 users and specific embedded applications.
 
-The default configuration is trimmed down but still contains a few
-applications to help with development and testing, it should be trimmed down
-further and secured before actual field deployment.
-
 Test Drive
 ----------
 
@@ -28,8 +24,7 @@ use with the test-drive image, download and usage instructions below:
 	wget http://dl.guillermoamaral.com/rpi/rpi-buildroot-toolchain.tar.xz
 	tar -xvJf rpi-buildroot-toolchain.tar.xz
 	source rpi-buildroot-toolchain/env
-	$CC -I"${BUILDROOT_HOST_DIR}/usr/include" \
-	    -I"${BUILDROOT_STAGING_DIR}/usr/include" \
+	$CC -I"${BUILDROOT_STAGING_DIR}/usr/include" \
 	    -I"${BUILDROOT_STAGING_DIR}/opt/vc/include" \
 	    -L"${BUILDROOT_STAGING_DIR}/opt/vc/lib" \
 	    -L"${BUILDROOT_STAGING_DIR}/usr/lib" \
@@ -58,6 +53,19 @@ Building
 
 Deploying
 ---------
+
+### Script
+
+I've added a script that can automatically flash your sdcard, you simply need
+to point it to the correct device node, confirm and you're done!
+
+**Notice** you will need to replace *sdx* in the following commands with the
+actual device node for your sdcard.
+
+    # run the following as root (sudo)
+    board/raspberrypi/mksdcard /dev/sdx
+
+### Manual
 
 You will need to create two partitions in your sdcard, the first (boot) needs
 to be a small *W95 FAT32 (LBA)* patition (that's partition id **c**), about 50

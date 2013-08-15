@@ -5,7 +5,7 @@
 #############################################################
 
 RPI_VERSION = master
-RPI_SITE = git://github.com/gamaral/rpi-firmware.git
+RPI_SITE = git://github.com/raspberrypi/firmware.git
 RPI_LICENSE = BSD-3c
 RPI_LICENSE_FILE = boot/LICENCE.broadcom
 

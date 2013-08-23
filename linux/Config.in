@@ -21,7 +21,7 @@ choice
 	prompt "Kernel version"
 
 config BR2_LINUX_KERNEL_LATEST_VERSION
-	bool "3.10.4"
+	bool "3.10.7"
 
 config BR2_LINUX_KERNEL_SAME_AS_HEADERS
 	bool "Same as toolchain kernel headers"
@@ -68,7 +68,6 @@ config BR2_LINUX_KERNEL_CUSTOM_GIT_REPO_URL
 
 config BR2_LINUX_KERNEL_CUSTOM_GIT_VERSION
 	string "Custom Git version"
-	default "HEAD"
 	depends on BR2_LINUX_KERNEL_CUSTOM_GIT
 	help
 	  Git revision to use in the format used by git rev-parse,
@@ -76,7 +75,7 @@ config BR2_LINUX_KERNEL_CUSTOM_GIT_VERSION
 
 config BR2_LINUX_KERNEL_VERSION
 	string
-	default "3.10.4" if BR2_LINUX_KERNEL_LATEST_VERSION
+	default "3.10.7" if BR2_LINUX_KERNEL_LATEST_VERSION
 	default BR2_DEFAULT_KERNEL_HEADERS if BR2_LINUX_KERNEL_SAME_AS_HEADERS
 	default BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE if BR2_LINUX_KERNEL_CUSTOM_VERSION
 	default "custom" if BR2_LINUX_KERNEL_CUSTOM_TARBALL

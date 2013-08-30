@@ -12,8 +12,8 @@ RPI_USERLAND_INSTALL_STAGING = YES
 RPI_USERLAND_INSTALL_TARGET = YES
 
 define RPI_USERLAND_POST_STAGING_CLEANUP
-    rm -f  $(STAGING_DIR)/etc/init.d/vcfiled
     rm -Rf $(STAGING_DIR)/opt/vc/{bin,sbin}
+    rm -f  $(STAGING_DIR)/etc/init.d/vcfiled
     rmdir -p $(STAGING_DIR)/etc/init.d || true
 endef
 
@@ -21,8 +21,8 @@ define RPI_USERLAND_POST_TARGET_CLEANUP
     rm -Rf $(TARGET_DIR)/opt/vc/include
     rm -Rf $(TARGET_DIR)/opt/vc/share
     rm -Rf $(TARGET_DIR)/opt/vc/src
-    rm -f  $(TARGET_DIR)/etc/init.d/vcfiled
     rm -f  $(TARGET_DIR)/opt/vc/lib/*.a
+    rm -f  $(TARGET_DIR)/etc/init.d/vcfiled
     rmdir -p $(TARGET_DIR_DIR)/etc/init.d || true
     grep -q "/opt/vc/lib" $(TARGET_DIR)/etc/ld.so.conf || \
         echo "/opt/vc/lib" >> $(TARGET_DIR)/etc/ld.so.conf

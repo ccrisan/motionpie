@@ -1,8 +1,0 @@
-config BR2_TARGET_RPI
-	bool "rpi"
-	depends on BR2_arm
-	help
-	  RaspberryPi Boot Formware
-
-	  https://github.com/raspberrypi/firmware
-

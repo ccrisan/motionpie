@@ -1,4 +1,4 @@
-# Makefile for buildroot2
+# Makefile for buildroot
 #
 # Copyright (C) 1999-2005 by Erik Andersen <andersen@codepoet.org>
 # Copyright (C) 2006-2013 by the Buildroot developers <buildroot@uclibc.org>
@@ -24,7 +24,7 @@
 #--------------------------------------------------------------
 
 # Set and export the version string
-export BR2_VERSION:=2013.08
+export BR2_VERSION:=2013.11-git
 
 # Check for minimal make version (note: this check will break at make 10.x)
 MIN_MAKE_VERSION=3.81
@@ -221,10 +221,6 @@ GNU_HOST_NAME:=$(shell support/gnuconfig/config.guess)
 # along with the packages to build for the target.
 #
 ################################################################################
-
-ifeq ($(BR2_CCACHE),y)
-BASE_TARGETS += host-ccache
-endif
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
 BASE_TARGETS += toolchain-buildroot
@@ -498,7 +494,7 @@ endif
 # I set a breakpoint"
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
 	find $(TARGET_DIR)/lib -type f -name 'libpthread*.so*' | \
-		xargs $(STRIPCMD) $(STRIP_STRIP_DEBUG) || true
+		xargs -r $(STRIPCMD) $(STRIP_STRIP_DEBUG)
 endif
 
 	mkdir -p $(TARGET_DIR)/etc

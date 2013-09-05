@@ -45,6 +45,17 @@ comment "build, or run, in unpredictable ways.               "
 endif
 
 ###############################################################################
+comment "Legacy options removed in 2013.11"
+
+config BR2_PACKAGE_MODULE_INIT_TOOLS
+	bool "module-init-tools replaced by kmod"
+	select BR2_PACKAGE_KMOD
+	select BR2_PACKAGE_KMOD_TOOLS
+	help
+	  The 'module-init-tools' package has been removed, since it
+	  has been depracated upstream and replaced by 'kmod'.
+
+###############################################################################
 comment "Legacy options removed in 2013.08"
 
 config BR2_ARM_OABI
@@ -95,6 +106,23 @@ config BR2_VFP_FLOAT
 	  the ARM architecture support, the BR2_VFP_FLOAT option has
 	  been replaced with a choice of options that allows to select
 	  between various VFP versions/capabilities.
+
+config BR2_PACKAGE_GCC_TARGET
+	bool "gcc on the target filesystem has been removed"
+	select BR2_LEGACY
+	help
+	  The support for gcc in the target filesystem was deprecated
+	  since a while, and has been removed completely from Buildroot.
+	  See Buildroot's documentation for more explanations.
+
+config BR2_HAVE_DEVFILES
+	bool "development files in target filesystem has been removed"
+	select BR2_LEGACY
+	help
+	  The installation of the development files in the target
+	  filesystem was deprecated since a while, and has been removed
+	  completely from Buildroot.
+	  See Buildroot's documentation for more explanations.
 
 ###############################################################################
 comment "Legacy options removed in 2013.05"

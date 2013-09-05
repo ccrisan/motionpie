@@ -1,3 +1,5 @@
+menu "Target options"
+
 config BR2_ARCH_IS_64
 	bool
 
@@ -123,6 +125,13 @@ config BR2_mips64el
 	  MIPS is a RISC microprocessor from MIPS Technologies. Little endian.
 	  http://www.mips.com/
 	  http://en.wikipedia.org/wiki/MIPS_Technologies
+
+config BR2_nios2
+	bool "Nios II"
+	help
+	  Nios II is a soft core processor from Altera Corporation.
+	  http://www.altera.com/
+	  http://en.wikipedia.org/wiki/Nios_II
 
 config BR2_powerpc
 	bool "PowerPC"
@@ -305,6 +314,10 @@ if BR2_mips || BR2_mips64 || BR2_mipsel || BR2_mips64el
 source "arch/Config.in.mips"
 endif
 
+if BR2_nios2
+source "arch/Config.in.nios2"
+endif
+
 if BR2_powerpc
 source "arch/Config.in.powerpc"
 endif
@@ -324,3 +337,5 @@ endif
 if BR2_xtensa
 source "arch/Config.in.xtensa"
 endif
+
+endmenu # Target options

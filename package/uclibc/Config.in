@@ -115,6 +115,7 @@ choice
 	config BR2_PTHREADS_NATIVE
 		bool "Native POSIX Threading (NPTL)"
 		select BR2_TOOLCHAIN_HAS_THREADS
+		select BR2_TOOLCHAIN_LIBC_NEEDS_THREE_STAGE_BUILD
 		depends on !BR2_arc
 		depends on !BR2_avr32
 		depends on !BR2_bfin
@@ -128,6 +129,16 @@ config BR2_PTHREAD_DEBUG
 	select BR2_TOOLCHAIN_HAS_THREADS_DEBUG
 	help
 	  Build the thread library with debugging enabled.
+
+config BR2_TOOLCHAIN_BUILDROOT_USE_SSP
+	bool "Enable stack protection support"
+	select BR2_TOOLCHAIN_HAS_SSP
+	help
+	  Enable stack smashing protection support using GCCs
+	  -fstack-protector-all option in uClibc.
+
+	  See http://www.linuxfromscratch.org/hints/downloads/files/ssp.txt
+	  for details.
 
 config BR2_UCLIBC_INSTALL_UTILS
 	bool "Compile and install uClibc utilities"

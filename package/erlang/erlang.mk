@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ERLANG_VERSION = R15B03-1
+ERLANG_VERSION = R16B01
 ERLANG_SITE = http://www.erlang.org/download
 ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
 ERLANG_DEPENDENCIES = host-erlang
@@ -12,9 +12,14 @@ HOST_ERLANG_DEPENDENCIES =
 
 ERLANG_LICENSE = EPL
 ERLANG_LICENSE_FILES = EPLICENCE
+ERLANG_INSTALL_STAGING = YES
 
 # The configure checks for these functions fail incorrectly
 ERLANG_CONF_ENV = ac_cv_func_isnan=yes ac_cv_func_isinf=yes
+
+# Set erl_xcomp variables. See xcomp/erl-xcomp.conf.template
+# for documentation.
+ERLANG_CONF_ENV += erl_xcomp_sysroot=$(STAGING_DIR)
 
 ERLANG_CONF_OPT = --without-javac
 HOST_ERLANG_CONF_OPT = --without-javac

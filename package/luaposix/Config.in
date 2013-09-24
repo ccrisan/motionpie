@@ -1,5 +1,7 @@
 config BR2_PACKAGE_LUAPOSIX
 	bool "luaposix"
+	select BR2_PACKAGE_LUABITOP if BR2_PACKAGE_LUA
+	# LuaBitOp is already included in LuaJIT
 	help
 	  luaposix is a POSIX binding, including curses, for Lua 5.1
 	  and 5.2; Like most libraries it simply binds to C APIs on
@@ -9,3 +11,4 @@ config BR2_PACKAGE_LUAPOSIX
 	  APIs
 
 	  https://github.com/luaposix/luaposix
+

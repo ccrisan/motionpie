@@ -21,6 +21,7 @@ GPU_VIV_BIN_MX6Q_REDISTRIBUTE = NO
 
 # DirectFB is not supported (wrong version)
 ifeq ($(BR2_PACKAGE_XORG7),y)
+GPU_VIV_BIN_MX6Q_DEPENDENCIES = xlib_libXdamage xlib_libXext
 GPU_VIV_BIN_MX6Q_LIB_TARGET = x11
 else
 GPU_VIV_BIN_MX6Q_LIB_TARGET = fb
@@ -51,6 +52,15 @@ endef
 
 define GPU_VIV_BIN_MX6Q_INSTALL_STAGING_CMDS
 	cp -r $(@D)/usr/* $(STAGING_DIR)/usr
+	for lib in egl glesv2 vg; do \
+		$(INSTALL) -m 0644 -D \
+			package/freescale-imx/gpu-viv-bin-mx6q/$${lib}.pc \
+			$(STAGING_DIR)/usr/lib/pkgconfig/$${lib}.pc; \
+		if [ "$(GPU_VIV_BIN_MX6Q_LIB_TARGET)" != "fb" ]; then \
+			$(SED) "s/-DEGL_API_FB=1//" \
+				$(STAGING_DIR)/usr/lib/pkgconfig/$${lib}.pc; \
+		fi; \
+	done
 endef
 
 ifeq ($(BR2_PACKAGE_GPU_VIV_BIN_MX6Q_EXAMPLES),y)

@@ -1,13 +1,12 @@
 ################################################################################
 #
-# ngircd
+# psplash
 #
 ################################################################################
 
-NGIRCD_VERSION = 20.3
-NGIRCD_SITE = ftp://ftp.berlios.de/pub/ngircd/
-NGIRCD_DEPENDENCIES = zlib
-NGIRCD_LICENSE = GPLv2+
-NGIRCD_LICENSE_FILES = COPYING
+PSPLASH_VERSION = 0.1
+PSPLASH_SITE = http://downloads.yoctoproject.org/releases/psplash
+PSPLASH_LICENSE = GPLv2+
+PSPLASH_LICENSE_FILES = COPYING
 
 $(eval $(autotools-package))

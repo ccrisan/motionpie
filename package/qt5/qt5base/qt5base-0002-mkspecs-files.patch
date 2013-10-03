@@ -1,4 +1,7 @@
-Add a Buildroot 'device' to ease cross-compilation
+From bee1e336e89745a91e3f9fdda3048d9b29f020f6 Mon Sep 17 00:00:00 2001
+From: "Guillermo A. Amaral" <g@maral.me>
+Date: Wed, 2 Oct 2013 13:56:10 -0700
+Subject: [PATCH] Add a Buildroot 'device' to ease cross-compilation
 
 Qt5 has a mechanism to support "device" profiles, so that people can
 specify the compiler, compiler flags and so on for a specific device.
@@ -8,38 +11,45 @@ simplify cross-compilation: we have our own "device" definition, which
 allows us to easily pass the cross-compiler paths and flags from our
 qt5.mk.
 
-Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+* Updated to work with Qt 5.1 on Raspberry Pi.
 
-Index: b/mkspecs/devices/linux-buildroot-g++/qmake.conf
-===================================================================
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Signed-off-by: Guillermo A. Amaral B. <g@maral.me>
+---
+ mkspecs/devices/linux-buildroot-g++/qmake.conf     | 43 ++++++++++++++++++++++
+ .../devices/linux-buildroot-g++/qplatformdefs.h    |  1 +
+ 2 files changed, 44 insertions(+)
+ create mode 100644 mkspecs/devices/linux-buildroot-g++/qmake.conf
+ create mode 100644 mkspecs/devices/linux-buildroot-g++/qplatformdefs.h
+
+diff --git a/mkspecs/devices/linux-buildroot-g++/qmake.conf b/mkspecs/devices/linux-buildroot-g++/qmake.conf
+new file mode 100644
+index 0000000..06ed93d
 --- /dev/null
 +++ b/mkspecs/devices/linux-buildroot-g++/qmake.conf
 @@ -0,0 +1,43 @@
-+MAKEFILE_GENERATOR      = UNIX
-+CONFIG                  += incremental gdb_dwarf_index
-+QMAKE_INCREMENTAL_STYLE = sublib
++include(../common/linux_device_pre.conf)
 +
-+include(../../common/linux.conf)
-+include(../../common/gcc-base-unix.conf)
-+include(../../common/g++-unix.conf)
++QMAKE_LFLAGS           += -Wl,-rpath-link,$$[QT_SYSROOT]/opt/vc/lib
 +
-+load(device_config)
++QMAKE_LIBDIR_OPENGL_ES2 = $$[QT_SYSROOT]/opt/vc/lib
++QMAKE_LIBDIR_EGL        = $$QMAKE_LIBDIR_OPENGL_ES2
 +
-+MODULE_VERSION = 5.0.2
++QMAKE_INCDIR_EGL        = $$[QT_SYSROOT]/opt/vc/include \
++                          $$[QT_SYSROOT]/opt/vc/include/interface/vcos/pthreads \
++                          $$[QT_SYSROOT]/opt/vc/include/interface/vmcs_host/linux
 +
-+QMAKE_INCDIR_EGL        = $$[QT_SYSROOT]/opt/vc/include $$[QT_SYSROOT]/opt/vc/include/interface/vcos/pthreads
-+QMAKE_INCDIR_OPENGL_ES2 = $${QMAKE_INCDIR_EGL}
-+QMAKE_LFLAGS            += -Wl,-rpath-link,$$[QT_SYSROOT]/opt/vc/lib
-+QMAKE_LIBDIR_EGL        = $$[QT_SYSROOT]/opt/vc/lib
-+QMAKE_LIBDIR_OPENGL_ES2 = $$QMAKE_LIBDIR_EGL
 +QMAKE_LIBS_EGL          = -lEGL -lGLESv2
 +QMAKE_LIBS_OPENGL_ES2   = -lEGL -lGLESv2
++
 +QT_QPA_DEFAULT_PLATFORM = eglfs
 +
-+BUILDROOT_CROSS_COMPILE =
-+BUILDROOT_COMPILER_CFLAGS =
-+BUILDROOT_COMPILER_CXXFLAGS =
-+BUILDROOT_INCLUDE_PATH =
++DISTRO_OPTS += hard-float
++
++BUILDROOT_CROSS_COMPILE = /development/rpi/host/usr/bin/arm-buildroot-linux-uclibcgnueabi-
++BUILDROOT_COMPILER_CFLAGS = -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -pipe -mhard-float -Os 
++BUILDROOT_COMPILER_CXXFLAGS = -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -pipe -mhard-float -Os 
++BUILDROOT_INCLUDE_PATH = /development/rpi/host/usr/arm-buildroot-linux-uclibcgnueabi/sysroot/opt/vc/include
 +
 +# modifications to g++.conf
 +QMAKE_CC                = $${BUILDROOT_CROSS_COMPILE}gcc
@@ -53,23 +63,21 @@ Index: b/mkspecs/devices/linux-buildroot-g++/qmake.conf
 +QMAKE_STRIP             = $${BUILDROOT_CROSS_COMPILE}strip
 +
 +#modifications to gcc-base.conf
-+QMAKE_CFLAGS           += $${BUILDROOT_COMPILER_CFLAGS}
++QMAKE_CFLAGS           += $${BUILDROOT_COMPILER_CFLAGS} -mfpu=vfp
 +QMAKE_CXXFLAGS         += $${BUILDROOT_COMPILER_CXXFLAGS}
 +QMAKE_CXXFLAGS_RELEASE += -O3
-+INCLUDEPATH            += $${BUILDROOT_INCLUDE_PATH}
++INCLUDEPATH            += $$[QT_SYSROOT]/opt/vc/include $${BUILDROOT_INCLUDE_PATH}
 +
-+QMAKE_LIBS             += -lrt -lpthread -ldl
-+
-+# device specific glue code
-+EGLFS_PLATFORM_HOOKS_SOURCES =
-+
-+# Sanity check
-+deviceSanityCheckCompiler()
++include(../common/linux_device_post.conf)
 +
 +load(qt_config)
-Index: b/mkspecs/devices/linux-buildroot-g++/qplatformdefs.h
-===================================================================
+diff --git a/mkspecs/devices/linux-buildroot-g++/qplatformdefs.h b/mkspecs/devices/linux-buildroot-g++/qplatformdefs.h
+new file mode 100644
+index 0000000..99e9a27
 --- /dev/null
 +++ b/mkspecs/devices/linux-buildroot-g++/qplatformdefs.h
 @@ -0,0 +1 @@
 +#include "../../linux-g++/qplatformdefs.h"
+-- 
+1.8.1.5
+

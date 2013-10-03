@@ -6,7 +6,6 @@
 #
 
 SDCARD="${1}"
-BOOT_SIZE="+40M"
 
 usage() {
 	echo "Usage: ${0} [SDCARD]"
@@ -104,7 +103,7 @@ n
 p
 1
 
-${BOOT_SIZE}
++32M
 n
 p
 2
@@ -112,7 +111,7 @@ p
 
 t
 1
-c
+e
 a
 1
 w
@@ -125,7 +124,7 @@ sleep 1
 
 section "Formatting partitions..."
 
-${MKFS_VFAT} -F 32 -n boot -I "${SDCARD}1" || exit 1
+${MKFS_VFAT} -F 16 -n boot -I "${SDCARD}1" || exit 1
 ${MKFS_EXT4} -L rootfs "${SDCARD}2" || exit 1
 sync
 

@@ -1,4 +1,4 @@
-From bee1e336e89745a91e3f9fdda3048d9b29f020f6 Mon Sep 17 00:00:00 2001
+From 82c6afdda7f0e0618e877914e40bc7020a235933 Mon Sep 17 00:00:00 2001
 From: "Guillermo A. Amaral" <g@maral.me>
 Date: Wed, 2 Oct 2013 13:56:10 -0700
 Subject: [PATCH] Add a Buildroot 'device' to ease cross-compilation
@@ -16,40 +16,43 @@ qt5.mk.
 Signed-off-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 Signed-off-by: Guillermo A. Amaral B. <g@maral.me>
 ---
- mkspecs/devices/linux-buildroot-g++/qmake.conf     | 43 ++++++++++++++++++++++
+ mkspecs/devices/linux-buildroot-g++/qmake.conf     | 46 ++++++++++++++++++++++
  .../devices/linux-buildroot-g++/qplatformdefs.h    |  1 +
- 2 files changed, 44 insertions(+)
+ 2 files changed, 47 insertions(+)
  create mode 100644 mkspecs/devices/linux-buildroot-g++/qmake.conf
  create mode 100644 mkspecs/devices/linux-buildroot-g++/qplatformdefs.h
 
 diff --git a/mkspecs/devices/linux-buildroot-g++/qmake.conf b/mkspecs/devices/linux-buildroot-g++/qmake.conf
 new file mode 100644
-index 0000000..06ed93d
+index 0000000..7d451f8
 --- /dev/null
 +++ b/mkspecs/devices/linux-buildroot-g++/qmake.conf
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,46 @@
 +include(../common/linux_device_pre.conf)
 +
 +QMAKE_LFLAGS           += -Wl,-rpath-link,$$[QT_SYSROOT]/opt/vc/lib
 +
-+QMAKE_LIBDIR_OPENGL_ES2 = $$[QT_SYSROOT]/opt/vc/lib
-+QMAKE_LIBDIR_EGL        = $$QMAKE_LIBDIR_OPENGL_ES2
++QMAKE_LIBDIR_EGL        = $$[QT_SYSROOT]/opt/vc/lib
++QMAKE_LIBDIR_OPENGL_ES2 = $$QMAKE_LIBDIR_EGL
 +
 +QMAKE_INCDIR_EGL        = $$[QT_SYSROOT]/opt/vc/include \
 +                          $$[QT_SYSROOT]/opt/vc/include/interface/vcos/pthreads \
 +                          $$[QT_SYSROOT]/opt/vc/include/interface/vmcs_host/linux
++QMAKE_INCDIR_OPENGL_ES2 = $${QMAKE_INCDIR_EGL}
 +
 +QMAKE_LIBS_EGL          = -lEGL -lGLESv2
 +QMAKE_LIBS_OPENGL_ES2   = -lEGL -lGLESv2
 +
 +QT_QPA_DEFAULT_PLATFORM = eglfs
++EGLFS_PLATFORM_HOOKS_SOURCES = $$PWD/../linux-rasp-pi-g++/qeglfshooks_pi.cpp
++EGLFS_PLATFORM_HOOKS_LIBS = -lbcm_host
 +
 +DISTRO_OPTS += hard-float
 +
-+BUILDROOT_CROSS_COMPILE = /development/rpi/host/usr/bin/arm-buildroot-linux-uclibcgnueabi-
-+BUILDROOT_COMPILER_CFLAGS = -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -pipe -mhard-float -Os 
-+BUILDROOT_COMPILER_CXXFLAGS = -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -pipe -mhard-float -Os 
-+BUILDROOT_INCLUDE_PATH = /development/rpi/host/usr/arm-buildroot-linux-uclibcgnueabi/sysroot/opt/vc/include
++BUILDROOT_CROSS_COMPILE =
++BUILDROOT_COMPILER_CFLAGS =
++BUILDROOT_COMPILER_CXXFLAGS =
++BUILDROOT_INCLUDE_PATH =
 +
 +# modifications to g++.conf
 +QMAKE_CC                = $${BUILDROOT_CROSS_COMPILE}gcc
@@ -64,7 +67,7 @@ index 0000000..06ed93d
 +
 +#modifications to gcc-base.conf
 +QMAKE_CFLAGS           += $${BUILDROOT_COMPILER_CFLAGS} -mfpu=vfp
-+QMAKE_CXXFLAGS         += $${BUILDROOT_COMPILER_CXXFLAGS}
++QMAKE_CXXFLAGS         += $${BUILDROOT_COMPILER_CXXFLAGS} -mfpu=vfp
 +QMAKE_CXXFLAGS_RELEASE += -O3
 +INCLUDEPATH            += $$[QT_SYSROOT]/opt/vc/include $${BUILDROOT_INCLUDE_PATH}
 +

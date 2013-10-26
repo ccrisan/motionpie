@@ -1,0 +1,11 @@
+config BR2_PACKAGE_GEVENT
+	bool "gevent"
+	depends on BR2_PACKAGE_PYTHON
+	depends on BR2_PACKAGE_GREENLET
+	depends on BR2_PACKAGE_LIBEVENT
+
+	help
+	  gevent is a Python networking library that uses greenlet to 
+	  provide synchronous API on top of libevent event loop.
+	  
+	  http://www.gevent.org/

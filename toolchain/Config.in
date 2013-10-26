@@ -1,13 +1,5 @@
 menu "Toolchain"
 
-config BR2_TOOLCHAIN_NEEDS_THREE_STAGE_BUILD
-	bool
-	default y if BR2_TOOLCHAIN_LIBC_NEEDS_THREE_STAGE_BUILD && \
-		BR2_GCC_VERSION_NEEDS_THREE_STAGE_BUILD
-
-config BR2_TOOLCHAIN_LIBC_NEEDS_THREE_STAGE_BUILD
-	bool
-
 # Should be selected for glibc or eglibc
 config BR2_TOOLCHAIN_USES_GLIBC
 	bool
@@ -19,10 +11,18 @@ config BR2_TOOLCHAIN_USES_GLIBC
 	select BR2_TOOLCHAIN_HAS_THREADS_DEBUG
 	select BR2_TOOLCHAIN_HAS_SHADOW_PASSWORDS
 	select BR2_TOOLCHAIN_HAS_SSP
-	select BR2_TOOLCHAIN_LIBC_NEEDS_THREE_STAGE_BUILD
 
 config BR2_TOOLCHAIN_USES_UCLIBC
 	bool
+
+config BR2_TOOLCHAIN_USES_MUSL
+	bool
+	select BR2_LARGEFILE
+	select BR2_INET_IPV6
+	select BR2_USE_WCHAR
+	select BR2_ENABLE_LOCALE
+	select BR2_TOOLCHAIN_HAS_THREADS
+	select BR2_TOOLCHAIN_HAS_THREADS_DEBUG
 
 choice
 	prompt "Toolchain type"
@@ -45,23 +45,10 @@ config BR2_TOOLCHAIN_EXTERNAL
 	  toolchain. Buildroot can either download automatically a
 	  toolchain, or use an already installed toolchain.
 
-config BR2_TOOLCHAIN_CTNG
-	bool "Crosstool-NG toolchain"
-	depends on BR2_DEPRECATED
-	depends on !BR2_microblaze && !BR2_aarch64 && !BR2_xtensa && \
-		   !BR2_arc && !BR2_nios2
-	select BR2_TOOLCHAIN_HAS_SHADOW_PASSWORDS
-	help
-	  Say 'y' if you want to generate the toolchain with crosstool-NG
-	  (http://crosstool-ng.org).
-
-	  This is considered experimental, and you can expect some breakage.
-
 endchoice
 
 source "toolchain/toolchain-buildroot/Config.in"
 source "toolchain/toolchain-external/Config.in"
-source "toolchain/toolchain-crosstool-ng/Config.in"
 source "toolchain/toolchain-common.in"
 
 endmenu

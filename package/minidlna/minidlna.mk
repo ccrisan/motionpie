@@ -4,9 +4,8 @@
 #
 ################################################################################
 
-MINIDLNA_VERSION = 1.0.25
+MINIDLNA_VERSION = 1.0.26
 MINIDLNA_SITE = http://downloads.sourceforge.net/project/minidlna/minidlna/$(MINIDLNA_VERSION)
-MINIDLNA_SOURCE = minidlna_$(MINIDLNA_VERSION)_src.tar.gz
 MINIDLNA_LICENSE = GPLv2 BSD-3c
 MINIDLNA_LICENSE_FILES = LICENCE LICENCE.miniupnpd
 
@@ -36,10 +35,15 @@ endif
 
 MINIDLNA_MAKE_OPTS += LIBS='$(MINIDLNA_COMMON_LIBS)'
 
+# genconfig.sh uses absolute paths to find libav, so help it out
 define MINIDLNA_BUILD_CMDS
 	PREFIX=$(STAGING_DIR)/usr \
 		$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
 		CFLAGS="$(MINIDLNA_CFLAGS)" -C $(@D) depend
+	$(SED) '/HAVE_LIBAV/d' $(@D)/config.h
+	echo "#define HAVE_LIBAVUTIL_AVUTIL_H 1" >>$(@D)/config.h
+	echo "#define HAVE_LIBAVFORMAT_AVFORMAT_H 1" >>$(@D)/config.h
+	echo "#define HAVE_LIBAVCODEC_AVCODEC_H 1" >>$(@D)/config.h
 	$(TARGET_MAKE_ENV) $(MAKE) $(TARGET_CONFIGURE_OPTS) \
 		CFLAGS="$(MINIDLNA_CFLAGS)" $(MINIDLNA_MAKE_OPTS) -C $(@D) all
 endef

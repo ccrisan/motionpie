@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-BOOST_VERSION = 1.53.0
+BOOST_VERSION = 1.54.0
 BOOST_FILE_VERSION = $(subst .,_,$(BOOST_VERSION))
 BOOST_SOURCE = boost_$(BOOST_FILE_VERSION).tar.bz2
 BOOST_SITE = http://downloads.sourceforge.net/project/boost/boost/$(BOOST_VERSION)
@@ -17,7 +17,9 @@ BOOST_DEPENDENCIES =
 BOOST_FLAGS =
 
 # atomic library compile only with upstream version, wait for next release
-BOOST_WITHOUT_FLAGS = python atomic
+# coroutine breaks on some weak toolchains and it's new for 1.54+
+# log breaks with some toolchain combinations and it's new for 1.54+
+BOOST_WITHOUT_FLAGS = atomic coroutine log python
 
 BOOST_WITHOUT_FLAGS += $(if $(BR2_PACKAGE_BOOST_CHRONO),,chrono)
 BOOST_WITHOUT_FLAGS += $(if $(BR2_PACKAGE_BOOST_CONTEXT),,context)

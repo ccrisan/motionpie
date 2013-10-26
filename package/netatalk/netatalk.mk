@@ -11,6 +11,8 @@ NETATALK_AUTORECONF = YES
 NETATALK_CONFIG_SCRIPTS = netatalk-config
 NETATALK_DEPENDENCIES = host-pkgconf openssl berkeleydb libgcrypt libgpg-error \
 	libevent
+NETATALK_LICENSE = GPLv2+, LGPLv3+, MIT-like
+NETATALK_LICENSE_FILES = COPYING COPYRIGHT
 
 # Don't run ldconfig!
 NETATALK_CONF_ENV += CC="$(TARGET_CC) -std=gnu99" \
@@ -24,7 +26,8 @@ NETATALK_CONF_OPT += --with-cnid-cdb-backend \
 	--disable-shell-check \
 	--without-kerberos \
 	--without-pam \
-	--with-libevent=no
+	--with-libevent=no \
+	--with-dtrace=no
 
 ifeq ($(BR2_PACKAGE_CUPS),y)
 	NETATALK_DEPENDENCIES += cups

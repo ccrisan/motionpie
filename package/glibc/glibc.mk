@@ -21,16 +21,10 @@ GLIBC_LICENSE_FILES = $(addprefix $(GLIBC_SRC_SUBDIR)/,COPYING COPYING.LIB LICEN
 
 # Before (e)glibc is configured, we must have the first stage
 # cross-compiler and the kernel headers
-GLIBC_DEPENDENCIES = host-gcc-initial linux-headers
+GLIBC_DEPENDENCIES = host-gcc-initial linux-headers host-gawk
 
-# eglibc also needs host-gawk
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT_EGLIBC),y)
-GLIBC_DEPENDENCIES += host-gawk
-endif
-
-# Before (e)glibc is built, we must have the second stage
-# cross-compiler, for some gcc versions
-glibc-build: $(if $(BR2_TOOLCHAIN_NEEDS_THREE_STAGE_BUILD),host-gcc-intermediate)
+# Before (e)glibc is built, we must have the second stage cross-compiler
+glibc-build: host-gcc-intermediate
 
 GLIBC_SUBDIR = build
 
@@ -51,6 +45,17 @@ ifeq ($(BR2_MIPS_NABI64),y)
 GLIBC_EXTRA_CFLAGS += -mabi=64
 else ifeq ($(BR2_MIPS_OABI32),y)
 GLIBC_EXTRA_CFLAGS += -mabi=32
+endif
+
+# The stubs.h header is not installed by install-headers, but is
+# needed for the gcc build. An empty stubs.h will work, as explained
+# in http://gcc.gnu.org/ml/gcc/2002-01/msg00900.html. The same trick
+# is used by Crosstool-NG.
+ifeq ($(BR2_TOOLCHAIN_BUILDROOT_GLIBC),y)
+define GLIBC_ADD_MISSING_STUB_H
+	mkdir -p $(STAGING_DIR)/usr/include/gnu
+	touch $(STAGING_DIR)/usr/include/gnu/stubs.h
+endef
 endif
 
 # Even though we use the autotools-package infrastructure, we have to
@@ -95,6 +100,7 @@ define GLIBC_CONFIGURE_CMDS
 	cp $(@D)/build/csu/crt1.o $(STAGING_DIR)/usr/lib/
 	cp $(@D)/build/csu/crti.o $(STAGING_DIR)/usr/lib/
 	cp $(@D)/build/csu/crtn.o $(STAGING_DIR)/usr/lib/
+	$(GLIBC_ADD_MISSING_STUB_H)
 	$(TARGET_CROSS)gcc -nostdlib \
 		-nostartfiles -shared -x c /dev/null -o $(STAGING_DIR)/usr/lib/libc.so
 endef
@@ -106,12 +112,12 @@ endef
 #
 
 GLIBC_LIBS_LIB = \
-	ld*.so libc.so libcrypt.so libdl.so libgcc_s.so libm.so	   \
-	libnsl.so libpthread.so libresolv.so librt.so libutil.so   \
-	libnss_files.so libnss_dns.so
+	ld*.so.* libc.so.* libcrypt.so.* libdl.so.* libgcc_s.so.* libm.so.*        \
+	libnsl.so.* libpthread.so.* libresolv.so.* librt.so.* libutil.so.*   \
+	libnss_files.so.* libnss_dns.so.*
 
 ifeq ($(BR2_PACKAGE_GDB_SERVER),y)
-GLIBC_LIBS_LIB += libthread_db.so
+GLIBC_LIBS_LIB += libthread_db.so.*
 endif
 
 define GLIBC_INSTALL_TARGET_CMDS

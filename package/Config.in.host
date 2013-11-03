@@ -13,5 +13,6 @@ source "package/openocd/Config.in.host"
 source "package/sam-ba/Config.in.host"
 source "package/sunxi-tools/Config.in.host"
 source "package/uboot-tools/Config.in.host"
+source "package/python-setuptools/Config.in.host"
 
 endmenu

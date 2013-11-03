@@ -1,6 +1,7 @@
 config BR2_PACKAGE_PYTHON_WIRINGPI2
 	bool "python-wiringpi2"
 	depends on BR2_PACKAGE_PYTHON
+	depends on BR2_PACKAGE_HOST_PYTHON_SETUPTOOLS
 	
 	help
 	  wiringPi C libraries and python bindings

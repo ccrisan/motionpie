@@ -1,0 +1,6 @@
+config BR2_PACKAGE_HOST_PYTHON_SETUPTOOLS
+	bool "host python-setuptools"
+	help
+	  Download, build, install, upgrade, and uninstall Python packages.
+	
+	  http://pypi.python.org/pypi/setuptools

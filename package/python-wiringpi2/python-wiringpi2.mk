@@ -11,10 +11,9 @@ PYTHON_WIRINGPI2_SITE = https://github.com/WiringPi/WiringPi2-Python.git
 PYTHON_WIRINGPI2_SITE_METHOD = git
 
 PYTHON_WIRINGPI2_DEPENDENCIES = python
-#export PYTHONPATH=/home/razvan/rpi-buildroot/output/target/usr/lib/python2.7/site-packages/
+export PYTHONPATH=$(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/site-packages/
 
 define PYTHON_WIRINGPI2_BUILD_CMDS
-	(export PYTHONPATH=$(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION)/site-packages/)
 	(cd $(@D); swig -python wiringpi.i)
 	(cd $(@D); CC="$(TARGET_CC)" CFLAGS="$(TARGET_CFLAGS)" \
 		LDSHARED="$(TARGET_CROSS)gcc -shared" \

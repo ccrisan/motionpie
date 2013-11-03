@@ -84,13 +84,17 @@ QT5BASE_CONFIGURE_OPTS += $(if $(BR2_PACKAGE_QT5BASE_DIRECTFB),-directfb,-no-dir
 QT5BASE_DEPENDENCIES   += $(if $(BR2_PACKAGE_QT5BASE_DIRECTFB),directfb)
 
 ifeq ($(BR2_PACKAGE_QT5BASE_XCB),y)
-QT5BASE_CONFIGURE_OPTS += -xcb
+QT5BASE_CONFIGURE_OPTS += -xcb -system-xkbcommon
 QT5BASE_DEPENDENCIES   += \
 	libxcb \
 	xcb-util-wm \
 	xcb-util-image \
 	xcb-util-keysyms \
-	xlib_libX11
+	xlib_libX11 \
+	libxkbcommon
+ifeq ($(BR2_PACKAGE_QT5BASE_WIDGETS),y)
+QT5BASE_DEPENDENCIES   += xlib_libXext
+endif
 else
 QT5BASE_CONFIGURE_OPTS += -no-xcb
 endif
@@ -123,6 +127,9 @@ QT5BASE_DEPENDENCIES   += $(if $(BR2_PACKAGE_QT5BASE_PNG),libpng)
 
 QT5BASE_CONFIGURE_OPTS += $(if $(BR2_PACKAGE_QT5BASE_DBUS),-dbus,-no-dbus)
 QT5BASE_DEPENDENCIES   += $(if $(BR2_PACKAGE_QT5BASE_DBUS),dbus)
+
+QT5BASE_CONFIGURE_OPTS += $(if $(BR2_PACKAGE_QT5BASE_TSLIB),-tslib,-no-tslib)
+QT5BASE_DEPENDENCIES   += $(if $(BR2_PACKAGE_QT5BASE_TSLIB),tslib)
 
 QT5BASE_CONFIGURE_OPTS += $(if $(BR2_PACKAGE_LIBGLIB2),-glib,-no-glib)
 QT5BASE_DEPENDENCIES   += $(if $(BR2_PACKAGE_LIBGLIB2),libglib2)
@@ -172,7 +179,7 @@ define QT5BASE_CONFIGURE_CMDS
 		-sysroot $(STAGING_DIR) \
 		-plugindir /usr/lib/qt/plugins \
 		-no-rpath \
-		-nomake examples -nomake demos -nomake tests \
+		-nomake examples -nomake tests \
 		-device buildroot \
 		-no-c++11 \
 		$(QT5BASE_CONFIGURE_OPTS) \

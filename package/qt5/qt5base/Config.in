@@ -104,6 +104,7 @@ if BR2_PACKAGE_QT5BASE_GUI
 
 config BR2_PACKAGE_QT5BASE_WIDGETS
 	bool "widgets module"
+	select BR2_PACKAGE_XLIB_LIBXEXT if BR2_PACKAGE_QT5BASE_XCB
 	help
 	  This option enables the Qt5Widgets library.
 
@@ -122,6 +123,7 @@ config BR2_PACKAGE_QT5BASE_XCB
 	select BR2_PACKAGE_XCB_UTIL_IMAGE
 	select BR2_PACKAGE_XCB_UTIL_KEYSYMS
 	select BR2_PACKAGE_XCB_UTIL_WM
+	select BR2_PACKAGE_LIBXKBCOMMON
 
 comment "X.org XCB backend available if X.org is enabled"
 	depends on !BR2_PACKAGE_XORG7
@@ -182,5 +184,15 @@ config BR2_PACKAGE_QT5BASE_ICU
 	help
 	  This option enables ICU support in Qt5. This is for example
 	  needed for Qt5Webkit.
+
+config BR2_PACKAGE_QT5BASE_TSLIB
+	bool "Enable Tslib support"
+	depends on !BR2_PREFER_STATIC_LIB # dlopen
+	select BR2_PACKAGE_TSLIB
+	help
+	  This options enables the Tslib plugin
+
+comment "tslib support needs a toolchain w/ dynamic library"
+	depends on BR2_PREFER_STATIC_LIB
 
 endif

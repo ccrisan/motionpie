@@ -74,6 +74,29 @@ MB will do.
 **Notice** you will need to replace *sdx* in the following commands with the
 actual device node for your sdcard.
 
+Create the partitions on the SD card. Run the following as root.
+**Notice** all data on the SD card will be lost. 
+
+	fdisk /dev/sdx
+	> p 		#prints partition table
+	> d		#repeat until all partitions are deleted
+	> n		#create a new partition
+	> p		#create primary
+	> 1		#make it the first partition
+	> <enter> 	#use the default sector
+	> +75M		#create a boot partition with 75MV of space
+	> n		#create rootfs partition
+	> p
+	> 2
+	> <enter>
+	> <enter>	#fill the remaining disk, adjust size to fit your needs
+	> p		#double check everything looks right
+	> w		#write partition table to disk. 
+	
+Format the boot partition with FAT 32
+
+**Notice** if `mkfs.vfat` errors with `WARNING: Not enough clusters for a 32 bit FAT!` add `-s2` to the command.
+
 	# run the following as root
 	mkfs.vfat -F 32 -n boot /dev/sdx1
 	mkdir -p /media/boot

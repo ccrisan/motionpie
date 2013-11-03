@@ -68,37 +68,35 @@ actual device node for your sdcard.
 ### Manual
 
 You will need to create two partitions in your sdcard, the first (boot) needs
-to be a small *W95 FAT32 (LBA)* patition (that's partition id **c**), about 50
+to be a small *W95 FAT16 (LBA)* patition (that's partition id **e**), about 32
 MB will do.
 
 **Notice** you will need to replace *sdx* in the following commands with the
 actual device node for your sdcard.
 
 Create the partitions on the SD card. Run the following as root.
-**Notice** all data on the SD card will be lost. 
+**Notice** all data on the SD card will be lost.
 
 	fdisk /dev/sdx
-	> p 		#prints partition table
-	> d		#repeat until all partitions are deleted
-	> n		#create a new partition
-	> p		#create primary
-	> 1		#make it the first partition
-	> <enter> 	#use the default sector
-	> +75M		#create a boot partition with 75MV of space
-	> n		#create rootfs partition
+	> p             # prints partition table
+	> d             # repeat until all partitions are deleted
+	> n             # create a new partition
+	> p             # create primary
+	> 1             # make it the first partition
+	> <enter>       # use the default sector
+	> +32M          # create a boot partition with 32MB of space
+	> n             # create rootfs partition
 	> p
 	> 2
 	> <enter>
-	> <enter>	#fill the remaining disk, adjust size to fit your needs
-	> p		#double check everything looks right
-	> w		#write partition table to disk. 
-	
-Format the boot partition with FAT 32
+	> <enter>       # fill the remaining disk, adjust size to fit your needs
+	> p             # double check everything looks right
+	> w             # write partition table to disk.
 
-**Notice** if `mkfs.vfat` errors with `WARNING: Not enough clusters for a 32 bit FAT!` add `-s2` to the command.
+Now format the boot partition as FAT 16
 
 	# run the following as root
-	mkfs.vfat -F 32 -n boot /dev/sdx1
+	mkfs.vfat -F16 -n boot /dev/sdx1
 	mkdir -p /media/boot
 	mount /dev/sdx1 /media/boot
 

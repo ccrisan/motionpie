@@ -10,7 +10,7 @@ NAME=mongoose
 DESC="Mongoose HTTP server"
 
 DAEMON=`which mongoose`
-OPTIONS="-max_threads 3 -root /var/www  -ports 80"
+OPTIONS="-num_threads 3 -document_root /var/www -listening_ports 80"
 
 [ -e /etc/default/mongoose ] && . /etc/default/mongoose
 
@@ -28,12 +28,12 @@ case "$1" in
   restart|force-reload)
 	echo -n "Restarting $DESC: "
 	start-stop-daemon -K -x "$DAEMON"
+	sleep 1
 	start-stop-daemon -S -x "$DAEMON" -b -- $OPTIONS
 	echo "$NAME."
 	;;
   *)
-	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	echo "Usage: $0 {start|stop|restart|force-reload}" >&2
 	exit 1
 	;;
 esac

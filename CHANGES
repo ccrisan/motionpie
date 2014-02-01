@@ -1,3 +1,36 @@
+2013.11, Released November 30th, 2013:
+
+	Minor fixes.
+
+	Updated/fixed packages: apr, binutils, dbus-python, dropwatch,
+	ecryptfs-utils, eglibc, gdb, gpsd, grantlee, hostapd,
+	iptables, qlibiscsi, libnspr, libnss, libpfm4, libtool,
+	lua-ev, lvm2, mplayer, qt, qt5, quagga, ruby, tinymembench,
+	tvheadend, util-linux, wpa_supplicant
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#1279: Buildroot compiled Busybox and Coreutils LFS issues
+	#2995: -fstack-protector-all causes ssh to SIGSEGV
+	#5570: Cannot compile software on the target machine
+	#6428: util-linux libmount segfaults with patch from buildroot
+	#6500: php fails to build for armel
+	#6554: gdb needs to dependents on host texinfo
+	#6692: GNU nano fails to compile for x86_64
+	#6704: wpa_supplicant: fix wrong path to executable file in D-Bus
+
+2013.11-rc3, Released November 26th, 2013
+
+	Fixes all over the tree.
+
+	Architecture: Mark MIPS I, II, III and IV as deprecated.
+
+	Updated/fixed packages: beecrypt, dbus, e2fsprogs, libcap-ng,
+	libglib2, libroxml, libsigsegv, libvncserver, lxc, mdadm,
+	mongoose, nut, ola, omniorb, openssl, pcre, php, poco,
+	protobuf-c, pv, qt5base, ruby, schifra, squid, sunxi-mail,
+	swig, ti-gfx, tinymembench, uclibc, udisks, vim
+
 2013.11-rc2, Released November 18th, 2013
 
 	Fixes all over the tree.

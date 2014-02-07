@@ -1,5 +1,5 @@
 BR2_arm=y
-BR2_arm11.7jzf_s=y
+BR2_arm1176jzf_s=y
 
 #
 # uClibc Options

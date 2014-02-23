@@ -8,12 +8,17 @@ config BR2_PACKAGE_LINUX_FIRMWARE
 
 if BR2_PACKAGE_LINUX_FIRMWARE
 
-menu "WiFi firmwares"
+menu "WiFi firmware"
 
 config BR2_PACKAGE_LINUX_FIRMWARE_ATHEROS_7010
 	bool "Atheros 7010"
 	help
 	  Firmware files for the Atheros 7010 module
+
+config BR2_PACKAGE_LINUX_FIRMWARE_ATHEROS_9170
+	bool "Atheros 9170"
+	help
+	  Firmware files for the Atheros 9170 module
 
 config BR2_PACKAGE_LINUX_FIRMWARE_ATHEROS_9271
 	bool "Atheros 9271"
@@ -25,10 +30,22 @@ config BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM43XX
 	help
 	  Firmware files for the Broadcom BRCM bcm43xx
 
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160
+	bool "Intel iwlwifi 3160"
+	help
+	  Firmware files for the Intel Wifi 3160 devices supported by
+	  the iwlwifi kernel driver.
+
 config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_5000
 	bool "Intel iwlwifi 5000"
 	help
 	  Firmware files for the Intel Wifi 5000 devices supported by
+	  the iwlwifi kernel driver.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_7260
+	bool "Intel iwlwifi 7260"
+	help
+	  Firmware files for the Intel Wifi 7260 devices supported by
 	  the iwlwifi kernel driver.
 
 config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8686_V8
@@ -88,7 +105,20 @@ config BR2_PACKAGE_LINUX_FIRMWARE_TI_WL128X
 
 endmenu
 
-menu "DVB firmwares"
+menu "Ethernet firmware"
+
+config BR2_PACKAGE_LINUX_FIRMWARE_BNX2X
+	bool "Broadcom NetXtremeII"
+	help
+	  Firmware files for Broadcom NetXtreme 10Gb ethernet cards (bnx2x)
+
+config BR2_PACKAGE_LINUX_FIRMWARE_CXGB4
+	bool "Chelsio T4 "
+	help
+	  Firmware files for Chelsio T4 1Gb and 10Gb ethernet cards (cxgb4)
+endmenu
+
+menu "DVB firmware"
 
 config BR2_PACKAGE_LINUX_FIRMWARE_DIB0700
 	bool "DiBcom dib0700"

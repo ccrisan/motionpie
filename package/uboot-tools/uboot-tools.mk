@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-UBOOT_TOOLS_VERSION = 2013.10
+UBOOT_TOOLS_VERSION = 2014.01
 UBOOT_TOOLS_SOURCE  = u-boot-$(UBOOT_TOOLS_VERSION).tar.bz2
 UBOOT_TOOLS_SITE    = ftp://ftp.denx.de/pub/u-boot
 UBOOT_TOOLS_LICENSE = GPLv2+
@@ -42,11 +42,6 @@ define UBOOT_TOOLS_INSTALL_TARGET_CMDS
 	$(UBOOT_TOOLS_INSTALL_MKIMAGE)
 	$(UBOOT_TOOLS_INSTALL_MKENVIMAGE)
 	$(UBOOT_TOOLS_INSTALL_FWPRINTENV)
-endef
-
-define UBOOT_TOOLS_UNINSTALL_TARGET_CMDS
-	rm -f $(addprefix $(TARGET_DIR)/,\
-		usr/bin/mkimage usr/sbin/fw_printenv usr/sbin/fw_setenv)
 endef
 
 define HOST_UBOOT_TOOLS_BUILD_CMDS

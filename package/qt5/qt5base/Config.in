@@ -28,6 +28,13 @@ config BR2_PACKAGE_QT5BASE_LICENSE_APPROVED
 
 	  See also http://qt-project.org/doc/qt-5.0/qtdoc/licensing.html
 
+config BR2_PACKAGE_QT5BASE_EXAMPLES
+	bool "Compile and install examples (with code)"
+	select BR2_PACKAGE_QT5BASE_NETWORK
+	select BR2_PACKAGE_QT5BASE_XML
+	help
+	  If unsure, say N.
+
 config BR2_PACKAGE_QT5BASE_NETWORK
 	bool "network module"
 	help
@@ -46,7 +53,7 @@ config BR2_PACKAGE_QT5BASE_SQL
 if BR2_PACKAGE_QT5BASE_SQL
 config BR2_PACKAGE_QT5BASE_MYSQL
 	bool "MySQL Plugin"
-	select BR2_PACKAGE_MYSQL_CLIENT
+	select BR2_PACKAGE_MYSQL
 	select BR2_PACKAGE_NCURSES
 	select BR2_PACKAGE_READLINE
 	depends on BR2_USE_MMU # mysql

@@ -16,16 +16,8 @@ define WHETSTONE_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE) LDLIBS="-lm" -C $(@D) whetstone
 endef
 
-define WHETSTONE_CLEAN_CMDS
-	rm -f $(@D)/whetstone
-endef
-
 define WHETSTONE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D $(@D)/whetstone $(TARGET_DIR)/usr/bin/whetstone
-endef
-
-define WHETSTONE_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/bin/whetstone
 endef
 
 $(eval $(generic-package))

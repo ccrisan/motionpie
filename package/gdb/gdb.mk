@@ -7,29 +7,23 @@
 GDB_VERSION = $(call qstrip,$(BR2_GDB_VERSION))
 GDB_SITE    = $(BR2_GNU_MIRROR)/gdb
 
-# When no version is defined, it means that cross-gdb for the host has
-# not been enabled, and we will only build gdbserver or gdb for the
-# target. In this case, use the latest available version
-# automatically.
-ifeq ($(GDB_VERSION),)
-ifeq ($(BR2_bfin),y)
-GDB_VERSION = 6.6a
-else ifeq ($(BR2_avr32),y)
-GDB_VERSION = 6.7.1-avr32-2.1.5
-else
-GDB_VERSION = 7.5.1
-endif
+ifeq ($(BR2_arc),y)
+GDB_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,gdb,$(GDB_VERSION))
+GDB_SOURCE = gdb-$(GDB_VERSION).tar.gz
+GDB_FROM_GIT = y
 endif
 
-ifeq ($(BR2_arc),y)
-GDB_SITE = $(BR2_ARC_SITE)
+ifeq ($(BR2_microblaze),y)
+GDB_SITE = $(call github,Xilinx,gdb,$(GDB_VERSION))
+GDB_SOURCE = gdb-$(GDB_VERSION).tar.gz
+GDB_FROM_GIT = y
 endif
 
 ifeq ($(GDB_VERSION),6.7.1-avr32-2.1.5)
 GDB_SITE = ftp://www.at91.com/pub/buildroot/
 endif
 
-GDB_SOURCE = gdb-$(GDB_VERSION).tar.bz2
+GDB_SOURCE ?= gdb-$(GDB_VERSION).tar.bz2
 GDB_LICENSE = GPLv2+ LGPLv2+ GPLv3+ LGPLv3+
 GDB_LICENSE_FILES = COPYING COPYING.LIB COPYING3 COPYING3.LIB
 
@@ -119,6 +113,10 @@ HOST_GDB_CONF_OPT = \
 	--disable-werror \
 	--without-included-gettext \
 	--disable-sim
+
+ifeq ($(GDB_FROM_GIT),y)
+HOST_GDB_DEPENDENCIES += host-texinfo
+endif
 
 # legacy $arch-linux-gdb symlink
 define HOST_GDB_ADD_SYMLINK

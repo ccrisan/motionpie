@@ -19,10 +19,6 @@ define PORTMAP_BUILD_CMDS
 	$(MAKE) CC="$(TARGET_CC)" -C $(@D) $(PORTMAP_FLAGS)
 endef
 
-define PORTMAP_CLEAN_CMDS
-	$(MAKE) -C $(@D) clean
-endef
-
 define PORTMAP_INSTALL_TARGET_CMDS
 	for sbin in $(PORTMAP_SBINS); do \
 		$(INSTALL) -D $(@D)/$$sbin $(TARGET_DIR)/sbin/$$sbin; \
@@ -35,12 +31,6 @@ define PORTMAP_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/share/man/man8/pmap_set.8
 	$(INSTALL) -m 0755 package/portmap/S13portmap \
 		$(TARGET_DIR)/etc/init.d
-endef
-
-define PORTMAP_UNINSTALL_TARGET_CMDS
-	rm -f $(addprefix $(TARGET_DIR)/sbin/,$(PORTMAP_SBINS))
-	rm -f $(addprefix $(TARGET_DIR)/usr/share/man/man8/, \
-		$(addsuffix .8,$(PORTMAP_SBINS)))
 endef
 
 $(eval $(generic-package))

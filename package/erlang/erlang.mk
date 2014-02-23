@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ERLANG_VERSION = R16B01
+ERLANG_VERSION = R16B03-1
 ERLANG_SITE = http://www.erlang.org/download
 ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
 ERLANG_DEPENDENCIES = host-erlang
@@ -41,6 +41,10 @@ endif
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 ERLANG_CONF_OPT += --enable-shared-zlib
 ERLANG_DEPENDENCIES += zlib
+endif
+
+ifeq ($(BR2_PACKAGE_ERLANG_SMP),)
+ERLANG_CONF_OPT += --disable-smp-support
 endif
 
 # Remove source, example, gs and wx files from the target

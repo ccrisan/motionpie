@@ -31,17 +31,9 @@ define WIRELESS_TOOLS_BUILD_CMDS
 		$(WIRELESS_TOOLS_BUILD_TARGETS)
 endef
 
-define WIRELESS_TOOLS_CLEAN_CMDS
-	$(MAKE) -C $(@D) realclean
-endef
-
 define WIRELESS_TOOLS_INSTALL_TARGET_CMDS
 	$(MAKE) -C $(@D) PREFIX="$(TARGET_DIR)" LDCONFIG=/bin/true $(WIRELESS_TOOLS_INSTALL_TARGETS)
 	$(MAKE) -C $(@D) INSTALL_MAN="$(TARGET_DIR)/usr/share/man" install-man
-endef
-
-define WIRELESS_TOOLS_UNINSTALL_TARGET_CMDS
-	$(MAKE) -C $(@D) PREFIX="$(TARGET_DIR)" uninstall
 endef
 
 $(eval $(generic-package))

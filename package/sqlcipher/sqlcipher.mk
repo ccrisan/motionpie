@@ -5,7 +5,7 @@
 ################################################################################
 
 SQLCIPHER_VERSION = v1.1.9
-SQLCIPHER_SITE = http://github.com/sqlcipher/sqlcipher/archive/$(SQLCIPHER_VERSION)
+SQLCIPHER_SITE = $(call github,sqlcipher,sqlcipher,$(SQLCIPHER_VERSION))
 SQLCIPHER_DEPENDENCIES = openssl host-tcl
 SQLCIPHER_INSTALL_STAGING = YES
 
@@ -32,25 +32,15 @@ ifeq ($(BR2_PACKAGE_SQLCIPHER_STAT3),y)
 SQLCIPHER_CFLAGS += -DSQLITE_ENABLE_STAT3
 endif
 
+ifeq ($(BR2_xtensa),y)
+SQLCIPHER_CFLAGS += -mtext-section-literals
+endif
+
 ifeq ($(BR2_PACKAGE_SQLCIPHER_READLINE),y)
 SQLCIPHER_DEPENDENCIES += ncurses readline
 SQLCIPHER_CONF_OPT += --with-readline-inc="-I$(STAGING_DIR)/usr/include"
 else
 SQLCIPHER_CONF_OPT += --disable-readline
 endif
-
-define SQLCIPHER_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/bin/sqlite3
-	rm -f $(TARGET_DIR)/usr/lib/libsqlite3*
-	rm -f $(TARGET_DIR)/usr/lib/pkgconfig/sqlite3.pc
-	rm -f $(TARGET_DIR)/usr/include/sqlite3*.h
-endef
-
-define SQLCIPHER_UNINSTALL_STAGING_CMDS
-	rm -f $(STAGING_DIR)/usr/bin/sqlite3
-	rm -f $(STAGING_DIR)/usr/lib/libsqlite3*
-	rm -f $(STAGING_DIR)/usr/lib/pkgconfig/sqlite3.pc
-	rm -f $(STAGING_DIR)/usr/include/sqlite3*.h
-endef
 
 $(eval $(autotools-package))

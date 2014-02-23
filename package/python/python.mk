@@ -26,7 +26,6 @@ HOST_PYTHON_CONF_OPT += 	\
 	--disable-curses	\
 	--disable-codecs-cjk	\
 	--disable-nis		\
-	--disable-unicodedata	\
 	--disable-dbm		\
 	--disable-gdbm		\
 	--disable-bsddb		\
@@ -50,6 +49,12 @@ HOST_PYTHON_MAKE = $(MAKE1)
 PYTHON_DEPENDENCIES  = host-python libffi
 
 HOST_PYTHON_DEPENDENCIES = host-expat host-zlib
+
+define HOST_PYTHON_INSTALL_PGEN
+	$(INSTALL) -m0755 -D $(@D)/Parser/pgen $(HOST_DIR)/usr/bin/python-pgen
+endef
+
+HOST_PYTHON_POST_INSTALL_HOOKS += HOST_PYTHON_INSTALL_PGEN
 
 PYTHON_INSTALL_STAGING = YES
 
@@ -94,6 +99,12 @@ endif
 
 ifneq ($(BR2_PACKAGE_PYTHON_UNICODEDATA),y)
 PYTHON_CONF_OPT += --disable-unicodedata
+HOST_PYTHON_CONF_OPT += --disable-unicodedata
+endif
+
+# Default is UCS2 w/o a conf opt
+ifeq ($(BR2_PACKAGE_PYTHON_UCS4),y)
+PYTHON_CONF_OPT += --enable-unicode=ucs4
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_BZIP2),y)
@@ -113,9 +124,14 @@ PYTHON_DEPENDENCIES += openssl
 endif
 
 PYTHON_CONF_ENV += \
-	PYTHON_FOR_BUILD=$(HOST_PYTHON_DIR)/python \
-	PGEN_FOR_BUILD=$(HOST_PYTHON_DIR)/Parser/pgen \
+	PYTHON_FOR_BUILD=$(HOST_DIR)/usr/bin/python \
+	PGEN_FOR_BUILD=$(HOST_DIR)/usr/bin/python-pgen \
 	ac_cv_have_long_long_format=yes
+
+PYTHON_MAKE_ENV += \
+	_python_sysroot=$(STAGING_DIR) \
+	PYTHON_MODULES_INCLUDE=$(STAGING_DIR)/usr/include \
+	PYTHON_MODULES_LIB="$(STAGING_DIR)/lib $(STAGING_DIR)/usr/lib"
 
 PYTHON_CONF_OPT += \
 	--without-cxx-main 	\
@@ -128,19 +144,6 @@ PYTHON_CONF_OPT += \
 	--disable-tk		\
 	--disable-nis		\
 	--disable-dbm
-
-PYTHON_MAKE_ENV = \
-	PYTHON_MODULES_INCLUDE=$(STAGING_DIR)/usr/include \
-	PYTHON_MODULES_LIB="$(STAGING_DIR)/lib $(STAGING_DIR)/usr/lib"
-
-# python distutils adds -L$LIBDIR when linking binary extensions, causing
-# trouble for cross compilation
-define PYTHON_FIXUP_LIBDIR
-	$(SED) 's|^LIBDIR=.*|LIBDIR= $(STAGING_DIR)/usr/lib|' \
-	   $(STAGING_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/config/Makefile
-endef
-
-PYTHON_POST_INSTALL_STAGING_HOOKS += PYTHON_FIXUP_LIBDIR
 
 #
 # Remove useless files. In the config/ directory, only the Makefile

@@ -1,6 +1,7 @@
 config BR2_PACKAGE_LUAPOSIX
 	bool "luaposix"
-	select BR2_PACKAGE_LUABITOP if BR2_PACKAGE_LUA
+	depends on BR2_PACKAGE_HAS_LUA_INTERPRETER
+	select BR2_PACKAGE_LUABITOP if BR2_PACKAGE_LUA_5_1
 	# LuaBitOp is already included in LuaJIT
 	help
 	  luaposix is a POSIX binding, including curses, for Lua 5.1
@@ -11,4 +12,3 @@ config BR2_PACKAGE_LUAPOSIX
 	  APIs
 
 	  https://github.com/luaposix/luaposix
-

@@ -91,23 +91,12 @@ config BR2_PACKAGE_PHP_EXT_DBA_INI
 
 endif
 
-config BR2_PACKAGE_PHP_EXT_SQLITE
-	bool "SQLite"
-	help
-	  Legacy SQLite2 support
-
-config BR2_PACKAGE_PHP_EXT_SQLITE_UTF8
-	bool "sqlite UTF8 support"
-	depends on BR2_PACKAGE_PHP_EXT_SQLITE
-	help
-	  UTF8 support for sqlite
-
 config BR2_PACKAGE_PHP_EXT_MYSQL
 	bool "Mysql"
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_MMU # mysql
 	depends on BR2_TOOLCHAIN_HAS_THREADS # mysql
-	select BR2_PACKAGE_MYSQL_CLIENT
+	select BR2_PACKAGE_MYSQL
 	help
 	  MySQL support
 
@@ -116,7 +105,7 @@ config BR2_PACKAGE_PHP_EXT_MYSQLI
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_MMU # mysql
 	depends on BR2_TOOLCHAIN_HAS_THREADS # mysql
-	select BR2_PACKAGE_MYSQL_CLIENT
+	select BR2_PACKAGE_MYSQL
 	select BR2_PACKAGE_PHP_EXT_MYSQL
 	help
 	  MySQL Improved extension support
@@ -133,7 +122,7 @@ config BR2_PACKAGE_PHP_EXT_PDO_MYSQL
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_MMU # mysql
 	depends on BR2_TOOLCHAIN_HAS_THREADS # mysql
-	select BR2_PACKAGE_MYSQL_CLIENT
+	select BR2_PACKAGE_MYSQL
 	help
 	  PDO driver for MySQL
 
@@ -227,6 +216,7 @@ config BR2_PACKAGE_PHP_EXT_FTP
 
 config BR2_PACKAGE_PHP_EXT_SNMP
 	bool "SNMP"
+	depends on BR2_USE_MMU # netsnmp fork()
 	select BR2_PACKAGE_NETSNMP
 	select BR2_PACKAGE_NETSNMP_ENABLE_MIBS
 	help
@@ -234,13 +224,18 @@ config BR2_PACKAGE_PHP_EXT_SNMP
 
 config BR2_PACKAGE_PHP_EXT_SOCKETS
 	bool "sockets"
+	depends on BR2_INET_IPV6
 	help
 	  Sockets support
+
+comment "sockets support needs a toolchain w/ IPv6"
+	depends on !BR2_INET_IPV6
 
 comment "Process Control"
 
 config BR2_PACKAGE_PHP_EXT_PCNTL
 	bool "PCNTL"
+	depends on BR2_USE_MMU # fork()
 	help
 	  Process control support
 

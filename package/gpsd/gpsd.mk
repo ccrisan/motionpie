@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-GPSD_VERSION = 3.9
-GPSD_SITE = http://download-mirror.savannah.gnu.org/releases/gpsd/
+GPSD_VERSION = b4c32aa40cff1b4e1041d5f3004e9d9156cdf96f
+GPSD_SITE = git://git.savannah.nongnu.org/gpsd.git
 GPSD_LICENSE = BSD-3c
 GPSD_LICENSE_FILES = COPYING
 GPSD_INSTALL_STAGING = YES
@@ -147,7 +147,7 @@ ifneq ($(BR2_PACKAGE_GPSD_TRUE_NORTH),y)
 	GPSD_SCONS_OPTS += tnt=no
 endif
 ifneq ($(BR2_PACKAGE_GPSD_UBX),y)
-	GPSD_SCONS_OPTS += ubx=no
+	GPSD_SCONS_OPTS += ublox=no
 endif
 
 # Features

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GREP_VERSION = 2.14
+GREP_VERSION = 2.16
 GREP_SITE = $(BR2_GNU_MIRROR)/grep
 GREP_SOURCE = grep-$(GREP_VERSION).tar.xz
 GREP_LICENSE = GPLv3+
@@ -16,6 +16,12 @@ GREP_DEPENDENCIES = $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext)
 ifeq ($(BR2_PACKAGE_LIBICONV),y)
 GREP_CONF_ENV += LIBS=-liconv
 GREP_DEPENDENCIES += libiconv
+endif
+
+# link with pcre if enabled
+ifeq ($(BR2_PACKAGE_PCRE),y)
+GREP_CONF_OPT += --enable-perl-regexp
+GREP_DEPENDENCIES += pcre
 endif
 
 # Full grep preferred over busybox grep

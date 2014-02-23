@@ -99,6 +99,192 @@ comment "----------------------------------------------------"
 endif
 
 ###############################################################################
+comment "Legacy options removed in 2014.02"
+
+config BR2_sh2
+	bool "sh2 support removed"
+	help
+	  Due to an inexistent user base and generally poor Linux
+	  support, the support for the SH2 architecture was removed.
+
+config BR2_sh3
+	bool "sh3 support removed"
+	help
+	  Due to an inexistent user base and generally poor Linux
+	  support, the support for the SH3 architecture was removed.
+
+config BR2_sh3eb
+	bool "sh3eb support removed"
+	help
+	  Due to an inexistent user base and generally poor Linux
+	  support, the support for the SH3eb architecture was removed.
+
+config BR2_KERNEL_HEADERS_3_1
+	bool "kernel headers version 3.1.x are no longer supported"
+	select BR2_KERNEL_HEADERS_3_2
+	select BR2_LEGACY
+	help
+	  Version 3.1.x of the Linux kernel headers have been deprecated
+	  for more than four buildroot releases and are now removed.
+	  As an alternative, version 3.2.x of the headers have been
+	  automatically selected in your configuration.
+
+config BR2_KERNEL_HEADERS_3_3
+	bool "kernel headers version 3.3.x are no longer supported"
+	select BR2_KERNEL_HEADERS_3_4
+	select BR2_LEGACY
+	help
+	  Version 3.3.x of the Linux kernel headers have been deprecated
+	  for more than four buildroot releases and are now removed.
+	  As an alternative, version 3.4.x of the headers have been
+	  automatically selected in your configuration.
+
+config BR2_KERNEL_HEADERS_3_5
+	bool "kernel headers version 3.5.x are no longer supported"
+	select BR2_KERNEL_HEADERS_3_6
+	select BR2_LEGACY
+	help
+	  Version 3.5.x of the Linux kernel headers have been deprecated
+	  for more than four buildroot releases and are now removed.
+	  As an alternative, version 3.6.x of the headers have been
+	  automatically selected in your configuration.
+
+config BR2_GDB_VERSION_7_2
+	bool "gdb 7.2.x is no longer supported"
+	select BR2_GDB_VERSION_7_5
+	select BR2_LEGACY
+	help
+	  Version 7.2.x of gdb has been deprecated for more than four
+	  buildroot releases and is now removed. As an alternative, gdb
+	  7.5.x has been automatically selected in your configuration.
+
+config BR2_GDB_VERSION_7_3
+	bool "gdb 7.3.x is no longer supported"
+	select BR2_GDB_VERSION_7_5
+	select BR2_LEGACY
+	help
+	  Version 7.3.x of gdb has been deprecated for more than four
+	  buildroot releases and is now removed. As an alternative, gdb
+	  7.5.x has been automatically selected in your configuration.
+
+config BR2_PACKAGE_CCACHE
+	bool "ccache target package has been removed"
+	select BR2_LEGACY
+	help
+	  The 'ccache' target package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+	  Note: using ccache for speeding up builds is still supported.
+
+config BR2_HAVE_DOCUMENTATION
+	bool "support for documentation on target has been removed"
+	select BR2_LEGACY
+	help
+	  Support for documentation on target has been removed since it has
+	  been deprecated for more than four buildroot releases.
+
+config BR2_PACKAGE_AUTOMAKE
+	bool "automake target package has been removed"
+	select BR2_LEGACY
+	help
+	  The 'automake' target package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+	  Note: the host automake still exists.
+
+config BR2_PACKAGE_AUTOCONF
+	bool "autoconf target package has been removed"
+	select BR2_LEGACY
+	help
+	  The 'autoconf' target package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+	  Note: the host autoconf still exists.
+
+config BR2_PACKAGE_XSTROKE
+	bool "xstroke has been removed"
+	select BR2_LEGACY
+	help
+	  The 'xstroke' package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+
+config BR2_PACKAGE_LZMA
+	bool "lzma target package has been removed"
+	select BR2_LEGACY
+	help
+	  The 'lzma' target package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+	  Note: generating lzma-compressed rootfs images is still supported.
+
+config BR2_PACKAGE_TTCP
+	bool "ttcp has been removed"
+	select BR2_LEGACY
+	help
+	  The 'ttcp' package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+
+config BR2_PACKAGE_LIBNFC_LLCP
+	bool "libnfc-llcp has been replaced by libllcp"
+	select BR2_LEGACY
+	select BR2_PACKAGE_LIBLLCP
+	help
+	  The 'libnfc-llcp' package has been removed since upstream renamed
+	  to 'libllcp'. We have added a new package for 'libllcp' and bumped
+	  the version at the same time.
+
+config BR2_PACKAGE_MYSQL_CLIENT
+	bool "MySQL client renamed to MySQL"
+	select BR2_LEGACY
+	select BR2_PACKAGE_MYSQL
+	help
+	  The option has been renamed BR2_PACKAGE_MYSQL
+
+config BR2_PACKAGE_SQUASHFS3
+	bool "squashfs3 has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_SQUASHFS
+	help
+	  The 'squashfs3' package has been removed since it has been
+	  deprecated for more than four buildroot releases. Package
+	  'squashfs' (4) has been selected automatically as replacement.
+
+config BR2_TARGET_ROOTFS_SQUASHFS3
+	bool "squashfs3 rootfs support has been removed"
+	select BR2_LEGACY
+	help
+	  Together with the removal of the squashfs3 package, support
+	  for squashfs3 root filesystems has been removed too. Squashfs
+	  root filesystems will automatically use squashfs4 now.
+
+config BR2_PACKAGE_NETKITBASE
+	bool "netkitbase has been removed"
+	select BR2_LEGACY
+	help
+	  The 'netkitbase' package has been removed since it has been
+	  deprecated since 2012.11. This package provided 'inetd'
+	  which is replaced by 'xinet' and 'ping' which is replaced by
+	  'busybox' or 'fping'.
+
+config BR2_PACKAGE_NETKITTELNET
+	bool "netkittelnet has been removed"
+	select BR2_LEGACY
+	help
+	  The 'netkittelnet' package has been removed since it has
+	  been deprecated since 2012.11. 'busybox' provides a telnet
+	  client and should be used instead.
+
+config BR2_PACKAGE_LUASQL
+	bool "luasql has been replaced by luasql-sqlite3"
+	select BR2_PACKAGE_LUASQL_SQLITE3
+	select BR2_LEGACY
+	help
+	  The option has been renamed BR2_PACKAGE_LUASQL_SQLITE3.
+
+config BR2_PACKAGE_LUACJSON
+	bool "luacjson has been replaced by lua-cjson"
+	select BR2_PACKAGE_LUA_CJSON
+	select BR2_LEGACY
+	help
+	  The option has been renamed BR2_PACKAGE_LUA_CJSON.
+
+###############################################################################
 comment "Legacy options removed in 2013.11"
 
 config BR2_PACKAGE_LVM2_DMSETUP_ONLY

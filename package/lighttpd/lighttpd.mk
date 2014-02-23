@@ -4,9 +4,10 @@
 #
 ################################################################################
 
-LIGHTTPD_VERSION = 1.4.33
+LIGHTTPD_VERSION_MAJOR = 1.4
+LIGHTTPD_VERSION = $(LIGHTTPD_VERSION_MAJOR).34
 LIGHTTPD_SOURCE = lighttpd-$(LIGHTTPD_VERSION).tar.xz
-LIGHTTPD_SITE = http://download.lighttpd.net/lighttpd/releases-1.4.x
+LIGHTTPD_SITE = http://download.lighttpd.net/lighttpd/releases-$(LIGHTTPD_VERSION_MAJOR).x
 LIGHTTPD_LICENSE = BSD-3c
 LIGHTTPD_LICENSE_FILES = COPYING
 LIGHTTPD_DEPENDENCIES = host-pkgconf
@@ -98,19 +99,13 @@ endef
 
 define LIGHTTPD_INSTALL_INIT_SYSTEMD
 	[ -f $(TARGET_DIR)/etc/systemd/system/lighttpd.service ] || \
-		$(INSTALL) -D -m 755 package/lighttpd/lighttpd.service \
+		$(INSTALL) -D -m 644 package/lighttpd/lighttpd.service \
 			$(TARGET_DIR)/etc/systemd/system/lighttpd.service
 
 	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
 
 	ln -fs ../lighttpd.service \
 		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/lighttpd.service
-endef
-
-define LIGHTTPD_UNINSTALL_TARGET_CMDS
-	$(RM) $(TARGET_DIR)/usr/sbin/lighttpd
-	$(RM) $(TARGET_DIR)/usr/sbin/lighttpd-angel
-	$(RM) -r $(TARGET_DIR)/usr/lib/lighttpd
 endef
 
 $(eval $(autotools-package))

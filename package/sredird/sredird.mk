@@ -16,12 +16,4 @@ define SREDIRD_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/sredird $(TARGET_DIR)/usr/sbin/sredird
 endef
 
-define SREDIRD_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/sbin/sredird
-endef
-
-define SREDIRD_CLEAN_CMDS
-	rm -f $(@D)/sredird
-endef
-
 $(eval $(generic-package))

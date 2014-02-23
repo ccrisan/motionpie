@@ -4,15 +4,12 @@
 #
 ################################################################################
 
-KMOD_VERSION = 15
+KMOD_VERSION = 16
 KMOD_SOURCE = kmod-$(KMOD_VERSION).tar.xz
 KMOD_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/kmod/
 KMOD_INSTALL_STAGING = YES
 KMOD_DEPENDENCIES = host-pkgconf
 HOST_KMOD_DEPENDENCIES = host-pkgconf
-
-# Some patches are touching configure.ac
-KMOD_AUTORECONF = YES
 
 # license info for libkmod only, conditionally add more below
 KMOD_LICENSE = LGPLv2.1+
@@ -22,12 +19,8 @@ KMOD_LICENSE_FILES = libkmod/COPYING
 # https://git.kernel.org/cgit/utils/kernel/kmod/kmod.git/commit/?id=b7016153ec8
 KMOD_CONF_OPT = --disable-static --enable-shared
 
-# manpages not installed to host and needs xsltproc
-HOST_KMOD_CONF_OPT = --disable-manpages
-
-ifneq ($(BR2_HAVE_DOCUMENTATION),y)
 KMOD_CONF_OPT += --disable-manpages
-endif
+HOST_KMOD_CONF_OPT = --disable-manpages
 
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 KMOD_DEPENDENCIES += zlib

@@ -1,6 +1,6 @@
 
 The code and graphics on this website (and it's mirror sites, if any) are
-Copyright (c) 1999-2005 by Erik Andersen, 2006-2013 The Buildroot
+Copyright (c) 1999-2005 by Erik Andersen, 2006-2014 The Buildroot
 developers. All rights reserved.
 
 Documents on this Web site including their graphical elements, design, and
@@ -25,6 +25,6 @@ HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 You have been warned.
 
-You can contact the webmaster at <buildroot@uclibc.org> if you have some sort
+You can contact the webmaster at <buildroot@buildroot.org> if you have some sort
 of problem with this.
 

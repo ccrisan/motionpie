@@ -48,8 +48,7 @@ endef
 #             for host packages
 #  argument 3 is the uppercase package name, without the HOST_ prefix
 #             for host packages
-#  argument 4 is the package directory prefix
-#  argument 5 is the type (target or host)
+#  argument 4 is the type (target or host)
 ################################################################################
 
 define inner-autotools-package
@@ -86,9 +85,6 @@ $(2)_AUTORECONF_OPT		?= $($(3)_AUTORECONF_OPT)
 $(2)_INSTALL_OPT                ?= install
 $(2)_INSTALL_STAGING_OPT	?= DESTDIR=$$(STAGING_DIR) install
 $(2)_INSTALL_TARGET_OPT		?= DESTDIR=$$(TARGET_DIR)  install
-$(2)_CLEAN_OPT			?= clean
-$(2)_UNINSTALL_STAGING_OPT	?= DESTDIR=$$(STAGING_DIR) uninstall
-$(2)_UNINSTALL_TARGET_OPT	?= DESTDIR=$$(TARGET_DIR)  uninstall
 
 
 #
@@ -97,7 +93,7 @@ $(2)_UNINSTALL_TARGET_OPT	?= DESTDIR=$$(TARGET_DIR)  uninstall
 # packages.
 #
 ifndef $(2)_CONFIGURE_CMDS
-ifeq ($(5),target)
+ifeq ($(4),target)
 
 # Configure package for target
 define $(2)_CONFIGURE_CMDS
@@ -113,7 +109,12 @@ define $(2)_CONFIGURE_CMDS
 		--exec-prefix=/usr \
 		--sysconfdir=/etc \
 		--program-prefix="" \
-		$$(DISABLE_DOCUMENTATION) \
+		--disable-gtk-doc \
+		--disable-doc \
+		--disable-docs \
+		--disable-documentation \
+		--with-xmlto=no \
+		--with-fop=no \
 		$$(DISABLE_NLS) \
 		$$(DISABLE_LARGEFILE) \
 		$$(DISABLE_IPV6) \
@@ -223,7 +224,7 @@ endif
 # file.
 #
 ifndef $(2)_BUILD_CMDS
-ifeq ($(5),target)
+ifeq ($(4),target)
 define $(2)_BUILD_CMDS
 	$$(TARGET_MAKE_ENV) $$($$(PKG)_MAKE_ENV) $$($$(PKG)_MAKE) $$($$(PKG)_MAKE_OPT) -C $$($$(PKG)_SRCDIR)
 endef
@@ -268,42 +269,9 @@ define $(2)_INSTALL_TARGET_CMDS
 endef
 endif
 
-#
-# Clean step. Only define it if not already defined by
-# the package .mk file.
-#
-ifndef $(2)_CLEAN_CMDS
-define $(2)_CLEAN_CMDS
-	-$$(TARGET_MAKE_ENV) $$($$(PKG)_MAKE_ENV) $$($$(PKG)_MAKE)  $$($$(PKG)_CLEAN_OPT) -C $$($$(PKG)_SRCDIR)
-endef
-endif
-
-#
-# Uninstall from staging step. Only define it if not already defined by
-# the package .mk file.
-#
-ifndef $(2)_UNINSTALL_STAGING_CMDS
-define $(2)_UNINSTALL_STAGING_CMDS
-	$$(TARGET_MAKE_ENV) $$($$(PKG)_MAKE_ENV) $$($$(PKG)_MAKE) $$($$(PKG)_UNINSTALL_STAGING_OPT) -C $$($$(PKG)_SRCDIR)
-endef
-endif
-
-#
-# Uninstall from target step. Only define it if not already defined
-# by the package .mk file.
-# Autotools Makefiles do uninstall with ( cd ...; rm -f ... )
-# Since we remove a lot of directories in target-finalize, this is likely
-# to fail.  Therefore add -k flag.
-#
-ifndef $(2)_UNINSTALL_TARGET_CMDS
-define $(2)_UNINSTALL_TARGET_CMDS
-	$$(TARGET_MAKE_ENV) $$($$(PKG)_MAKE_ENV) $$($$(PKG)_MAKE) -k $$($$(PKG)_UNINSTALL_TARGET_OPT) -C $$($$(PKG)_SRCDIR)
-endef
-endif
-
 # Call the generic package infrastructure to generate the necessary
 # make targets
-$(call inner-generic-package,$(1),$(2),$(3),$(4),$(5))
+$(call inner-generic-package,$(1),$(2),$(3),$(4))
 
 endef
 
@@ -311,5 +279,5 @@ endef
 # autotools-package -- the target generator macro for autotools packages
 ################################################################################
 
-autotools-package = $(call inner-autotools-package,$(call pkgname),$(call UPPERCASE,$(call pkgname)),$(call UPPERCASE,$(call pkgname)),$(call pkgparentdir),target)
-host-autotools-package = $(call inner-autotools-package,host-$(call pkgname),$(call UPPERCASE,host-$(call pkgname)),$(call UPPERCASE,$(call pkgname)),$(call pkgparentdir),host)
+autotools-package = $(call inner-autotools-package,$(pkgname),$(call UPPERCASE,$(pkgname)),$(call UPPERCASE,$(pkgname)),target)
+host-autotools-package = $(call inner-autotools-package,host-$(pkgname),$(call UPPERCASE,host-$(pkgname)),$(call UPPERCASE,$(pkgname)),host)

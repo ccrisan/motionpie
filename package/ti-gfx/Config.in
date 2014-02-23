@@ -11,6 +11,15 @@ config BR2_PACKAGE_TI_GFX
 
 if BR2_PACKAGE_TI_GFX
 
+config BR2_PACKAGE_PROVIDES_OPENGL_EGL
+	default "ti-gfx"
+
+config BR2_PACKAGE_PROVIDES_OPENGL_ES
+	default "ti-gfx"
+
+config BR2_PACKAGE_PROVIDES_POWERVR
+	default "ti-gfx"
+
 config BR2_PACKAGE_TI_GFX_DEBUG
 	bool "enable debug support"
 	help
@@ -60,6 +69,6 @@ endchoice
 
 endif
 
-comment "ti-gfx needs an (e)glibc toolchain and the linux kernel"
+comment "ti-gfx needs an (e)glibc toolchain and a Linux kernel to be built"
 	depends on BR2_arm
 	depends on !(BR2_LINUX_KERNEL && BR2_TOOLCHAIN_USES_GLIBC)

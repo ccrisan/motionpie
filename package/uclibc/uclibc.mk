@@ -5,12 +5,16 @@
 ################################################################################
 
 UCLIBC_VERSION = $(call qstrip,$(BR2_UCLIBC_VERSION_STRING))
-UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.bz2
+UCLIBC_SOURCE ?= uClibc-$(UCLIBC_VERSION).tar.bz2
 
 ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
 UCLIBC_SITE = http://www.uclibc.org/downloads/snapshots
-else ifeq ($(findstring arc,$(UCLIBC_VERSION)),arc)
-UCLIBC_SITE = $(BR2_ARC_SITE)
+else ifeq ($(BR2_arc),y)
+UCLIBC_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,uClibc,$(UCLIBC_VERSION))
+UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.gz
+else ifeq ($(BR2_UCLIBC_VERSION_XTENSA_GIT),y)
+UCLIBC_SITE = git://git.busybox.net/uClibc
+UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.gz
 else
 UCLIBC_SITE = http://www.uclibc.org/downloads
 UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.xz
@@ -390,18 +394,12 @@ UCLIBC_WCHAR_CONFIG = $(call UCLIBC_OPT_UNSET,UCLIBC_HAS_WCHAR,$(@D))
 endif
 
 #
-# debug
-#
-
-ifeq ($(BR2_ENABLE_DEBUG),y)
-UCLIBC_DEBUG_CONFIG = $(call UCLIBC_OPT_SET,DODEBUG,y,$(@D))
-endif
-
-#
 # strip
 #
 
 ifeq ($(BR2_STRIP_none),y)
+UCLIBC_STRIP_CONFIG = $(call UCLIBC_OPT_UNSET,DOSTRIP,$(@D))
+else
 UCLIBC_STRIP_CONFIG = $(call UCLIBC_OPT_SET,DOSTRIP,y,$(@D))
 endif
 
@@ -416,7 +414,7 @@ UCLIBC_MAKE_FLAGS = \
 	HOSTCC="$(HOSTCC)"
 
 define UCLIBC_SETUP_DOT_CONFIG
-	cp -f $(UCLIBC_CONFIG_FILE) $(@D)/.config
+	$(INSTALL) -m 0644 $(UCLIBC_CONFIG_FILE) $(@D)/.config
 	$(call UCLIBC_OPT_SET,CROSS_COMPILER_PREFIX,"$(TARGET_CROSS)",$(@D))
 	$(call UCLIBC_OPT_SET,TARGET_$(UCLIBC_TARGET_ARCH),y,$(@D))
 	$(call UCLIBC_OPT_SET,TARGET_ARCH,"$(UCLIBC_TARGET_ARCH)",$(@D))
@@ -447,7 +445,6 @@ define UCLIBC_SETUP_DOT_CONFIG
 	$(UCLIBC_LOCALE_CONFIG)
 	$(UCLIBC_WCHAR_CONFIG)
 	$(UCLIBC_STRIP_CONFIG)
-	$(UCLIBC_DEBUG_CONFIG)
 	yes "" | $(MAKE1) -C $(@D) \
 		$(UCLIBC_MAKE_FLAGS) \
 		PREFIX=$(STAGING_DIR) \
@@ -456,9 +453,8 @@ define UCLIBC_SETUP_DOT_CONFIG
 		oldconfig
 endef
 
-UCLIBC_POST_PATCH_HOOKS += UCLIBC_SETUP_DOT_CONFIG
-
 define UCLIBC_CONFIGURE_CMDS
+	$(UCLIBC_SETUP_DOT_CONFIG)
 	$(MAKE1) -C $(UCLIBC_DIR) \
 		$(UCLIBC_MAKE_FLAGS) \
 		PREFIX=$(STAGING_DIR) \

@@ -11,7 +11,7 @@ NETSNMP_LICENSE = Various BSD-like
 NETSNMP_LICENSE_FILES = COPYING
 NETSNMP_INSTALL_STAGING = YES
 NETSNMP_CONF_ENV = ac_cv_NETSNMP_CAN_USE_SYSCTL=yes
-NETSNMP_CONF_OPT = --with-persistent-directory=/var/lib/snmp --disable-static \
+NETSNMP_CONF_OPT = --with-persistent-directory=/var/lib/snmp \
 		--with-defaults --enable-mini-agent --without-rpm \
 		--with-logfile=none --without-kmem-usage $(DISABLE_IPV6) \
 		--enable-as-needed --without-perl-modules \
@@ -22,7 +22,8 @@ NETSNMP_CONF_OPT = --with-persistent-directory=/var/lib/snmp --disable-static \
 		--with-sys-location="Unknown" \
 		--with-mib-modules="$(call qstrip,$(BR2_PACKAGE_NETSNMP_WITH_MIB_MODULES))" \
 		--with-out-mib-modules="$(call qstrip,$(BR2_PACKAGE_NETSNMP_WITHOUT_MIB_MODULES))" \
-		--with-out-transports="Unix"
+		--with-out-transports="Unix" \
+		--disable-manuals
 NETSNMP_MAKE = $(MAKE1)
 NETSNMP_CONFIG_SCRIPTS = net-snmp-config
 
@@ -39,14 +40,16 @@ ifeq ($(BR2_PACKAGE_OPENSSL),y)
 	NETSNMP_DEPENDENCIES += openssl
 	NETSNMP_CONF_OPT += \
 		--with-openssl=$(STAGING_DIR)/usr/include/openssl
+ifeq ($(BR2_PREFER_STATIC_LIB),y)
+	# openssl uses zlib, so we need to explicitly link with it when static
+	NETSNMP_CONF_ENV += LIBS=-lz
+endif
 else
 	NETSNMP_CONF_OPT += --without-openssl
 endif
 
 # Docs
-ifneq ($(BR2_HAVE_DOCUMENTATION),y)
-	NETSNMP_CONF_OPT += --disable-manuals
-endif
+NETSNMP_CONF_OPT += --disable-manuals
 
 ifneq ($(BR2_PACKAGE_NETSNMP_ENABLE_MIBS),y)
 	NETSNMP_CONF_OPT += --disable-mib-loading
@@ -73,13 +76,6 @@ define NETSNMP_INSTALL_TARGET_CMDS
 		rm -f $(TARGET_DIR)/usr/share/snmp/mibs/$$mib-MIB.txt; \
 	done
 	$(NETSNMP_REMOVE_MIBS_IPV6)
-endef
-
-define NETSNMP_UNINSTALL_TARGET_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) \
-		DESTDIR=$(TARGET_DIR) uninstall
-	rm -f $(TARGET_DIR)/etc/init.d/S59snmpd
-	rm -f $(TARGET_DIR)/usr/lib/libnetsnmp*
 endef
 
 define NETSNMP_STAGING_NETSNMP_CONFIG_FIXUP

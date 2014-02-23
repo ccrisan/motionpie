@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-IW_VERSION = 3.11
+IW_VERSION = 3.14
 IW_SOURCE = iw-$(IW_VERSION).tar.xz
 IW_SITE = $(BR2_KERNEL_MIRROR)/software/network/iw
 IW_LICENSE = iw license
@@ -26,11 +26,6 @@ endef
 
 define IW_INSTALL_TARGET_CMDS
 	$(IW_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install
-endef
-
-define IW_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/sbin/iw
-	rm -f $(TARGET_DIR)/usr/share/man/man8/iw.8*
 endef
 
 $(eval $(generic-package))

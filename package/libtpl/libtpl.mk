@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-LIBTPL_VERSION = 445b4e9f236a48e274eaace31acf56d700da142a
-LIBTPL_SITE = http://github.com/troydhanson/tpl/tarball/$(LIBTPL_VERSION)
+LIBTPL_VERSION = 6df007e450cbee7d7a4896d3538128c5370b1c61
+LIBTPL_SITE = $(call github,troydhanson,tpl,$(LIBTPL_VERSION))
 LIBTPL_INSTALL_STAGING = YES
 LIBTPL_LICENSE = BSD-like
 LIBTPL_LICENSE_FILES = LICENSE

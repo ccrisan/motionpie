@@ -60,21 +60,5 @@ define HOST_ZLIB_INSTALL_CMDS
 	$(MAKE1) -C $(@D) LDCONFIG=true install
 endef
 
-define ZLIB_CLEAN_CMDS
-	-$(MAKE1) -C $(@D) clean
-endef
-
-define ZLIB_UNINSTALL_STAGING_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(STAGING_DIR) uninstall
-endef
-
-define ZLIB_UNINSTALL_TARGET_CMDS
-	$(MAKE1) -C $(@D) DESTDIR=$(TARGET_DIR) uninstall
-endef
-
-define HOST_ZLIB_UNINSTALL_TARGET_CMDS
-	$(MAKE1) -C $(@D) uninstall
-endef
-
 $(eval $(generic-package))
 $(eval $(host-generic-package))

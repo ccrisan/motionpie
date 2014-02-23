@@ -5,7 +5,7 @@
 ################################################################################
 
 TI_UTILS_VERSION = 06dbdb2727354b5f3ad7c723897f40051fddee49
-TI_UTILS_SITE = http://github.com/gxk/ti-utils/tarball/$(TI_UTILS_VERSION)
+TI_UTILS_SITE = $(call github,gxk,ti-utils,$(TI_UTILS_VERSION))
 TI_UTILS_DEPENDENCIES = libnl
 
 define TI_UTILS_BUILD_CMDS
@@ -21,11 +21,6 @@ define TI_UTILS_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/share/ti-utils/scripts/go.sh
 
 	cp -r $(@D)/ini_files $(TARGET_DIR)/usr/share/ti-utils
-endef
-
-define TI_UTILS_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/bin/calibrator
-	rm -fr $(TARGET_DIR)/usr/share/ti-utils
 endef
 
 $(eval $(generic-package))

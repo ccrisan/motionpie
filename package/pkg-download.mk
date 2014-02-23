@@ -23,15 +23,15 @@ LOCALFILES := $(call qstrip,$(BR2_LOCALFILES))
 # external-deps target.
 DL_MODE=DOWNLOAD
 
-# Override BR2_DL_DIR if shell variable defined
-ifneq ($(BUILDROOT_DL_DIR),)
-DL_DIR := $(BUILDROOT_DL_DIR)
-else
-DL_DIR := $(call qstrip,$(BR2_DL_DIR))
-endif
-
+# DL_DIR may have been set already from the environment
+ifeq ($(origin DL_DIR),undefined)
+DL_DIR ?= $(call qstrip,$(BR2_DL_DIR))
 ifeq ($(DL_DIR),)
 DL_DIR := $(TOPDIR)/dl
+endif
+else
+# Restore the BR2_DL_DIR that was overridden by the .config file
+BR2_DL_DIR = $(DL_DIR)
 endif
 
 # ensure it exists and a absolute path
@@ -54,6 +54,9 @@ notdomain=$(patsubst $(call domain,$(1),$(2))$(call domainseparator,$(2))%,%,$(c
 #
 # default domainseparator is /, specify alternative value as first argument
 domainseparator=$(if $(1),$(1),/)
+
+# github(user,package,version): returns site of github repository
+github = https://github.com/$(1)/$(2)/tarball/$(3)
 
 ################################################################################
 # The DOWNLOAD_* helpers are in charge of getting a working copy
@@ -88,8 +91,9 @@ define DOWNLOAD_GIT
 	  (echo "Doing full clone" && \
 	   $(GIT) clone --bare $($(PKG)_SITE) $($(PKG)_BASE_NAME))) && \
 	pushd $($(PKG)_BASE_NAME) > /dev/null && \
-	$(GIT) archive --format=tar --prefix=$($(PKG)_BASE_NAME)/ $($(PKG)_DL_VERSION) | \
-		gzip -c > $(DL_DIR)/$($(PKG)_SOURCE) && \
+	$(GIT) archive --format=tar --prefix=$($(PKG)_BASE_NAME)/ -o $(DL_DIR)/.$($(PKG)_SOURCE).tmp $($(PKG)_DL_VERSION) && \
+	gzip -c $(DL_DIR)/.$($(PKG)_SOURCE).tmp > $(DL_DIR)/$($(PKG)_SOURCE) && \
+	rm -f $(DL_DIR)/.$($(PKG)_SOURCE).tmp && \
 	popd > /dev/null && \
 	rm -rf $($(PKG)_DL_DIR) && \
 	popd > /dev/null)
@@ -175,6 +179,7 @@ endef
 define DOWNLOAD_HG
 	test -e $(DL_DIR)/$($(PKG)_SOURCE) || \
 	(pushd $(DL_DIR) > /dev/null && \
+	rm -rf $($(PKG)_BASE_NAME) && \
 	$(HG) clone --noupdate --rev $($(PKG)_DL_VERSION) $($(PKG)_SITE) $($(PKG)_BASE_NAME) && \
 	$(HG) archive --repository $($(PKG)_BASE_NAME) --type tgz --prefix $($(PKG)_BASE_NAME)/ \
 	              --rev $($(PKG)_DL_VERSION) $(DL_DIR)/$($(PKG)_SOURCE) && \

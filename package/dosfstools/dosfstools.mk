@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DOSFSTOOLS_VERSION = 3.0.23
+DOSFSTOOLS_VERSION = 3.0.25
 DOSFSTOOLS_SOURCE = dosfstools-$(DOSFSTOOLS_VERSION).tar.xz
 DOSFSTOOLS_SITE = http://daniel-baumann.ch/files/software/dosfstools
 DOSFSTOOLS_LICENSE = GPLv3+
@@ -36,16 +36,6 @@ define DOSFSTOOLS_INSTALL_TARGET_CMDS
 	test -z "$(DOSFSTOOLS_INSTALL_BIN_FILES_y)" || \
 	$(INSTALL) -m 755 $(addprefix $(@D)/,$(DOSFSTOOLS_INSTALL_BIN_FILES_y)) \
 		$(TARGET_DIR)/sbin/
-endef
-
-define DOSFSTOOLS_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/sbin/$(FATLABEL_BINARY)
-	rm -f $(TARGET_DIR)/sbin/$(FSCK_FAT_BINARY)
-	rm -f $(TARGET_DIR)/sbin/$(MKFS_FAT_BINARY)
-endef
-
-define DOSFSTOOLS_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
 endef
 
 define HOST_DOSFSTOOLS_BUILD_CMDS

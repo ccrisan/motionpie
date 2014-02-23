@@ -19,6 +19,10 @@ LMBENCH_CFLAGS += -I$(STAGING_DIR)/usr/include/tirpc/
 LMBENCH_LDFLAGS += -ltirpc
 endif
 
+ifeq ($(BR2_xtensa),y)
+LMBENCH_CFLAGS += -mtext-section-literals
+endif
+
 define LMBENCH_CONFIGURE_CMDS
 	$(call CONFIG_UPDATE,$(@D))
 	sed -i 's/CFLAGS=/CFLAGS+=/g' $(@D)/src/Makefile
@@ -33,10 +37,6 @@ endef
 
 define LMBENCH_INSTALL_TARGET_CMDS
 	$(MAKE) CFLAGS="$(TARGET_CFLAGS)" OS=$(ARCH) CC="$(TARGET_CC)" BASE=$(TARGET_DIR)/usr -C $(@D)/src install
-endef
-
-define LMBENCH_CLEAN_CMDS
-	$(MAKE) -C $(@D)/src clean
 endef
 
 $(eval $(generic-package))

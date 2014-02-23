@@ -20,12 +20,13 @@ choice
 		bool "uClibc 0.9.33.x"
 		depends on !(BR2_arc || BR2_avr32 || BR2_xtensa)
 
-	config BR2_UCLIBC_VERSION_0_9_33_ARC
-		bool "uClibc 0.9.33.x-arc"
-		depends on BR2_arc
+	config BR2_UCLIBC_VERSION_XTENSA_GIT
+		bool "uClibc Git Xtensa"
+		depends on BR2_xtensa
 
 	config BR2_UCLIBC_VERSION_SNAPSHOT
 		bool "daily snapshot"
+		depends on !(BR2_arc)
 
 endchoice
 
@@ -34,14 +35,15 @@ config BR2_USE_UCLIBC_SNAPSHOT
 	default "snapshot"
 	depends on BR2_UCLIBC_VERSION_SNAPSHOT
 	help
-	    Use latest snapshot or one from a specific date?
+	  Use latest snapshot or one from a specific date?
 
 config BR2_UCLIBC_VERSION_STRING
 	string
 	default 0.9.31.1	if BR2_UCLIBC_VERSION_0_9_31
 	default 0.9.32.1	if BR2_UCLIBC_VERSION_0_9_32
 	default 0.9.33.2	if BR2_UCLIBC_VERSION_0_9_33
-	default 0.9.33-arc	if BR2_UCLIBC_VERSION_0_9_33_ARC
+	default "9f0f466d3b17181ce88be36ce24a775774fe686c" if BR2_arc
+	default "7bf35c8b7d4a1f97174eb49f47f33946b282114c" if BR2_UCLIBC_VERSION_XTENSA_GIT
 	default BR2_USE_UCLIBC_SNAPSHOT	if BR2_UCLIBC_VERSION_SNAPSHOT
 
 config BR2_UCLIBC_CONFIG
@@ -49,8 +51,9 @@ config BR2_UCLIBC_CONFIG
 	default "package/uclibc/uClibc-0.9.31.config" if BR2_UCLIBC_VERSION_0_9_31
 	default "package/uclibc/uClibc-0.9.32.config" if BR2_UCLIBC_VERSION_0_9_32
 	default "package/uclibc/uClibc-0.9.33.config" if BR2_UCLIBC_VERSION_0_9_33
-	default "package/uclibc/uClibc-snapshot.config" if BR2_UCLIBC_VERSION_0_9_33_ARC
+	default "package/uclibc/uClibc-snapshot.config" if BR2_arc
 	default "package/uclibc/uClibc-snapshot.config" if BR2_UCLIBC_VERSION_SNAPSHOT
+	default "package/uclibc/uClibc-snapshot.config" if BR2_UCLIBC_VERSION_XTENSA_GIT
 	help
 	  Some people may wish to use their own modified uClibc configuration
 	  file and will specify their config file location with this option.
@@ -112,11 +115,11 @@ choice
 		bool "linuxthreads"
 		depends on !BR2_bfin
 		depends on !BR2_xtensa
-	        select BR2_TOOLCHAIN_HAS_THREADS
+		select BR2_TOOLCHAIN_HAS_THREADS
 
 	config BR2_PTHREADS_OLD
 		bool "linuxthreads (stable/old)"
-	        select BR2_TOOLCHAIN_HAS_THREADS
+		select BR2_TOOLCHAIN_HAS_THREADS
 
 	config BR2_PTHREADS_NATIVE
 		bool "Native POSIX Threading (NPTL)"
@@ -237,8 +240,7 @@ config BR2_UCLIBC_MIPS_ISA
 config BR2_UCLIBC_SH_TYPE
 	string
 	depends on BR2_UCLIBC_TARGET_ARCH = "sh"
-	default SHA2 if BR2_sh2
-	default SH3  if BR2_sh3 || BR2_sh3eb
+	default SH2A if BR2_sh2a
 	default SH4  if BR2_sh4 || BR2_sh4eb
 
 config BR2_UCLIBC_SPARC_TYPE

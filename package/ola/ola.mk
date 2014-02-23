@@ -4,17 +4,21 @@
 #
 ################################################################################
 
-OLA_VERSION = 0.8.32
+OLA_VERSION = 0.8.33
 OLA_SITE = https://open-lighting.googlecode.com/files
 
 OLA_LICENSE = LGPLv2.1+ (libola, libolacommon, Python bindings), GPLv2+ (libolaserver, olad, Python examples and tests)
 OLA_LICENSE_FILES = LICENCE GPL LGPL
 OLA_INSTALL_STAGING = YES
 
+# We modify configure.ac, so we need to autoreconf
+OLA_AUTORECONF = YES
+
 # util-linux provides uuid lib
 OLA_DEPENDENCIES = protobuf util-linux host-bison host-flex
 
 OLA_CONF_OPT = \
+	ac_cv_have_pymod_google_protobuf=yes \
 	--disable-gcov \
 	--disable-tcmalloc \
 	--disable-unittests \

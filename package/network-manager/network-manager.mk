@@ -5,7 +5,7 @@
 ################################################################################
 
 NETWORK_MANAGER_VERSION_MAJOR = 0.9
-NETWORK_MANAGER_VERSION = $(NETWORK_MANAGER_VERSION_MAJOR).8.0
+NETWORK_MANAGER_VERSION = $(NETWORK_MANAGER_VERSION_MAJOR).8.2
 NETWORK_MANAGER_SOURCE = NetworkManager-$(NETWORK_MANAGER_VERSION).tar.xz
 NETWORK_MANAGER_SITE = http://ftp.gnome.org/pub/GNOME/sources/NetworkManager/$(NETWORK_MANAGER_VERSION_MAJOR)
 NETWORK_MANAGER_INSTALL_STAGING = YES
@@ -33,6 +33,14 @@ NETWORK_MANAGER_CONF_OPT = \
 		--with-iptables=/usr/sbin/iptables \
 		--disable-ifupdown \
 		--disable-ifnet
+
+ifeq ($(BR2_PACKAGE_DHCP_CLIENT),y)
+NETWORK_MANAGER_CONF_OPT += --with-dhclient=/usr/sbin/dhclient
+endif
+
+ifeq ($(BR2_PACKAGE_DHCPCD),y)
+NETWORK_MANAGER_CONF_OPT += --with-dhcpcd=/usr/sbin/dhcpcd
+endif
 
 # uClibc by default doesn't have backtrace support, so don't use it
 ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)

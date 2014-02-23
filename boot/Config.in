@@ -14,4 +14,3 @@ source "boot/xloader/Config.in"
 source "boot/rpi-firmware/Config.in"
 
 endmenu
-

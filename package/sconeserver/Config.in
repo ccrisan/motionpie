@@ -2,6 +2,10 @@ menuconfig BR2_PACKAGE_SCONESERVER
 	bool "sconeserver"
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_TOOLCHAIN_HAS_THREADS
+	# pthread_setschedprio needs NPTL
+	depends on !BR2_PTHREADS && !BR2_PTHREADS_OLD
+	# no NPTL for these archs
+	depends on !BR2_avr32 && !BR2_xtensa && !BR2_arc
 	select BR2_PACKAGE_PCRE
 	help
 	  Sconeserver is a modular, object-orientated and extremely versatile
@@ -34,7 +38,7 @@ config BR2_PACKAGE_SCONESERVER_HTTP_SCONESITE_IMAGE
 config BR2_PACKAGE_SCONESERVER_MYSQL
 	bool "mysql"
 	depends on BR2_USE_MMU # mysql
-	select BR2_PACKAGE_MYSQL_CLIENT
+	select BR2_PACKAGE_MYSQL
 	help
 	  MySQL module for Sconeserver
 
@@ -44,9 +48,14 @@ config BR2_PACKAGE_SCONESERVER_BLUETOOTH
 	depends on BR2_USE_MMU # bluez->dbus
 	depends on BR2_TOOLCHAIN_HAS_THREADS # bluez->dbus, bluez->libglib2
 	depends on !BR2_avr32 # bluez_utils
+	depends on !BR2_PREFER_STATIC_LIB # bluez_utils
 	select BR2_PACKAGE_BLUEZ_UTILS
 	help
 	  Bluetooth module for Sconeserver
+
+comment "bluetooth support needs a toolchain w/ wchar, threads, dynamic library"
+	depends on !BR2_avr32 && BR2_USE_MMU
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || BR2_PREFER_STATIC_LIB
 
 config BR2_PACKAGE_SCONESERVER_RSS
 	bool "rss"
@@ -58,6 +67,7 @@ config BR2_PACKAGE_SCONESERVER_LOCATION
 	bool "location"
 	depends on BR2_USE_MMU # gpsd
 	depends on BR2_TOOLCHAIN_HAS_THREADS # gpsd
+	depends on !BR2_microblaze # gpsd
 	select BR2_PACKAGE_GPSD
 	help
 	  Location module for Sconeserver
@@ -94,3 +104,5 @@ endif # BR2_PACKAGE_SCONESERVER
 
 comment "sconeserver needs a toolchain w/ C++, threads"
 	depends on !(BR2_INSTALL_LIBSTDCPP && BR2_TOOLCHAIN_HAS_THREADS)
+	depends on !BR2_PTHREADS && !BR2_PTHREADS_OLD
+	depends on !BR2_avr32 && !BR2_xtensa && !BR2_arc

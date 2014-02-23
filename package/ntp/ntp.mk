@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-NTP_VERSION = 4.2.6p5
-NTP_SITE = http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2
+NTP_VERSION_MAJOR = 4.2
+NTP_VERSION = $(NTP_VERSION_MAJOR).6p5
+NTP_SITE = http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-$(NTP_VERSION_MAJOR)
 NTP_LICENSE = ntp license
 NTP_LICENSE_FILES = COPYRIGHT
 NTP_CONF_ENV = ac_cv_lib_md5_MD5Init=no
@@ -56,13 +57,6 @@ define NTP_INSTALL_TARGET_CMDS
 		install -m 755 -d $(TARGET_DIR)/etc/default ; \
 		install -m 644 package/ntp/ntpd.etc.default $(TARGET_DIR)/etc/default/ntpd ; \
 	fi
-endef
-
-define NTP_UNINSTALL_TARGET_CMDS
-	rm $(TARGET_DIR)/usr/sbin/ntpd
-	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,$(NTP_INSTALL_FILES_y))
-	rm $(TARGET_DIR)/etc/init.d/S49ntp
-	rm $(TARGET_DIR)/etc/default/ntpd
 endef
 
 NTP_POST_PATCH_HOOKS += NTP_PATCH_FIXUPS

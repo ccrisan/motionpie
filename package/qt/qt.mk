@@ -11,9 +11,10 @@
 #
 ################################################################################
 
-QT_VERSION = 4.8.5
+QT_VERSION_MAJOR = 4.8
+QT_VERSION = $(QT_VERSION_MAJOR).5
 QT_SOURCE  = qt-everywhere-opensource-src-$(QT_VERSION).tar.gz
-QT_SITE    = http://download.qt-project.org/official_releases/qt/4.8/$(QT_VERSION)
+QT_SITE    = http://download.qt-project.org/official_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION)
 QT_DEPENDENCIES = host-pkgconf
 QT_INSTALL_STAGING = YES
 
@@ -58,9 +59,14 @@ QT_CONFIGURE_OPTS += -no-qt3support
 endif
 
 ifeq ($(BR2_PACKAGE_QT_DEMOS),y)
-QT_CONFIGURE_OPTS += -examplesdir $(TARGET_DIR)/usr/share/qt/examples -demosdir $(TARGET_DIR)/usr/share/qt/demos
+QT_CONFIGURE_OPTS += -demosdir $(TARGET_DIR)/usr/share/qt/demos
 else
-QT_CONFIGURE_OPTS += -nomake examples -nomake demos
+QT_CONFIGURE_OPTS += -nomake demos
+endif
+ifeq ($(BR2_PACKAGE_QT_EXAMPLES),y)
+QT_CONFIGURE_OPTS += -examplesdir $(TARGET_DIR)/usr/share/qt/examples
+else
+QT_CONFIGURE_OPTS += -nomake examples
 endif
 
 # ensure glib is built first if enabled for Qt's glib support
@@ -335,7 +341,7 @@ QT_CONFIGURE_OPTS += -qt-sql-ibase
 endif
 ifeq ($(BR2_PACKAGE_QT_MYSQL),y)
 QT_CONFIGURE_OPTS += -qt-sql-mysql -mysql_config $(STAGING_DIR)/usr/bin/mysql_config
-QT_DEPENDENCIES   += mysql_client
+QT_DEPENDENCIES   += mysql
 endif
 ifeq ($(BR2_PACKAGE_QT_ODBC),y)
 QT_CONFIGURE_OPTS += -qt-sql-odbc
@@ -680,16 +686,6 @@ define QT_INSTALL_TARGET_CMDS
 	$(QT_INSTALL_TARGET_FONTS_TTF)
 	$(QT_INSTALL_TARGET_POWERVR)
 	$(QT_INSTALL_TARGET_TRANSLATIONS)
-endef
-
-define QT_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
-endef
-
-define QT_UNINSTALL_TARGET_CMDS
-	-rm -rf $(TARGET_DIR)/usr/lib/fonts
-	-rm $(TARGET_DIR)/usr/lib/libQt*.so.*
-	-rm $(TARGET_DIR)/usr/lib/libphonon.so.*
 endef
 
 $(eval $(generic-package))

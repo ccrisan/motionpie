@@ -6,11 +6,17 @@ config BR2_TARGET_GENERIC_HOSTNAME
 	help
 	  Select system hostname to be stored in /etc/hostname.
 
+	  Leave empty to not create /etc/hostname, or to keep the
+	  one from a custom skeleton.
+
 config BR2_TARGET_GENERIC_ISSUE
 	string "System banner"
 	default "Welcome to Buildroot"
 	help
 	  Select system banner (/etc/issue) to be displayed at login.
+
+	  Leave empty to not create /etc/issue, or to keep the
+	  one from a custom skeleton.
 
 choice
 	bool "Passwords encoding"
@@ -76,6 +82,7 @@ config BR2_INIT_BUSYBOX
 
 config BR2_INIT_SYSV
 	bool "systemV"
+	select BR2_PACKAGE_BUSYBOX_SHOW_OTHERS # sysvinit
 	select BR2_PACKAGE_SYSVINIT
 
 config BR2_INIT_SYSTEMD
@@ -116,15 +123,18 @@ config BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_MDEV
 
 config BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV
 	bool "Dynamic using udev"
+	depends on !BR2_avr32 # udev
 	depends on BR2_LARGEFILE # udev
 	depends on BR2_USE_WCHAR # udev
 	depends on !BR2_PREFER_STATIC_LIB # udev -> kmod
 	select BR2_PACKAGE_UDEV
 
 comment "udev needs a toolchain w/ largefile, wchar"
+	depends on !BR2_avr32 # udev
 	depends on !(BR2_LARGEFILE && BR2_USE_WCHAR)
 
 comment "udev doesn't work with 'prefer static libraries'"
+	depends on !BR2_avr32 # udev
 	depends on BR2_PREFER_STATIC_LIB
 
 endchoice

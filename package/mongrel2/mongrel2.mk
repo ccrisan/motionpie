@@ -5,7 +5,7 @@
 ################################################################################
 
 MONGREL2_VERSION = v1.8.0
-MONGREL2_SITE = https://github.com/zedshaw/mongrel2/tarball/$(MONGREL2_VERSION)
+MONGREL2_SITE = $(call github,zedshaw,mongrel2,$(MONGREL2_VERSION))
 MONGREL2_LICENSE = BSD-3c
 MONGREL2_LICENSE_FILES = LICENSE
 MONGREL2_DEPENDENCIES = sqlite zeromq
@@ -18,12 +18,6 @@ endef
 define MONGREL2_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE1) $(TARGET_CONFIGURE_OPTS) -C $(@D) \
 		PREFIX=/usr DESTDIR=$(TARGET_DIR) install
-endef
-
-define MONGREL2_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/bin/mongrel2
-	rm -f $(TARGET_DIR)/usr/bin/m2sh
-	rm -f $(TARGET_DIR)/usr/bin/procer
 endef
 
 $(eval $(generic-package))

@@ -5,7 +5,7 @@
 ################################################################################
 
 SUNXI_MALI_VERSION = c2491fe952354ba44538064e534ed7c731cedb1e
-SUNXI_MALI_SITE = http://github.com/linux-sunxi/sunxi-mali/tarball/$(SUNXI_MALI_VERSION)
+SUNXI_MALI_SITE = $(call github,linux-sunxi,sunxi-mali,$(SUNXI_MALI_VERSION))
 
 SUNXI_MALI_INSTALL_STAGING = YES
 SUNXI_MALI_DEPENDENCIES = sunxi-mali-prop
@@ -68,8 +68,6 @@ endef
 define SUNXI_MALI_INSTALL_TARGET_CMDS
 	$(SUNXI_MALI_MAKE_ENV) $(MAKE) -C $(@D)/lib \
 		$(SUNXI_MALI_MAKE_OPTS) DESTDIR=$(TARGET_DIR) install
-	# add execution permissions so that libraries are properly stripped
-	chmod +x $(addprefix $(TARGET_DIR)/usr/lib/lib,EGL.so GLESv1_CM.so GLESv2.so Mali.so UMP.so*)
 	$(if $(BR2_PACKAGE_SUNXI_MALI_DBG),
 		$(INSTALL) -m 755 $(@D)/version/version $(TARGET_DIR)/usr/bin/maliver; \
 		$(INSTALL) -m 755 $(@D)/test/test $(TARGET_DIR)/usr/bin/malitest

@@ -5,7 +5,7 @@
 ################################################################################
 
 AXEL_VERSION = 2.4
-AXEL_SITE = https://alioth.debian.org/frs/download.php/file/3015
+AXEL_SITE = http://sources.buildroot.net/
 AXEL_LICENSE = GPLv2+
 AXEL_LICENSE_FILES = COPYING
 
@@ -36,14 +36,6 @@ endef
 
 define AXEL_INSTALL_TARGET_CMDS
 	$(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
-endef
-
-define AXEL_UNINSTALL_TARGET_CMDS
-	$(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) uninstall
-endef
-
-define AXEL_CLEAN_CMDS
-	-$(MAKE) -C $(@D) clean
 endef
 
 $(eval $(generic-package))

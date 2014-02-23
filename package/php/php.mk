@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-PHP_VERSION = 5.3.27
-PHP_SOURCE = php-$(PHP_VERSION).tar.xz
+PHP_VERSION = 5.5.8
 PHP_SITE = http://www.php.net/distributions
 PHP_INSTALL_STAGING = YES
 PHP_INSTALL_STAGING_OPT = INSTALL_ROOT=$(STAGING_DIR) install
 PHP_INSTALL_TARGET_OPT = INSTALL_ROOT=$(TARGET_DIR) install
+PHP_DEPENDENCIES = host-pkgconf
 PHP_LICENSE = PHP
 PHP_LICENSE_FILES = LICENSE
 PHP_CONF_OPT =  --mandir=/usr/share/man \
@@ -33,6 +33,10 @@ ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
 ifneq ($(BR2_INET_IPV6),y)
 	PHP_CFLAGS += -DHAVE_DEPRECATED_DNS_FUNCS
 endif
+endif
+
+ifeq ($(BR2_xtensa),y)
+PHP_CFLAGS += -mtext-section-literals
 endif
 
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CLI),,--disable-cli)
@@ -125,25 +129,14 @@ ifeq ($(BR2_PACKAGE_PHP_EXT_READLINE),y)
 	PHP_DEPENDENCIES += readline
 endif
 
-### Legacy sqlite2 support
-ifeq ($(BR2_PACKAGE_PHP_EXT_SQLITE),y)
-	PHP_CONF_OPT += --with-sqlite
-ifneq ($(BR2_LARGEFILE),y)
-	PHP_CFLAGS += -DSQLITE_DISABLE_LFS
-endif
-ifeq ($(BR2_PACKAGE_PHP_EXT_SQLITE_UTF8),y)
-	PHP_CONF_OPT += --enable-sqlite-utf8
-endif
-endif
-
 ### Native MySQL extensions
 ifeq ($(BR2_PACKAGE_PHP_EXT_MYSQL),y)
 	PHP_CONF_OPT += --with-mysql=$(STAGING_DIR)/usr
-	PHP_DEPENDENCIES += mysql_client
+	PHP_DEPENDENCIES += mysql
 endif
 ifeq ($(BR2_PACKAGE_PHP_EXT_MYSQLI),y)
 	PHP_CONF_OPT += --with-mysqli=$(STAGING_DIR)/usr/bin/mysql_config
-	PHP_DEPENDENCIES += mysql_client
+	PHP_DEPENDENCIES += mysql
 endif
 
 ### PDO
@@ -159,7 +152,7 @@ endif
 endif
 ifeq ($(BR2_PACKAGE_PHP_EXT_PDO_MYSQL),y)
 	PHP_CONF_OPT += --with-pdo-mysql=$(STAGING_DIR)/usr
-	PHP_DEPENDENCIES += mysql_client
+	PHP_DEPENDENCIES += mysql
 endif
 endif
 
@@ -217,18 +210,6 @@ define PHP_INSTALL_FIXUP
 endef
 
 PHP_POST_INSTALL_TARGET_HOOKS += PHP_INSTALL_FIXUP
-
-define PHP_UNINSTALL_STAGING_CMDS
-	rm -rf $(STAGING_DIR)/usr/include/php
-	rm -rf $(STAGING_DIR)/usr/lib/php
-	rm -f $(STAGING_DIR)/usr/bin/php*
-	rm -f $(STAGING_DIR)/usr/share/man/man1/php*.1
-endef
-
-define PHP_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/etc/php.ini
-	rm -f $(TARGET_DIR)/usr/bin/php*
-endef
 
 PHP_CONF_ENV += CFLAGS="$(PHP_CFLAGS)"
 

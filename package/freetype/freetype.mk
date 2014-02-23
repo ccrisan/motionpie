@@ -4,11 +4,9 @@
 #
 ################################################################################
 
-FREETYPE_VERSION_MAJOR = 2.5.0
-FREETYPE_VERSION_MINOR = 1
-FREETYPE_VERSION = $(FREETYPE_VERSION_MAJOR).$(FREETYPE_VERSION_MINOR)
+FREETYPE_VERSION = 2.5.2
 FREETYPE_SOURCE = freetype-$(FREETYPE_VERSION).tar.bz2
-FREETYPE_SITE = http://downloads.sourceforge.net/project/freetype/freetype2/$(FREETYPE_VERSION_MAJOR)
+FREETYPE_SITE = http://downloads.sourceforge.net/project/freetype/freetype2/$(FREETYPE_VERSION)
 FREETYPE_INSTALL_STAGING = YES
 FREETYPE_MAKE_OPT = CCexe="$(HOSTCC)"
 FREETYPE_LICENSE = Dual FTL/GPLv2+
@@ -58,6 +56,17 @@ define FREETYPE_FIX_CONFIG_FILE_LIBS
 		$(STAGING_DIR)/usr/bin/freetype-config
 endef
 FREETYPE_POST_INSTALL_STAGING_HOOKS += FREETYPE_FIX_CONFIG_FILE_LIBS
+
+# Version 2.5.1 reorganized headers out of freetype2/freetype
+# It's unexpected for some packages so symlink it until it spreads upstream
+define FREETYPE_FIX_FREETYPE_INCLUDE
+	ln -sf . $(STAGING_DIR)/usr/include/freetype2/freetype
+endef
+FREETYPE_POST_INSTALL_STAGING_HOOKS += FREETYPE_FIX_FREETYPE_INCLUDE
+define HOST_FREETYPE_FIX_FREETYPE_INCLUDE
+	ln -sf . $(HOST_DIR)/usr/include/freetype2/freetype
+endef
+HOST_FREETYPE_POST_INSTALL_HOOKS += HOST_FREETYPE_FIX_FREETYPE_INCLUDE
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

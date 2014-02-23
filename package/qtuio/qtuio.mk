@@ -51,20 +51,22 @@ define QTUIO_INSTALL_EXAMPLES
 endef
 endif
 
+ifeq ($(BR2_PACKAGE_QT_STATIC),y)
+QTUIO_LIBRARY = libqTUIO.a
+else
+QTUIO_LIBRARY = libqTUIO.so*
+define QTUIO_INSTALL_TARGET_LIBRARY
+	cp -dpf $(@D)/lib/$(QTUIO_LIBRARY) $(TARGET_DIR)/usr/lib
+endef
+endif
+
 define QTUIO_INSTALL_TARGET_CMDS
-	cp -dpf $(@D)/lib/libqTUIO.so* $(TARGET_DIR)/usr/lib
+	$(QTUIO_INSTALL_TARGET_LIBRARY)
 	$(QTUIO_INSTALL_EXAMPLES)
 endef
 
 define QTUIO_INSTALL_STAGING_CMDS
-	cp -dpf $(@D)/lib/libqTUIO.so* $(STAGING_DIR)/usr/lib
-endef
-
-define QTUIO_CLEAN_CMDS
-	$(MAKE) -C $(@D)/src clean
-	for example in $(QTUIO_EXAMPLES) ; do \
-		($(MAKE) -C $(@D)/examples/$${example} clean) ; \
-	done
+	cp -dpf $(@D)/lib/$(QTUIO_LIBRARY) $(STAGING_DIR)/usr/lib
 endef
 
 $(eval $(generic-package))

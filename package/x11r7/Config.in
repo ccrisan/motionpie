@@ -2,6 +2,7 @@ menuconfig BR2_PACKAGE_XORG7
 	bool "X.org X Window System"
 	depends on BR2_USE_WCHAR
 	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on !BR2_PREFER_STATIC_LIB # dlopen in xlib_libX11
 	help
 	  Support for X11R7 libraries, servers, drivers, and/or
 	  applications in the target.
@@ -87,6 +88,7 @@ if BR2_PACKAGE_XORG7
 		source package/x11r7/xapp_xclipboard/Config.in
 		source package/x11r7/xapp_xclock/Config.in
 		source package/x11r7/xapp_xcmsdb/Config.in
+		source package/x11r7/xapp_xconsole/Config.in
 		source package/x11r7/xapp_xcursorgen/Config.in
 		source package/x11r7/xapp_xdbedizzy/Config.in
 		source package/x11r7/xapp_xditview/Config.in
@@ -234,6 +236,7 @@ if BR2_PACKAGE_XORG7
 		source package/x11r7/xproto_glproto/Config.in
 		source package/x11r7/xproto_inputproto/Config.in
 		source package/x11r7/xproto_kbproto/Config.in
+		source package/x11r7/xproto_presentproto/Config.in
 		source package/x11r7/xproto_randrproto/Config.in
 		source package/x11r7/xproto_recordproto/Config.in
 		source package/x11r7/xproto_renderproto/Config.in
@@ -262,5 +265,5 @@ if BR2_PACKAGE_XORG7
 	endmenu
 endif
 
-comment "X.org needs a toolchain w/ wchar, threads"
-	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS
+comment "X.org needs a toolchain w/ wchar, threads, dynamic library"
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || BR2_PREFER_STATIC_LIB

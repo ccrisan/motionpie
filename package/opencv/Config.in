@@ -1,6 +1,7 @@
 menuconfig BR2_PACKAGE_OPENCV
 	bool "opencv"
 	select BR2_PACKAGE_ZLIB
+	depends on BR2_TOOLCHAIN_HAS_THREADS
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_WCHAR
 	help
@@ -24,12 +25,6 @@ config BR2_PACKAGE_OPENCV_LIB_CONTRIB
 	default y
 	help
 	  Include opencv_contrib module into the OpenCV build.
-
-config BR2_PACKAGE_OPENCV_LIB_CORE
-	bool "core"
-	default y
-	help
-	  Include opencv_core module into the OpenCV build.
 
 config BR2_PACKAGE_OPENCV_LIB_FEATURES2D
 	bool "features2d"
@@ -208,5 +203,5 @@ config BR2_PACKAGE_OPENCV_INSTALL_DATA
 
 endif # BR2_PACKAGE_OPENCV
 
-comment "opencv needs a toolchain w/ C++, wchar"
-	depends on !(BR2_INSTALL_LIBSTDCPP  && BR2_USE_WCHAR)
+comment "opencv needs a toolchain w/ C++, threads, wchar"
+	depends on !(BR2_INSTALL_LIBSTDCPP  && BR2_USE_WCHAR && BR2_TOOLCHAIN_HAS_THREADS)

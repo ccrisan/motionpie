@@ -14,10 +14,20 @@ config BR2_HOSTARCH
 	string
 	option env="HOSTARCH"
 
+config BR2_EXTERNAL
+	string
+	option env="BR2_EXTERNAL"
+
 # Hidden boolean selected by pre-built packages for x86, when they
 # need to run on x86-64 machines (example: pre-built external
 # toolchains, binary tools like SAM-BA, etc.).
 config BR2_HOSTARCH_NEEDS_IA32_LIBS
+	bool
+
+# Hidden boolean selected by packages that need to build 32 bits
+# binaries with the host compiler, even on 64 bits build machines (e.g
+# bootloaders).
+config BR2_HOSTARCH_NEEDS_IA32_COMPILER
 	bool
 
 source "arch/Config.in"
@@ -116,7 +126,7 @@ config BR2_DL_DIR
 	default "$(TOPDIR)/dl"
 	help
 	  Directory to store all the source files that we need to fetch.
-	  If the Linux shell environment has defined the BUILDROOT_DL_DIR
+	  If the Linux shell environment has defined the BR2_DL_DIR
 	  environment variable, then this overrides this configuration item.
 
 	  The default is $(TOPDIR)/dl
@@ -207,6 +217,14 @@ config BR2_DEBIAN_MIRROR
 
 endif
 
+config BR2_LUAROCKS_MIRROR
+	string "LuaRocks mirror"
+	default "http://luarocks.org/repositories/rocks"
+	help
+	  LuaRocks repository.
+
+	  See http://luarocks.org
+
 endmenu
 
 config BR2_JLEVEL
@@ -243,6 +261,26 @@ config BR2_DEPRECATED
 	bool "Show packages that are deprecated or obsolete"
 	help
 	  This option hides outdated/obsolete versions of packages.
+
+if BR2_DEPRECATED
+
+config BR2_DEPRECATED_SINCE_2013_05
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2013_08
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2013_11
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2014_02
+	bool
+	default y
+
+endif
 
 config BR2_ENABLE_DEBUG
 	bool "build packages with debugging symbols"
@@ -430,16 +468,6 @@ config BR2_PREFER_STATIC_LIB
 
 	  WARNING: This is highly experimental at the moment.
 
-config BR2_HAVE_DOCUMENTATION
-	bool "documentation on the target"
-	# We no longer want to support a toolchain on the target
-	depends on BR2_DEPRECATED
-	help
-	  Install the documentation, including manual pages and info
-	  pages, on the target.
-	  If you say n here, your target will not contain any
-	  documentation.
-
 config BR2_PACKAGE_OVERRIDE_FILE
 	string "location of a package override file"
 	default "$(TOPDIR)/local.mk"
@@ -451,18 +479,22 @@ config BR2_PACKAGE_OVERRIDE_FILE
 	  Buildroot documentation for more details on this feature.
 
 config BR2_GLOBAL_PATCH_DIR
-	string "global patch directory"
+	string "global patch directories"
 	help
-	  You may specify a directory containing global package patches.
-	  For a specific version <packageversion> of a specific package
-	  <packagename>, patches are applied as follows.
+	  You may specify a space separated list of one or more directories
+	  containing global package patches. For a specific version
+	  <packageversion> of a specific package <packagename>, patches are
+	  applied as follows:
 
-	  First, the default Buildroot patch set for the package is applied.
+	  First, the default Buildroot patch set for the package is applied
+	  from the package's directory in Buildroot.
 
-	  If the directory $(BR2_GLOBAL_PATCH_DIR)/<packagename>/<packageversion>
-	  exists, then all *.patch files in the directory will be applied.
+	  Then for every directory - <global-patch-dir> - that exists in
+	  BR2_GLOBAL_PATCH_DIR, if the directory
+	  <global-patch-dir>/<packagename>/<packageversion>/ exists, then all
+	  *.patch files in this directory will be applied.
 
-	  Otherwise, if the directory $(BR2_GLOBAL_PATCH_DIR)/<packagename> exists,
+	  Otherwise, if the directory <global-patch-dir>/<packagename> exists,
 	  then all *.patch files in the directory will be applied.
 
 endmenu
@@ -482,3 +514,10 @@ source "boot/Config.in"
 source "package/Config.in.host"
 
 source "Config.in.legacy"
+
+menu "User-provided options"
+	depends on BR2_EXTERNAL != "support/dummy-external"
+
+source "$BR2_EXTERNAL/Config.in"
+
+endmenu

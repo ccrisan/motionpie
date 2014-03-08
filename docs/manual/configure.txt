@@ -68,12 +68,10 @@ The _internal toolchain backend_ is the backend where Buildroot builds
 by itself a cross-compilation toolchain, before building the userspace
 applications and libraries for your target embedded system.
 
-This backend is the historical backend of Buildroot, and has been
-limited for a long time to the usage of the
-http://www.uclibc.org[uClibc C library]. Support for the _eglibc_ C
-library has been added in 2013 and is at this point considered
-experimental. See the _External toolchain backend_ for another
-solution to use _glibc_ or _eglibc_.
+This backend supports several C libraries:
+http://www.uclibc.org[uClibc], the
+http://www.gnu.org/software/libc/libc.html[glibc] and
+http://www.eglibc.org[eglibc].
 
 Once you have selected this backend, a number of options appear. The
 most important ones allow to:
@@ -96,18 +94,7 @@ most important ones allow to:
    the C library might be using interfaces that are not provided by
    your Linux kernel.
 
- * Change the version and the configuration of the uClibc C library
-   (if uClibc is selected). The default options are usually
-   fine. However, if you really need to specifically customize the
-   configuration of your uClibc C library, you can pass a specific
-   configuration file here. Or alternatively, you can run the +make
-   uclibc-menuconfig+ command to get access to uClibc's configuration
-   interface. Note that all packages in Buildroot are tested against
-   the default uClibc configuration bundled in Buildroot: if you
-   deviate from this configuration by removing features from uClibc,
-   some packages may no longer build.
-
- * Change the version of the GCC compiler and binutils.
+ * Change the version of the GCC compiler, binutils and the C library.
 
  * Select a number of toolchain options (uClibc only): whether the
    toolchain should have largefile support (i.e support for files
@@ -118,7 +105,12 @@ most important ones allow to:
    libraries visible in Buildroot menus will change: many applications
    and libraries require certain toolchain options to be enabled. Most
    packages show a comment when a certain toolchain option is required
-   to be able to enable those packages.
+   to be able to enable those packages. If needed, you can further
+   refine the uClibc configuration by running +make
+   uclibc-menuconfig+. Note however that all packages in Buildroot are
+   tested against the default uClibc configuration bundled in
+   Buildroot: if you deviate from this configuration by removing
+   features from uClibc, some packages may no longer build.
 
 It is worth noting that whenever one of those options is modified,
 then the entire toolchain and system must be rebuilt. See
@@ -146,10 +138,9 @@ http://www.linaro.org[Linaro] for ARM,
 http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/[Sourcery
 CodeBench] for ARM, x86, x86-64, PowerPC, MIPS and SuperH,
 https://blackfin.uclinux.org/gf/project/toolchain[Blackfin toolchains
-from ADI], http://git.xilinx.com/[Xilinx toolchains for Microblaze],
-etc.) and is capable of downloading them automatically, or it can be
-pointed to a custom toolchain, either available for download or
-installed locally.
+from Analog Devices], etc.) and is capable of downloading them
+automatically, or it can be pointed to a custom toolchain, either
+available for download or installed locally.
 
 Then, you have three solutions to use an external toolchain:
 
@@ -168,14 +159,14 @@ Then, you have three solutions to use an external toolchain:
   toolchain.
 
 * Use a completely custom external toolchain. This is particularly
-  useful for toolchains generated using crosstool-NG. To do this,
-  select the +Custom toolchain+ solution in the +Toolchain+ list. You
-  need to fill the +Toolchain path+, +Toolchain prefix+ and +External
-  toolchain C library+ options. Then, you have to tell Buildroot what
-  your external toolchain supports. If your external toolchain uses
-  the 'glibc' library, you only have to tell whether your toolchain
-  supports C\+\+ or not and whether it has built-in RPC support. If
-  your external toolchain uses the 'uClibc'
+  useful for toolchains generated using crosstool-NG or with Buildroot
+  itself. To do this, select the +Custom toolchain+ solution in the
+  +Toolchain+ list. You need to fill the +Toolchain path+, +Toolchain
+  prefix+ and +External toolchain C library+ options. Then, you have
+  to tell Buildroot what your external toolchain supports. If your
+  external toolchain uses the 'glibc' library, you only have to tell
+  whether your toolchain supports C\+\+ or not and whether it has
+  built-in RPC support. If your external toolchain uses the 'uClibc'
   library, then you have to tell Buildroot if it supports largefile,
   IPv6, RPC, wide-char, locale, program invocation, threads and
   C++. At the beginning of the execution, Buildroot will tell you if
@@ -188,23 +179,13 @@ Buildroot itself. In general, all toolchains that support the
 'sysroot' feature should work. If not, do not hesitate to contact the
 developers.
 
-We do not support toolchains from the
-http://www.denx.de/wiki/DULG/ELDK[ELDK] of Denx, for two reasons:
-
-* The ELDK does not contain a pure toolchain (i.e just the compiler,
-  binutils, the C and C++ libraries), but a toolchain that comes with
-  a very large set of pre-compiled libraries and programs. Therefore,
-  Buildroot cannot import the 'sysroot' of the toolchain, as it would
-  contain hundreds of megabytes of pre-compiled libraries that are
-  normally built by Buildroot.
-
-* The ELDK toolchains have a completely non-standard custom mechanism
-  to handle multiple library variants. Instead of using the standard
-  GCC 'multilib' mechanism, the ARM ELDK uses different symbolic links
-  to the compiler to differentiate between library variants (for ARM
-  soft-float and ARM VFP), and the PowerPC ELDK compiler uses a
-  +CROSS_COMPILE+ environment variable. This non-standard behaviour
-  makes it difficult to support ELDK in Buildroot.
+We do not support toolchains or SDK generated by OpenEmbedded or
+Yocto, because these toolchains are not pure toolchains (i.e just the
+compiler, binutils, the C and C++ libraries). Instead these toolchains
+come with a very large set of pre-compiled libraries and
+programs. Therefore, Buildroot cannot import the 'sysroot' of the
+toolchain, as it would contain hundreds of megabytes of pre-compiled
+libraries that are normally built by Buildroot.
 
 We also do not support using the distribution toolchain (i.e the
 gcc/binutils/C library installed by your distribution) as the

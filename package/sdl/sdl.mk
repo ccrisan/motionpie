@@ -12,12 +12,12 @@ SDL_LICENSE_FILES = COPYING
 SDL_INSTALL_STAGING = YES
 
 # we're patching configure.in, but package cannot autoreconf with our version of
-# autotools, so we have to do it manually instead of setting SD_AUTORECONF = YES
+# autotools, so we have to do it manually instead of setting SDL_AUTORECONF = YES
 define SDL_RUN_AUTOGEN
 	cd $(@D) && PATH=$(HOST_PATH) ./autogen.sh
 endef
 
-SDL_POST_PATCH_HOOKS += SDL_RUN_AUTOGEN
+SDL_PRE_CONFIGURE_HOOKS += SDL_RUN_AUTOGEN
 SDL_DEPENDENCIES += host-automake host-autoconf host-libtool
 
 

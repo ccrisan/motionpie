@@ -1,9 +1,18 @@
-BuildRoot for Raspberry Pi
+Buildroot for Raspberry Pi
 ==========================
 
 This buildroot fork will produce a very light-weight and trimmed down
-toolchain, rootfs and kernel for the Raspberry Pi. It's intended for advanced
-users and specific embedded applications.
+toolchain, rootfs and kernel for the Raspberry Pi. It's intended for **advanced
+users** and specific embedded applications.
+
+Before You Begin
+----------------
+
+- If you're not familiar with Buildroot and what it can and can't do, please
+  take the time to [read the manual](http://buildroot.org/downloads/manual/manual.html).
+
+- You must be pretty comfortable with **cross-compilation** in order to use
+  rpi-buildroot.
 
 Test Drive
 ----------

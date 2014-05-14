@@ -18,6 +18,11 @@ config BR2_EXTERNAL
 	string
 	option env="BR2_EXTERNAL"
 
+# Hidden boolean selected by packages in need of Java in order to build
+# (example: xbmc)
+config BR2_NEEDS_HOST_JAVA
+	bool
+
 # Hidden boolean selected by pre-built packages for x86, when they
 # need to run on x86-64 machines (example: pre-built external
 # toolchains, binary tools like SAM-BA, etc.).
@@ -225,6 +230,17 @@ config BR2_LUAROCKS_MIRROR
 
 	  See http://luarocks.org
 
+config BR2_CPAN_MIRROR
+	string "CPAN mirror (Perl packages)"
+	default "http://search.cpan.org/CPAN"
+	help
+	  CPAN (Comprehensive Perl Archive Network) is a repository
+	  of Perl packages. It has multiple software mirrors scattered
+	  around the world. This option allows you to select a mirror.
+
+	  The list of mirrors is available at:
+	  http://search.cpan.org/mirror
+
 endmenu
 
 config BR2_JLEVEL
@@ -264,10 +280,6 @@ config BR2_DEPRECATED
 
 if BR2_DEPRECATED
 
-config BR2_DEPRECATED_SINCE_2013_05
-	bool
-	default y
-
 config BR2_DEPRECATED_SINCE_2013_08
 	bool
 	default y
@@ -277,6 +289,10 @@ config BR2_DEPRECATED_SINCE_2013_11
 	default y
 
 config BR2_DEPRECATED_SINCE_2014_02
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2014_05
 	bool
 	default y
 
@@ -470,7 +486,7 @@ config BR2_PREFER_STATIC_LIB
 
 config BR2_PACKAGE_OVERRIDE_FILE
 	string "location of a package override file"
-	default "$(TOPDIR)/local.mk"
+	default "$(CONFIG_DIR)/local.mk"
 	help
 	  A package override file is a short makefile that contains
 	  variable definitions of the form <pkg>_OVERRIDE_SRCDIR,

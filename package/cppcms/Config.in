@@ -4,8 +4,8 @@ config BR2_PACKAGE_CPPCMS
 	select BR2_PACKAGE_PCRE
 	select BR2_PACKAGE_LIBGCRYPT
 	depends on BR2_INSTALL_LIBSTDCPP
-	# cppcms uses <monetary.h> which doesn't exist in uClibc
-	depends on BR2_TOOLCHAIN_USES_GLIBC
+	depends on BR2_TOOLCHAIN_HAS_THREADS_NPTL
+	depends on !BR2_PREFER_STATIC_LIB # dlopen()
 	help
 	  CppCMS is a Free High Performance Web Development Framework
 	  (not a CMS) aimed for Rapid Web Application Development. It
@@ -26,12 +26,19 @@ config BR2_PACKAGE_CPPCMS_ICU
 	bool "enable icu support"
 	depends on !BR2_arc # icu -> atomic builtins
 	depends on !BR2_BINFMT_FLAT # icu
+	depends on BR2_USE_WCHAR # icu
 	select BR2_PACKAGE_ICU
 	help
 	  Using ICU allows advanced localization features into CppCMS,
 	  in another hand ICU is heavier than iconv.
 
+comment "icu support needs a toolchain w/ wchar"
+	depends on !BR2_arc
+	depends on !BR2_BINFMT_FLAT
+	depends on !BR2_USE_WCHAR
+
 endif
 
-comment "cppcms needs an (e)glibc toolchain w/ C++"
-	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_USES_GLIBC
+comment "cppcms needs a toolchain w/ C++, NPTL, dynamic library"
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS_NPTL || \
+		BR2_PREFER_STATIC_LIB

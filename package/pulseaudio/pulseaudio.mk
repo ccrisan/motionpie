@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PULSEAUDIO_VERSION = 4.0
+PULSEAUDIO_VERSION = 5.0
 PULSEAUDIO_SOURCE = pulseaudio-$(PULSEAUDIO_VERSION).tar.xz
 PULSEAUDIO_SITE = http://freedesktop.org/software/pulseaudio/releases/
 PULSEAUDIO_INSTALL_STAGING = YES
@@ -26,7 +26,7 @@ PULSEAUDIO_DEPENDENCIES = \
 	$(if $(BR2_PACKAGE_AVAHI_DAEMON),avahi) \
 	$(if $(BR2_PACKAGE_DBUS),dbus) \
 	$(if $(BR2_PACKAGE_BLUEZ_UTILS),bluez_utils) \
-	$(if $(BR2_PACKAGE_UDEV),udev) \
+	$(if $(BR2_PACKAGE_HAS_UDEV),udev) \
 	$(if $(BR2_PACKAGE_OPENSSL),openssl) \
 	$(if $(BR2_PACKAGE_FFTW),fftw) \
 	$(if $(BR2_PACKAGE_WEBRTC_AUDIO_PROCESSING),webrtc-audio-processing) \
@@ -39,6 +39,13 @@ PULSEAUDIO_CONF_ENV += ORCC=$(HOST_DIR)/usr/bin/orcc
 PULSEAUDIO_CONF_OPT += --enable-orc
 else
 PULSEAUDIO_CONF_OPT += --disable-orc
+endif
+
+ifeq ($(BR2_PACKAGE_LIBCAP),y)
+PULSEAUDIO_DEPENDENCIES += libcap
+PULSEAUDIO_CONF_OPT += --with-caps
+else
+PULSEAUDIO_CONF_OPT += --without-caps
 endif
 
 ifneq ($(BR2_INSTALL_LIBSTDCPP),y)
@@ -93,13 +100,11 @@ else
 PULSEAUDIO_CONF_OPT += --disable-x11
 endif
 
-ifneq ($(BR2_PACKAGE_VALA),y)
 define PULSEAUDIO_REMOVE_VALA
 	rm -rf $(TARGET_DIR)/usr/share/vala
 endef
 
 PULSEAUDIO_POST_INSTALL_TARGET_HOOKS += PULSEAUDIO_REMOVE_VALA
-endif
 
 ifeq ($(BR2_PACKAGE_PULSEAUDIO_DAEMON),y)
 define PULSEAUDIO_USERS

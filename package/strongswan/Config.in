@@ -1,4 +1,5 @@
 comment "strongswan needs a toolchain w/ threads"
+	depends on BR2_USE_MMU
 	depends on !BR2_TOOLCHAIN_HAS_THREADS
 
 menuconfig BR2_PACKAGE_STRONGSWAN
@@ -91,6 +92,7 @@ if BR2_PACKAGE_STRONGSWAN_EAP
 
 config BR2_PACKAGE_STRONGSWAN_EAP_SIM_PCSC
 	bool "Enable EAP-SIM smart card backend"
+	depends on !BR2_PREFER_STATIC_LIB # pcsc-lite
 	select BR2_PACKAGE_PCSC_LITE
 
 endif

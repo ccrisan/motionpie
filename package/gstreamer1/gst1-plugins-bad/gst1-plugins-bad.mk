@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GST1_PLUGINS_BAD_VERSION = 1.2.2
+GST1_PLUGINS_BAD_VERSION = 1.2.4
 GST1_PLUGINS_BAD_SOURCE = gst-plugins-bad-$(GST1_PLUGINS_BAD_VERSION).tar.xz
 GST1_PLUGINS_BAD_SITE = http://gstreamer.freedesktop.org/src/gst-plugins-bad
 GST1_PLUGINS_BAD_LICENSE_FILES = COPYING COPYING.LIB
@@ -39,9 +39,7 @@ GST1_PLUGINS_BAD_CONF_OPT += \
 	--disable-mfc \
 	--disable-opensles \
 	--disable-uvch264 \
-	--disable-assrender \
 	--disable-voamrwbenc \
-	--disable-voaacenc \
 	--disable-chromaprint \
 	--disable-dash \
 	--disable-dc1394 \
@@ -511,6 +509,20 @@ else
 GST1_PLUGINS_BAD_CONF_OPT += --disable-apexsink
 endif
 
+ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_ASSRENDER),y)
+GST1_PLUGINS_BAD_CONF_OPT += --enable-assrender
+GST1_PLUGINS_BAD_DEPENDENCIES += libass
+else
+GST1_PLUGINS_BAD_CONF_OPT += --disable-assrender
+endif
+
+ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_VOAACENC),y)
+GST1_PLUGINS_BAD_CONF_OPT += --enable-voaacenc
+GST1_PLUGINS_BAD_DEPENDENCIES += vo-aacenc
+else
+GST1_PLUGINS_BAD_CONF_OPT += --disable-voaacenc
+endif
+
 ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_BZ2),y)
 GST1_PLUGINS_BAD_CONF_OPT += --enable-bz2
 GST1_PLUGINS_BAD_DEPENDENCIES += bzip2
@@ -671,7 +683,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_GST1_PLUGINS_BAD_PLUGIN_DVB),y)
 GST1_PLUGINS_BAD_CONF_OPT += --enable-dvb
-GST1_PLUGINS_BAD_DEPENDENCIES += dvb-apps
+GST1_PLUGINS_BAD_DEPENDENCIES += dtv-scan-tables
 else
 GST1_PLUGINS_BAD_CONF_OPT += --disable-dvb
 endif

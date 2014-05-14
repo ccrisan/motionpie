@@ -1,8 +1,7 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-Infrastructure for Python packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Infrastructure for Python packages
 
 This infrastructure applies to Python packages that use the standard
 Python setuptools mechanism as their build system, generally
@@ -10,8 +9,7 @@ recognizable by the usage of a +setup.py+ script.
 
 [[python-package-tutorial]]
 
-+python-package+ tutorial
-^^^^^^^^^^^^^^^^^^^^^^^^^
+==== +python-package+ tutorial
 
 First, let's see how to write a +.mk+ file for a Python package,
 with an example :
@@ -61,8 +59,7 @@ built.
 
 [[python-package-reference]]
 
-+python-package+ reference
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== +python-package+ reference
 
 As a policy, packages that merely provide Python modules should all be
 named +python-<something>+ in Buildroot. Other packages that use the
@@ -143,6 +140,13 @@ therefore only use a few of them, or none.
   packages), +PKG_PYTHON_SETUPTOOLS_INSTALL_OPT+ (for target
   setuptools packages) and +HOST_PKG_PYTHON_SETUPTOOLS_INSTALL_OPT+
   (for host setuptools packages).
+
+* +HOST_PYTHON_FOO_NEEDS_HOST_PYTHON+, to define the host python
+  interpreter. The usage of this variable is limited to host
+  packages. The two supported value are +python2+ and +python3+.  It
+  will ensures the right host python package is available and will
+  invoke it for the build. If some build steps are overloaded, the
+  right python interpreter must be explicitly called in the commands.
 
 With the Python infrastructure, all the steps required to build and
 install the packages are already defined, and they generally work well

@@ -163,6 +163,18 @@ copy_toolchain_sysroot = \
 	find $(STAGING_DIR) -type d | xargs chmod 755
 
 #
+# Check the specified kernel headers version actually matches the
+# version in the toolchain.
+#
+# $1: sysroot directory
+# $2: kernel version string, in the form: X.Y
+#
+check_kernel_headers_version = \
+	if ! support/scripts/check-kernel-headers.sh $(1) $(2); then \
+		exit 1; \
+	fi
+
+#
 # Check the availability of a particular glibc feature. This function
 # is used to check toolchain options that are always supported by
 # glibc, so we simply check that the corresponding option is properly
@@ -268,6 +280,7 @@ check_uclibc = \
 	$(call check_uclibc_feature,__UCLIBC_HAS_WCHAR__,BR2_USE_WCHAR,$${UCLIBC_CONFIG_FILE},Wide char support) ;\
 	$(call check_uclibc_feature,__UCLIBC_HAS_THREADS__,BR2_TOOLCHAIN_HAS_THREADS,$${UCLIBC_CONFIG_FILE},Thread support) ;\
 	$(call check_uclibc_feature,__PTHREADS_DEBUG_SUPPORT__,BR2_TOOLCHAIN_HAS_THREADS_DEBUG,$${UCLIBC_CONFIG_FILE},Thread debugging support) ;\
+	$(call check_uclibc_feature,__UCLIBC_HAS_THREADS_NATIVE__,BR2_TOOLCHAIN_HAS_THREADS_NPTL,$${UCLIBC_CONFIG_FILE},NPTL thread support) ;\
 	$(call check_uclibc_feature,__UCLIBC_HAS_SSP__,BR2_TOOLCHAIN_HAS_SSP,$${UCLIBC_CONFIG_FILE},Stack Smashing Protection support)
 
 #
@@ -284,18 +297,10 @@ check_arm_abi = \
 		echo "External toolchain uses the unsuported OABI" ; \
 		exit 1 ; \
 	fi ; \
-	EXT_TOOLCHAIN_CRT1=`LANG=C $${__CROSS_CC} -print-file-name=crt1.o` ; \
-	if $${__CROSS_READELF} -A $${EXT_TOOLCHAIN_CRT1} | grep -q "Tag_ABI_VFP_args:" ; then \
-		EXT_TOOLCHAIN_ABI="eabihf" ; \
-	else \
-		EXT_TOOLCHAIN_ABI="eabi" ; \
-	fi ; \
-	if [ "$(BR2_ARM_EABI)" = "y" -a "$${EXT_TOOLCHAIN_ABI}" = "eabihf" ] ; then \
-		echo "Incorrect ABI setting: EABI selected, but toolchain uses EABIhf" ; \
-		exit 1 ; \
-	fi ; \
-	if [ "$(BR2_ARM_EABIHF)" = "y" -a "$${EXT_TOOLCHAIN_ABI}" = "eabi" ] ; then \
-		echo "Incorrect ABI setting: EABIhf selected, but toolchain uses EABI" ; \
+	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o /dev/null - 2>/dev/null; then \
+		abistr_$(BR2_ARM_EABI)='EABI'; \
+		abistr_$(BR2_ARM_EABIHF)='EABIhf'; \
+		echo "Incorrect ABI setting: $${abistr_y} selected, but toolchain is incompatible"; \
 		exit 1 ; \
 	fi
 
@@ -342,3 +347,10 @@ check_unusable_toolchain = \
 		echo "such as Buildroot." ; \
 		exit 1 ; \
 	fi
+
+#
+# Generate gdbinit file for use with Buildroot
+#
+gen_gdbinit_file = \
+	mkdir -p $(STAGING_DIR)/usr/share/buildroot/ ; \
+	echo "set sysroot $(STAGING_DIR)" > $(STAGING_DIR)/usr/share/buildroot/gdbinit

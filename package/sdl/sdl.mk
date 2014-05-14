@@ -14,12 +14,14 @@ SDL_INSTALL_STAGING = YES
 # we're patching configure.in, but package cannot autoreconf with our version of
 # autotools, so we have to do it manually instead of setting SDL_AUTORECONF = YES
 define SDL_RUN_AUTOGEN
-	cd $(@D) && PATH=$(HOST_PATH) ./autogen.sh
+	cd $(@D) && PATH=$(BR_PATH) ./autogen.sh
 endef
 
 SDL_PRE_CONFIGURE_HOOKS += SDL_RUN_AUTOGEN
-SDL_DEPENDENCIES += host-automake host-autoconf host-libtool
+HOST_SDL_PRE_CONFIGURE_HOOKS += SDL_RUN_AUTOGEN
 
+SDL_DEPENDENCIES += host-automake host-autoconf host-libtool
+HOST_SDL_DEPENDENCIES += host-automake host-autoconf host-libtool
 
 ifeq ($(BR2_PACKAGE_SDL_FBCON),y)
 SDL_CONF_OPT += --enable-video-fbcon=yes
@@ -69,6 +71,13 @@ SDL_CONF_OPT += --enable-pulseaudio=no \
 		--disable-nasm \
 		--disable-video-ps3
 
+HOST_SDL_CONF_OPT += --enable-pulseaudio=no \
+		--enable-video-x11=no \
+		--disable-arts \
+		--disable-esd \
+		--disable-nasm \
+		--disable-video-ps3
+
 SDL_CONFIG_SCRIPTS = sdl-config
 
 # Remove the -Wl,-rpath option.
@@ -80,3 +89,4 @@ endef
 SDL_POST_INSTALL_STAGING_HOOKS += SDL_FIXUP_SDL_CONFIG
 
 $(eval $(autotools-package))
+$(eval $(host-autotools-package))

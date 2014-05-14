@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LUAJIT_VERSION = 2.0.2
+LUAJIT_VERSION = 2.0.3
 LUAJIT_SOURCE  = LuaJIT-$(LUAJIT_VERSION).tar.gz
 LUAJIT_SITE    = http://luajit.org/download
 LUAJIT_LICENSE = MIT
@@ -14,6 +14,12 @@ LUAJIT_INSTALL_STAGING = YES
 
 ifneq ($(BR2_LARGEFILE),y)
 LUAJIT_NO_LARGEFILE = TARGET_LFSFLAGS=
+endif
+
+ifeq ($(BR2_PREFER_STATIC_LIB),y)
+LUAJIT_BUILDMODE = static
+else
+LUAJIT_BUILDMODE = dynamic
 endif
 
 # The luajit build procedure requires the host compiler to have the
@@ -37,13 +43,14 @@ define LUAJIT_BUILD_CMDS
 		DYNAMIC_CC="$(TARGET_CC) -fPIC" \
 		TARGET_LD="$(TARGET_CC)" \
 		TARGET_AR="$(TARGET_AR) rcus" \
-		TARGET_STRIP="$(TARGET_STRIP)" \
+		TARGET_STRIP=true \
 		TARGET_CFLAGS="$(TARGET_CFLAGS)" \
 		TARGET_LDFLAGS="$(TARGET_LDFLAGS)" \
 		HOST_CC="$(LUAJIT_HOST_CC)" \
 		HOST_CFLAGS="$(HOST_CFLAGS)" \
 		HOST_LDFLAGS="$(HOST_LDFLAGS)" \
 		$(LUAJIT_NO_LARGEFILE) \
+		BUILDMODE=$(LUAJIT_BUILDMODE) \
 		-C $(@D) amalg
 endef
 

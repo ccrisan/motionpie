@@ -12,26 +12,37 @@ VLC_LICENSE_FILES = COPYING COPYING.LIB
 VLC_DEPENDENCIES = host-pkgconf
 VLC_AUTORECONF = YES
 
+# VLC defines two autoconf functions which are also defined by our own pkg.m4
+# from pkgconf. Unfortunately, they are defined in a different way: VLC adds
+# --enable- options, but pkg.m4 adds --with- options. To make sure we use
+# VLC's definition, rename these two functions.
+define VLC_OVERRIDE_PKG_M4
+	$(SED) 's/PKG_WITH_MODULES/VLC_PKG_WITH_MODULES/g' \
+		-e 's/PKG_HAVE_WITH_MODULES/VLC_PKG_HAVE_WITH_MODULES/g' \
+		$(@D)/configure.ac $(@D)/m4/with_pkg.m4
+endef
+VLC_POST_PATCH_HOOKS += VLC_OVERRIDE_PKG_M4
+
 VLC_CONF_OPT += \
 	--disable-a52 \
-	--without-shout \
-	--without-twolame \
-	--without-dca \
-	--without-dirac \
-	--without-schroedinger \
-	--without-quicksync \
-	--without-fluidsynth \
+	--disable-shout \
+	--disable-twolame \
+	--disable-dca \
+	--disable-dirac \
+	--disable-schroedinger \
+	--disable-quicksync \
+	--disable-fluidsynth \
 	--disable-zvbi \
-	--without-kate \
-	--without-caca \
+	--disable-kate \
+	--disable-caca \
 	--disable-jack \
-	--without-samplerate \
-	--without-chromaprint \
-	--without-goom \
+	--disable-samplerate \
+	--disable-chromaprint \
+	--disable-goom \
 	--disable-projectm \
 	--disable-vsxu \
-	--without-mtp \
-	--without-opencv
+	--disable-mtp \
+	--disable-opencv
 
 # Building static and shared doesn't work, so force static off.
 ifeq ($(BR2_PREFER_STATIC_LIB),)
@@ -54,10 +65,10 @@ endif
 
 # bonjour support needs avahi-client, which needs avahi-daemon and dbus
 ifeq ($(BR2_PACKAGE_AVAHI)$(BR2_PACKAGE_AVAHI_DAEMON)$(BR2_PACKAGE_DBUS),yyy)
-VLC_CONF_OPT += --with-bonjour
+VLC_CONF_OPT += --enable-bonjour
 VLC_DEPENDENCIES += avahi dbus
 else
-VLC_CONF_OPT += --without-bonjour
+VLC_CONF_OPT += --disable-bonjour
 endif
 
 ifeq ($(BR2_PACKAGE_DBUS),y)
@@ -101,24 +112,24 @@ VLC_CONF_OPT += --disable-swscale
 endif
 
 ifeq ($(BR2_PACKAGE_FLAC),y)
-VLC_CONF_OPT += --with-flac
+VLC_CONF_OPT += --enable-flac
 VLC_DEPENDENCIES += flac
 else
-VLC_CONF_OPT += --without-flac
+VLC_CONF_OPT += --disable-flac
 endif
 
-ifeq ($(BR2_PACKAGE_MESA3D),y)
+ifeq ($(BR2_PACKAGE_HAS_LIBGL),y)
 VLC_CONF_OPT += --enable-glx
-VLC_DEPENDENCIES += mesa3d
+VLC_DEPENDENCIES += libgl
 else
 VLC_CONF_OPT += --disable-glx
 endif
 
 ifeq ($(BR2_PACKAGE_OPUS),y)
-VLC_CONF_OPT += --with-opus
-VLC_DEPENDENCIES += opus
+VLC_CONF_OPT += --enable-opus
+VLC_DEPENDENCIES += libvorbis opus
 else
-VLC_CONF_OPT += --without-opus
+VLC_CONF_OPT += --disable-opus
 endif
 
 ifeq ($(BR2_PACKAGE_LIBASS),y)
@@ -152,10 +163,10 @@ VLC_CONF_OPT += --disable-mod
 endif
 
 ifeq ($(BR2_PACKAGE_LIBMPEG2),y)
-VLC_CONF_OPT += --with-libmpeg2
+VLC_CONF_OPT += --enable-libmpeg2
 VLC_DEPENDENCIES += libmpeg2
 else
-VLC_CONF_OPT += --without-libmpeg2
+VLC_CONF_OPT += --disable-libmpeg2
 endif
 
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
@@ -166,31 +177,31 @@ VLC_CONF_OPT += --disable-png
 endif
 
 ifeq ($(BR2_PACKAGE_LIBRSVG),y)
-VLC_CONF_OPT += --with-svg
+VLC_CONF_OPT += --enable-svg
 VLC_DEPENDENCIES += librsvg
 else
-VLC_CONF_OPT += --without-svg
+VLC_CONF_OPT += --disable-svg
 endif
 
 ifeq ($(BR2_PACKAGE_LIBTHEORA),y)
-VLC_CONF_OPT += --with-theora
+VLC_CONF_OPT += --enable-theora
 VLC_DEPENDENCIES += libtheora
 else
-VLC_CONF_OPT += --without-theora
+VLC_CONF_OPT += --disable-theora
 endif
 
 ifeq ($(BR2_PACKAGE_LIBUPNP),y)
-VLC_CONF_OPT += --with-upnp
+VLC_CONF_OPT += --enable-upnp
 VLC_DEPENDENCIES += libupnp
 else
-VLC_CONF_OPT += --without-upnp
+VLC_CONF_OPT += --disable-upnp
 endif
 
 ifeq ($(BR2_PACKAGE_LIBVORBIS),y)
-VLC_CONF_OPT += --with-vorbis
+VLC_CONF_OPT += --enable-vorbis
 VLC_DEPENDENCIES += libvorbis
 else
-VLC_CONF_OPT += --without-vorbis
+VLC_CONF_OPT += --disable-vorbis
 endif
 
 ifeq ($(BR2_PACKAGE_LIBV4L),y)
@@ -208,10 +219,10 @@ VLC_CONF_OPT += --disable-xcb
 endif
 
 ifeq ($(BR2_PACKAGE_LIBXML2),y)
-VLC_CONF_OPT += --with-libxml2
+VLC_CONF_OPT += --enable-libxml2
 VLC_DEPENDENCIES += libxml2
 else
-VLC_CONF_OPT += --without-libxml2
+VLC_CONF_OPT += --disable-libxml2
 endif
 
 # live555 installs a static library only, and vlc tries to link it into a
@@ -261,10 +272,10 @@ VLC_CONF_OPT += --disable-sdl-image
 endif
 
 ifeq ($(BR2_PACKAGE_SPEEX),y)
-VLC_CONF_OPT += --with-speex
+VLC_CONF_OPT += --enable-speex
 VLC_DEPENDENCIES += speex
 else
-VLC_CONF_OPT += --without-speex
+VLC_CONF_OPT += --disable-speex
 endif
 
 ifeq ($(BR2_PACKAGE_TREMOR),y)
@@ -274,11 +285,11 @@ else
 VLC_CONF_OPT += --disable-tremor
 endif
 
-ifeq ($(BR2_PACKAGE_UDEV),y)
-VLC_CONF_OPT += --with-udev
+ifeq ($(BR2_PACKAGE_HAS_UDEV),y)
+VLC_CONF_OPT += --enable-udev
 VLC_DEPENDENCIES += udev
 else
-VLC_CONF_OPT += --without-udev
+VLC_CONF_OPT += --disable-udev
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)

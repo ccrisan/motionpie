@@ -36,6 +36,16 @@ define CONFIG_UPDATE
 	done
 endef
 
+# This function generates the ac_cv_file_<foo> value for a given
+# filename. This is needed to convince configure script doing
+# AC_CHECK_FILE() tests that the file actually exists, since such
+# tests cannot be done in a cross-compilation context. This function
+# takes as argument the path of the file. An example usage is:
+#
+#  FOOBAR_CONF_ENV = \
+#	$(call AUTOCONF_AC_CHECK_FILE_VAL,/dev/random)=yes
+AUTOCONF_AC_CHECK_FILE_VAL = ac_cv_file_$(subst -,_,$(subst /,_,$(subst .,_,$(1))))
+
 ################################################################################
 # inner-autotools-package -- defines how the configuration, compilation and
 # installation of an autotools package should be done, implements a
@@ -210,7 +220,8 @@ endef
 # This must be repeated from inner-generic-package, otherwise we get an empty
 # _DEPENDENCIES if _AUTORECONF is YES.  Also filter the result of _AUTORECONF
 # away from the non-host rule
-$(2)_DEPENDENCIES ?= $(filter-out host-automake host-autoconf host-libtool $(1),\
+$(2)_DEPENDENCIES ?= $(filter-out host-automake host-autoconf host-libtool \
+				host-toolchain $(1),\
     $(patsubst host-host-%,host-%,$(addprefix host-,$($(3)_DEPENDENCIES))))
 
 

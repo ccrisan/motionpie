@@ -4,8 +4,11 @@
 #
 ################################################################################
 
-JQUERY_UI_VERSION = 1.10.3
-JQUERY_UI_SITE = http://jqueryui.com/resources/download
+JQUERY_UI_VERSION = 1.10.4
+# Use buildroot mirror since upstream switched the zipfile and directory
+# structure without bumping/renaming.
+# Remember to switch back to jqueryui.com when bumping!
+JQUERY_UI_SITE = http://sources.buildroot.net
 JQUERY_UI_SOURCE = jquery-ui-$(JQUERY_UI_VERSION).zip
 JQUERY_UI_LICENSE = MIT
 JQUERY_UI_LICENSE_FILES = MIT-LICENSE.txt

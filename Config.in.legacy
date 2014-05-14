@@ -99,6 +99,171 @@ comment "----------------------------------------------------"
 endif
 
 ###############################################################################
+comment "Legacy options removed in 2014.05"
+
+config BR2_PACKAGE_EVTEST_CAPTURE
+	bool "evtest-capture support removed (dropped since evtest 1.31)"
+	select BR2_LEGACY
+	help
+	  Support for evtest-capture has been removed (dropped from
+	  evtest package since version 1.31), use evemu package
+	  instead.
+
+config BR2_KERNEL_HEADERS_3_6
+	bool "kernel headers version 3.6.x are no longer supported"
+	select BR2_KERNEL_HEADERS_3_8
+	select BR2_LEGACY
+	help
+	  Version 3.6.x of the Linux kernel headers have been deprecated
+	  for more than four buildroot releases and are now removed.
+	  As an alternative, version 3.8.x of the headers have been
+	  automatically selected in your configuration.
+
+config BR2_KERNEL_HEADERS_3_7
+	bool "kernel headers version 3.7.x are no longer supported"
+	select BR2_KERNEL_HEADERS_3_8
+	select BR2_LEGACY
+	help
+	  Version 3.7.x of the Linux kernel headers have been deprecated
+	  for more than four buildroot releases and are now removed.
+	  As an alternative, version 3.8.x of the headers have been
+	  automatically selected in your configuration.
+
+config BR2_PACKAGE_VALA
+	bool "vala target package has been removed"
+	select BR2_LEGACY
+	help
+	  The 'vala' target package has been removed since it has been
+	  deprecated for more than four buildroot releases.
+	  Note: the host vala package still exists.
+
+config BR2_TARGET_TZ_ZONELIST
+	default BR2_PACKAGE_TZDATA_ZONELIST if BR2_PACKAGE_TZDATA_ZONELIST != ""
+
+config BR2_PACKAGE_TZDATA_ZONELIST
+	string "tzdata: the timezone list option has been renamed"
+	help
+	  The option BR2_PACKAGE_TZDATA_ZONELIST has been renamed to
+	  BR2_TARGET_TZ_ZONELIST, and moved to the "System configuration"
+	  menu. You'll need to select BR2_TARGET_TZ_INFO.
+
+config BR2_PACKAGE_TZDATA_ZONELIST_WRAP
+	bool
+	default y if BR2_PACKAGE_TZDATA_ZONELIST != ""
+	select BR2_LEGACY
+
+config BR2_PACKAGE_LUA_INTERPRETER_EDITING_NONE
+	bool "Lua command-line editing none has been renamed"
+	select BR2_LEGACY
+	help
+	  The BR2_PACKAGE_LUA_INTERPRETER_EDITING_NONE option has been
+	  renamed to BR2_PACKAGE_LUA_EDITING_NONE. You will have to select
+	  it in the corresponding choice.
+
+config BR2_PACKAGE_LUA_INTERPRETER_READLINE
+	bool "Lua command-line editing using readline has been renamed"
+	select BR2_LEGACY
+	help
+	  The BR2_PACKAGE_LUA_INTERPRETER_READLINE option has been
+	  renamed to BR2_PACKAGE_LUA_READLINE. You will have to select
+	  it in the corresponding choice.
+
+config BR2_PACKAGE_LUA_INTERPRETER_LINENOISE
+	bool "Lua command-line editing using linenoise has been renamed"
+	select BR2_LEGACY
+	help
+	  The BR2_PACKAGE_LUA_INTERPRETER_LINENOISE option has been
+	  renamed to BR2_PACKAGE_LUA_LINENOISE. You will have to select
+	  it in the corresponding choice.
+
+config BR2_PACKAGE_DVB_APPS_UTILS
+	bool "dvb-apps utilities now built by default"
+	select BR2_LEGACY
+	help
+	  The dvb-apps utilities are now always built when the dvb-apps
+	  package is selected.
+
+config BR2_KERNEL_HEADERS_SNAP
+	bool "Local Linux snapshot support removed"
+	select BR2_LEGACY
+	help
+	  Support for using a custom snapshot to install the Linux
+	  kernel headers has been removed.
+
+config BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV
+	bool "/dev management by udev removed"
+	select BR2_LEGACY
+	help
+	  The 'udev' package has been converted to a virtual package.
+	  The providers for this feature are: 'eudev', 'systemd'.
+
+	  Therefore, if you are not using 'systemd' as init system, you
+	  must choose 'Dynamic using eudev' in the '/dev management'
+	  menu to get the same behaviour as in your old configuration.
+
+	  If you are using 'systemd', its internal implementation of
+	  'udev' will be used automatically.
+
+	  You must also check the packages depending on 'udev' are still
+	  selected.
+
+config BR2_PACKAGE_UDEV
+	bool "udev is now a virtual package"
+	select BR2_LEGACY
+	select BR2_PACKAGE_HAS_UDEV
+	help
+	  The 'udev' package has been converted to a virtual package.
+	  The providers for this feature are: 'eudev', 'systemd'.
+
+	  Your old configuration refers to packages depending on 'udev',
+	  either for build or at runtime.
+
+	  Check that a 'udev' provider is selected. If you are not using
+	  'systemd' as init system, 'eudev' should be selected, which is
+	  the case if '/dev management' is set to 'Dynamic using eudev'.
+
+	  If you are using 'systemd', its internal implementation of 'udev'
+	  is used.
+
+config BR2_PACKAGE_UDEV_RULES_GEN
+	bool "udev rules generation handled by provider"
+	select BR2_LEGACY
+	select BR2_PACKAGE_EUDEV if !BR2_INIT_SYSTEMD
+	select BR2_PACKAGE_EUDEV_RULES_GEN if !BR2_INIT_SYSTEMD
+	help
+	  The 'udev' package has been converted to a virtual package.
+	  The providers for this feature are: 'eudev', 'systemd'.
+
+	  If you are not using 'systemd' as init system, udev rules
+	  generation will be handled by 'eudev'. Check that
+	  '/dev management' is set to 'Dynamic using eudev' to get
+	  the same behaviour as in your old configuration.
+
+	  If you are using 'systemd', it internal implementation of 'udev'
+	  will generate the rules.
+
+config BR2_PACKAGE_UDEV_ALL_EXTRAS
+	bool "udev extras removed"
+	select BR2_LEGACY
+	help
+	  The 'udev' package has been converted to a virtual package.
+	  The providers for this feature are: 'eudev', 'systemd'.
+
+	  The option to enable the extra features of 'udev' (gudev, ...)
+	  has been removed. These features are automatically enabled in
+	  the 'udev' providers if the dependencies are selected. For
+	  example, selecting 'libglib2' will trigger the build of gudev.
+
+config BR2_PACKAGE_XLIB_LIBPTHREAD_STUBS
+	bool "xlib-libpthread-stubs option has been renamed"
+	depends on BR2_PACKAGE_XORG7
+	select BR2_LEGACY
+	select BR2_PACKAGE_LIBPTHREAD_STUBS
+	help
+	  The pthread stubs neither depend on X11 nor Xlib. Thus the
+	  package has been renamed BR2_PACKAGE_LIBPTHREAD_STUBS
+
+###############################################################################
 comment "Legacy options removed in 2014.02"
 
 config BR2_sh2
@@ -141,12 +306,12 @@ config BR2_KERNEL_HEADERS_3_3
 
 config BR2_KERNEL_HEADERS_3_5
 	bool "kernel headers version 3.5.x are no longer supported"
-	select BR2_KERNEL_HEADERS_3_6
+	select BR2_KERNEL_HEADERS_3_8
 	select BR2_LEGACY
 	help
 	  Version 3.5.x of the Linux kernel headers have been deprecated
 	  for more than four buildroot releases and are now removed.
-	  As an alternative, version 3.6.x of the headers have been
+	  As an alternative, version 3.8.x of the headers have been
 	  automatically selected in your configuration.
 
 config BR2_GDB_VERSION_7_2
@@ -568,11 +733,10 @@ config BR2_PACKAGE_XSERVER_tinyx
 config BR2_PACKAGE_PTHREAD_STUBS
 	bool "pthread-stubs option has been renamed"
 	select BR2_LEGACY
-	select BR2_PACKAGE_XLIB_LIBPTHREAD_STUBS
-	depends on BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_LIBPTHREAD_STUBS
 	help
 	  For consistency reason, the pthread-stubs package has been
-	  renamed to xlib_libpthread-stubs.
+	  renamed to libpthread-stubs.
 
 ###############################################################################
 comment "Legacy options removed in 2012.08"

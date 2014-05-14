@@ -5,7 +5,7 @@
 ################################################################################
 
 IPSEC_TOOLS_VERSION_MAJOR = 0.8
-IPSEC_TOOLS_VERSION = $(IPSEC_TOOLS_VERSION_MAJOR).0
+IPSEC_TOOLS_VERSION = $(IPSEC_TOOLS_VERSION_MAJOR).2
 IPSEC_TOOLS_SOURCE = ipsec-tools-$(IPSEC_TOOLS_VERSION).tar.bz2
 IPSEC_TOOLS_SITE = http://ftp.sunet.se/pub/NetBSD/misc/ipsec-tools/$(IPSEC_TOOLS_VERSION_MAJOR)/
 IPSEC_TOOLS_INSTALL_STAGING = YES
@@ -14,6 +14,11 @@ IPSEC_TOOLS_DEPENDENCIES = openssl flex host-flex
 
 # configure hardcodes -Werror, so override CFLAGS on make invocation
 IPSEC_TOOLS_MAKE_OPT = CFLAGS='$(TARGET_CFLAGS)'
+
+# openssl uses zlib, so we need to explicitly link with it when static
+ifeq ($(BR2_PREFER_STATIC_LIB),y)
+IPSEC_TOOLS_CONF_ENV += LIBS=-lz
+endif
 
 IPSEC_TOOLS_CONF_OPT = \
 	  --disable-hybrid \

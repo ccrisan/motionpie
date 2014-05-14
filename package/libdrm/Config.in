@@ -1,7 +1,7 @@
 config BR2_PACKAGE_LIBDRM
 	bool "libdrm"
-	select BR2_PACKAGE_XLIB_LIBPTHREAD_STUBS
-	depends on BR2_PACKAGE_XORG7
+	select BR2_PACKAGE_LIBPTHREAD_STUBS
+	depends on BR2_TOOLCHAIN_HAS_THREADS # libpthread-stubs
 	depends on BR2_LARGEFILE
 	help
 	  Direct Rendering Manager
@@ -14,30 +14,29 @@ menu "DRM Drivers"
 
 config BR2_PACKAGE_LIBDRM_INTEL
 	bool "intel"
+	depends on BR2_PACKAGE_XORG7
 	select BR2_PACKAGE_LIBATOMIC_OPS
 	select BR2_PACKAGE_XLIB_LIBPCIACCESS
 	depends on BR2_i386 || BR2_x86_64
 	help
 	  installs intel graphics driver
 
+comment "libdrm intel driver depends on X.org"
+	depends on !BR2_PACKAGE_XORG7
+
 config BR2_PACKAGE_LIBDRM_RADEON
 	bool "radeon"
-	select BR2_PACKAGE_LIBATOMIC_OPS
-	select BR2_PACKAGE_XLIB_LIBPCIACCESS
-	depends on BR2_i386 || BR2_x86_64
 	help
 	  install AMD/ATI graphics driver
 
 config BR2_PACKAGE_LIBDRM_NOUVEAU
 	bool "nouveau"
-	select BR2_PACKAGE_XLIB_LIBPCIACCESS
 	depends on BR2_i386 || BR2_x86_64
 	help
 	  install Nvidia graphics driver
 
 config BR2_PACKAGE_LIBDRM_VMWGFX
 	bool "vmwgfx"
-	select BR2_PACKAGE_XLIB_LIBPCIACCESS
 	depends on BR2_i386 || BR2_x86_64
 	help
 	  installs Vmware graphics driver
@@ -64,6 +63,5 @@ endmenu
 
 endif
 
-comment "libdrm needs a toolchain w/ largefile"
-	depends on BR2_PACKAGE_XORG7
-	depends on !BR2_LARGEFILE
+comment "libdrm needs a toolchain w/ largefile, threads"
+	depends on !BR2_LARGEFILE || !BR2_TOOLCHAIN_HAS_THREADS

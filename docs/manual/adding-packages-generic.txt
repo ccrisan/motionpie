@@ -1,8 +1,7 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-Infrastructure for packages with specific build systems
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Infrastructure for packages with specific build systems
 
 By 'packages with specific build systems' we mean all the packages
 whose build system is not one of the standard ones, such as
@@ -11,8 +10,7 @@ system is based on hand-written Makefiles or shell scripts.
 
 [[generic-package-tutorial]]
 
-+generic-package+ Tutorial
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== +generic-package+ tutorial
 
 ------------------------------
 01: ################################################################################
@@ -150,7 +148,7 @@ On line 31..33, we define a device-node file used by this package
 On line 35..37, we define the permissions to set to specific files
 installed by this package (+LIBFOO_PERMISSIONS+).
 
-On lines 39..41, we define a user that is used by this package (eg.
+On lines 39..41, we define a user that is used by this package (e.g.
 to run a daemon as non-root) (+LIBFOO_USERS+).
 
 Finally, on line 43, we call the +generic-package+ function, which
@@ -159,8 +157,7 @@ Makefile code necessary to make your package working.
 
 [[generic-package-reference]]
 
-+generic-package+ Reference
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== +generic-package+ reference
 
 There are two variants of the generic target. The +generic-package+ macro is
 used for packages to be cross-compiled for the target.  The
@@ -211,7 +208,7 @@ information is (assuming the package name is +libfoo+) :
   the package. If +HOST_LIBFOO_SOURCE+ is not specified, it
   defaults to +LIBFOO_SOURCE+. If none are specified, then
   the value is assumed to be
-  +packagename-$(LIBFOO_VERSION).tar.gz+. +
+  +libfoo-$(LIBFOO_VERSION).tar.gz+. +
   Example: +LIBFOO_SOURCE = foobar-$(LIBFOO_VERSION).tar.bz2+
 
 * +LIBFOO_PATCH+ may contain a space-separated list of patch file
@@ -335,7 +332,7 @@ information is (assuming the package name is +libfoo+) :
   This variable is optional.
 
 * +LIBFOO_USERS+ lists the users to create for this package, if it installs
-  a program you want to run as a specific user (eg. as a daemon, or as a
+  a program you want to run as a specific user (e.g. as a daemon, or as a
   cron-job). The syntax is similar in spirit to the makedevs one, and is
   described in the xref:makeuser-syntax[]. This variable is optional.
 
@@ -412,6 +409,15 @@ different steps of the build process.
   the directory given by +$(STAGING_DIR)+. All development files
   should be installed, since they might be needed to compile other
   packages.
+
+* +LIBFOO_INSTALL_IMAGES_CMDS+ lists the actions to be performed to
+  install the package to the images directory, when the package is a
+  target package. The package must install its files to the directory
+  given by +$(BINARIES_DIR)+. Only files that are binary images (aka
+  images) that do not belong in the +TARGET_DIR+ but are necessary
+  for booting the board should be placed here. For example, a package
+  should utilize this step if it has binaries which would be similar
+  to the kernel image, bootloader or root filesystem images.
 
 * +LIBFOO_INSTALL_INIT_SYSV+ and +LIBFOO_INSTALL_INIT_SYSTEMD+ list the
   actions to install init scripts either for the systemV-like init systems

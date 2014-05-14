@@ -54,14 +54,14 @@ else
 	CAIRO_CONF_OPT += --disable-directfb
 endif
 
-ifeq ($(BR2_PACKAGE_HAS_OPENGL_ES),y)
+ifeq ($(BR2_PACKAGE_HAS_LIBGLES),y)
 	CAIRO_CONF_OPT += --enable-glesv2
 	CAIRO_DEPENDENCIES += libgles
 else
 	CAIRO_CONF_OPT += --disable-glesv2
 endif
 
-ifeq ($(BR2_PACKAGE_HAS_OPENVG),y)
+ifeq ($(BR2_PACKAGE_HAS_LIBOPENVG),y)
 	CAIRO_CONF_OPT += --enable-vg
 	CAIRO_DEPENDENCIES += libopenvg
 else

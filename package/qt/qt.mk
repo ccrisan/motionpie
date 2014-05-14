@@ -12,7 +12,7 @@
 ################################################################################
 
 QT_VERSION_MAJOR = 4.8
-QT_VERSION = $(QT_VERSION_MAJOR).5
+QT_VERSION = $(QT_VERSION_MAJOR).6
 QT_SOURCE  = qt-everywhere-opensource-src-$(QT_VERSION).tar.gz
 QT_SITE    = http://download.qt-project.org/official_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION)
 QT_DEPENDENCIES = host-pkgconf
@@ -586,6 +586,9 @@ endif
 ifeq ($(BR2_PACKAGE_QT_GFX_POWERVR),y)
 QT_INSTALL_LIBS    += pvrQWSWSEGL
 endif
+ifeq ($(BR2_PACKAGE_QT_TEST),y)
+QT_INSTALL_LIBS    += QtTest
+endif
 
 QT_CONF_FILE=$(HOST_DIR)/usr/bin/qt.conf
 
@@ -625,6 +628,7 @@ endef
 # Library installation
 ifeq ($(BR2_PACKAGE_QT_SHARED),y)
 define QT_INSTALL_TARGET_LIBS
+	mkdir -p $(TARGET_DIR)/usr/lib
 	for lib in $(QT_INSTALL_LIBS); do \
 		cp -dpf $(STAGING_DIR)/usr/lib/lib$${lib}.so.* $(TARGET_DIR)/usr/lib ; \
 	done

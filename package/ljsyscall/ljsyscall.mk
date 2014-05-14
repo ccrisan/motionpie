@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LJSYSCALL_VERSION = v0.9
+LJSYSCALL_VERSION = v0.10
 LJSYSCALL_SITE = $(call github,justincormack,ljsyscall,$(LJSYSCALL_VERSION))
 LJSYSCALL_LICENSE = MIT
 LJSYSCALL_LICENSE_FILES = COPYRIGHT
@@ -19,7 +19,7 @@ else ifeq ($(LJSYSCALL_ARCH),)
 LJSYSCALL_ARCH = $(BR2_ARCH)
 endif
 
-LJSYSCALL_TARGET_DIR = $(TARGET_DIR)/usr/share/luajit-$(LUAJIT_VERSION)
+LJSYSCALL_TARGET_DIR = $(TARGET_DIR)/usr/share/lua/$(LUAINTERPRETER_ABIVER)
 
 define LJSYSCALL_INSTALL_TARGET_CMDS
 	$(INSTALL) -d $(LJSYSCALL_TARGET_DIR)/syscall

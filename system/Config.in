@@ -87,20 +87,21 @@ config BR2_INIT_SYSV
 
 config BR2_INIT_SYSTEMD
 	bool "systemd"
+	depends on BR2_PACKAGE_SYSTEMD_ARCH_SUPPORTS
+	depends on BR2_TOOLCHAIN_USES_GLIBC
 	depends on BR2_LARGEFILE
 	depends on BR2_USE_WCHAR
 	depends on BR2_INET_IPV6
-	depends on BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV
 	depends on BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_TOOLCHAIN_HAS_SSP
 	depends on BR2_USE_MMU
-	select BR2_PACKAGE_DBUS
+	depends on !BR2_PREFER_STATIC_LIB
+	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8
 	select BR2_PACKAGE_SYSTEMD
 
-comment 'systemd needs udev /dev management and a toolchain w/ largefile, wchar, IPv6, threads'
-	depends on BR2_USE_MMU
-	depends on !(BR2_LARGEFILE && BR2_USE_WCHAR && \
-		     BR2_INET_IPV6 && BR2_TOOLCHAIN_HAS_THREADS && \
-		     BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV)
+comment 'systemd needs an (e)glibc toolchain, headers >= 3.8'
+	depends on !(BR2_TOOLCHAIN_USES_GLIBC \
+		&& BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8)
 
 config BR2_INIT_NONE
 	bool "None"
@@ -108,7 +109,7 @@ config BR2_INIT_NONE
 endchoice
 
 choice
-	prompt "/dev management"
+	prompt "/dev management" if !BR2_INIT_SYSTEMD
 	default BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_DEVTMPFS
 
 config BR2_ROOTFS_DEVICE_CREATION_STATIC
@@ -121,24 +122,24 @@ config BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_MDEV
 	bool "Dynamic using mdev"
 	select BR2_PACKAGE_BUSYBOX
 
-config BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_UDEV
-	bool "Dynamic using udev"
-	depends on !BR2_avr32 # udev
-	depends on BR2_LARGEFILE # udev
-	depends on BR2_USE_WCHAR # udev
-	depends on !BR2_PREFER_STATIC_LIB # udev -> kmod
-	depends on BR2_USE_MMU # udev -> util-linux/libblkid
-	select BR2_PACKAGE_UDEV
+config BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV
+	bool "Dynamic using eudev"
+	depends on !BR2_avr32 # eudev
+	depends on BR2_LARGEFILE
+	depends on BR2_USE_WCHAR
+	depends on !BR2_PREFER_STATIC_LIB
+	depends on BR2_USE_MMU # eudev
+	select BR2_PACKAGE_EUDEV
 
-comment "udev needs a toolchain w/ largefile, wchar"
-	depends on !BR2_avr32 # udev
-	depends on !(BR2_LARGEFILE && BR2_USE_WCHAR)
-
-comment "udev doesn't work with 'prefer static libraries'"
-	depends on !BR2_avr32 # udev
-	depends on BR2_PREFER_STATIC_LIB
+comment "eudev needs a toolchain w/ largefile, wchar, dynamic library"
+	depends on !BR2_avr32 # eudev
+	depends on BR2_USE_MMU
+	depends on !BR2_LARGEFILE || !BR2_USE_WCHAR || BR2_PREFER_STATIC_LIB
 
 endchoice
+
+comment "/dev management using udev (from systemd)"
+	depends on BR2_INIT_SYSTEMD
 
 config BR2_ROOTFS_DEVICE_TABLE
 	string "Path to the permission tables"
@@ -184,7 +185,7 @@ config BR2_ROOTFS_SKELETON_CUSTOM_PATH
 	string "custom target skeleton path"
 	default "system/skeleton"
 	help
-	  Path custom target skeleton.
+	  Path to custom target skeleton.
 endif
 
 if BR2_ROOTFS_SKELETON_DEFAULT
@@ -266,6 +267,45 @@ config BR2_TARGET_GENERIC_GETTY_OPTIONS
 endmenu
 endif
 
+config BR2_TARGET_TZ_INFO
+	bool "Install timezone info"
+	# No timezone for musl; only for uClibc or (e)glibc.
+	depends on BR2_TOOLCHAIN_USES_GLIBC || BR2_TOOLCHAIN_USES_UCLIBC
+	select BR2_PACKAGE_TZDATA if BR2_TOOLCHAIN_USES_GLIBC
+	select BR2_PACKAGE_TZ if BR2_TOOLCHAIN_USES_UCLIBC
+	help
+	  Say 'y' here to install timezone info.
+
+if BR2_TARGET_TZ_INFO
+
+config BR2_TARGET_TZ_ZONELIST
+	string "timezone list"
+	default "default"
+	help
+	  Space-separated list of time zones to compile.
+
+	  The value "default" includes all commonly used time zones. Note
+	  that this set consumes around 5.5M for (e)glibc and 2.1M for uClibc.
+
+	  The full list is the list of files in the time zone database source,
+	  not including the build and .tab files.
+
+config BR2_TARGET_LOCALTIME
+	string "default local time"
+	help
+	  The time zone to install as the default local time, expressed as a
+	  tzdata location, such as:
+	    GMT
+	    Europe/Paris
+	    America/New_York
+	    Pacific/Wallis
+	    ...
+
+	  If empty, no local time will be set, and the dates will be
+	  expressed in UTC.
+
+endif # BR2_TARGET_TZ_INFO
+
 config BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW
 	bool "remount root filesystem read-write during boot"
 	default y
@@ -278,6 +318,15 @@ config BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW
 	  If unsure, say Y.
 
 endif # BR2_ROOTFS_SKELETON_DEFAULT
+
+config BR2_ROOTFS_USERS_TABLES
+	string "Path to the users tables"
+	help
+	  Specify a space-separated list of users table locations,
+	  that will be passed to the mkusers utility to create
+	  users on the system, with home directory, password, etc.
+
+	  See manual for details on the usage and syntax of these files.
 
 config BR2_ROOTFS_OVERLAY
 	string "Root filesystem overlay directories"
@@ -298,7 +347,7 @@ config BR2_ROOTFS_POST_BUILD_SCRIPT
 	  has finished and before Buildroot starts packing the files into
 	  selected filesystem images.
 
-	  This gives users the oportunity to do board-specific cleanups,
+	  This gives users the opportunity to do board-specific cleanups,
 	  add-ons and the like, so the generated files can be used directly
 	  without further processing.
 
@@ -328,7 +377,7 @@ config BR2_ROOTFS_POST_SCRIPT_ARGS
 	string "Extra post-{build,image} arguments"
 	depends on BR2_ROOTFS_POST_BUILD_SCRIPT != "" || BR2_ROOTFS_POST_IMAGE_SCRIPT != ""
 	help
-	  Pass these aditional arguments to each post-build or post-image
+	  Pass these additional arguments to each post-build or post-image
 	  scripts.
 
 	  Note that all the post-build and post-image scripts will be passed

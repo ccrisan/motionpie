@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-IPROUTE2_VERSION = 3.12.0
+IPROUTE2_VERSION = 3.14.0
 IPROUTE2_SOURCE = iproute2-$(IPROUTE2_VERSION).tar.xz
 IPROUTE2_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/net/iproute2
 IPROUTE2_DEPENDENCIES = host-bison host-flex
@@ -32,8 +32,8 @@ define IPROUTE2_WITH_IPTABLES
 endef
 endif
 
-# arpd needs BerkeleyDB
-ifeq ($(BR2_PACKAGE_BERKELEYDB_COMPAT185),y)
+# arpd needs BerkeleyDB and links against pthread
+ifeq ($(BR2_PACKAGE_BERKELEYDB_COMPAT185)$(BR2_TOOLCHAIN_HAS_THREADS),yy)
 IPROUTE2_DEPENDENCIES += berkeleydb
 else
 define IPROUTE2_DISABLE_ARPD

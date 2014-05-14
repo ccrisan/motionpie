@@ -1,13 +1,11 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-Daily use
----------
+== Daily use
 
 include::rebuilding-packages.txt[]
 
-Offline builds
-~~~~~~~~~~~~~~
+=== Offline builds
 
 If you intend to do an offline build and just want to download
 all sources that you previously selected in the configurator
@@ -20,8 +18,7 @@ all sources that you previously selected in the configurator
 You can now disconnect or copy the content of your +dl+
 directory to the build-host.
 
-Building out-of-tree
-~~~~~~~~~~~~~~~~~~~~
+=== Building out-of-tree
 
 As default, everything built by Buildroot is stored in the directory
 +output+ in the Buildroot tree.
@@ -63,8 +60,7 @@ and +-C <...>+, simply run (in the output directory):
 
 [[env-vars]]
 
-Environment variables
-~~~~~~~~~~~~~~~~~~~~~
+=== Environment variables
 
 Buildroot also honors some environment variables, when they are passed
 to +make+ or set in the environment:
@@ -96,6 +92,8 @@ to +make+ or set in the environment:
   build-time graphs
 * +BR2_GRAPH_OUT+ to set the filetype of generated graphs, either +pdf+ (the
   default), or +png+.
+* +BR2_GRAPH_DEPTH+ (an integer) to limit the depth of the dependency graph.
+  The default, +0+, is to not limit the depth.
 
 An example that uses config files located in the toplevel directory and
 in your $HOME:
@@ -111,12 +109,11 @@ or +g+++ for building helper-binaries on your host, then do
  $ make HOSTCXX=g++-4.3-HEAD HOSTCC=gcc-4.3-HEAD
 --------------------
 
-Dealing efficiently with filesystem images
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Dealing efficiently with filesystem images
 
 Filesystem images can get pretty big, depending on the filesystem you choose,
 the number of packages, whether you provisioned free space... Yet, some
-locations in the filesystems images may just be _empty_ (eg. a long run of
+locations in the filesystems images may just be _empty_ (e.g. a long run of
 'zeroes'); such a file is called a _sparse_ file.
 
 Most tools can handle sparse files efficiently, and will only store or write
@@ -139,19 +136,18 @@ For example:
 Other tools may have similar options. Please consult their respective man
 pages.
 
-You can use sparse files if you need to store the filesystem images (eg.
-to transfer from one machine to another), of if you need to send them (eg.
+You can use sparse files if you need to store the filesystem images (e.g.
+to transfer from one machine to another), or if you need to send them (e.g.
 to the Q&A team).
 
 Note however that flashing a filesystem image to a device while using the
-sparse mode of +dd+ may result in a broken filesystem (eg. the block bitmap
+sparse mode of +dd+ may result in a broken filesystem (e.g. the block bitmap
 of an ext2 filesystem may be corrupted; or, if you have sparse files in
 your filesystem, those parts may not be all-zeroes when read back). You
 should only use sparse files when handling files on the build machine, not
 when transferring them to an actual device that will be used on the target.
 
-Graphing the dependencies between packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Graphing the dependencies between packages
 
 [[graph-depends]]
 
@@ -202,8 +198,7 @@ supported.
 BR2_GRAPH_OUT=svg make graph-depends
 --------------------------------
 
-Graphing the build duration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Graphing the build duration
 
 [[graph-duration]]
 

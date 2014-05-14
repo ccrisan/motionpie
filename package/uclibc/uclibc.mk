@@ -22,12 +22,12 @@ endif
 
 UCLIBC_INSTALL_STAGING = YES
 
+# uclibc is part of the toolchain so disable the toolchain dependency
+UCLIBC_ADD_TOOLCHAIN_DEPENDENCY = NO
+
 # Before uClibc is configured, we must have the first stage
 # cross-compiler and the kernel headers
 UCLIBC_DEPENDENCIES = host-gcc-initial linux-headers
-
-# Before uClibc is built, we must have the second stage cross-compiler
-uclibc-build: host-gcc-intermediate
 
 # specifying UCLIBC_CONFIG_FILE on the command-line overrides the .config
 # setting.
@@ -211,7 +211,7 @@ endef
 endif
 
 #
-# Endianess
+# Endianness
 #
 
 ifeq ($(call qstrip,$(BR2_ENDIAN)),BIG)
@@ -542,7 +542,7 @@ define UCLIBC_INSTALL_STAGING_CMDS
 	$(UCLIBC_INSTALL_UTILS_STAGING)
 endef
 
-uclibc-menuconfig: dirs uclibc-patch
+uclibc-menuconfig: uclibc-patch
 	$(MAKE1) -C $(UCLIBC_DIR) \
 		$(UCLIBC_MAKE_FLAGS) \
 		PREFIX=$(STAGING_DIR) \
@@ -552,3 +552,9 @@ uclibc-menuconfig: dirs uclibc-patch
 	rm -f $(UCLIBC_DIR)/.stamp_{configured,built,target_installed,staging_installed}
 
 $(eval $(generic-package))
+
+uclibc-update-config: $(UCLIBC_DIR)/.stamp_configured
+	cp -f $(UCLIBC_DIR)/.config $(UCLIBC_CONFIG_FILE)
+
+# Before uClibc is built, we must have the second stage cross-compiler
+$(UCLIBC_TARGET_BUILD): | host-gcc-intermediate

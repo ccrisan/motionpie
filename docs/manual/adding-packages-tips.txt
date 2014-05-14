@@ -1,12 +1,10 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-Tips and tricks
-~~~~~~~~~~~~~~~
+=== Tips and tricks
 
 [[package-name-variable-relation]]
-Package name, config entry name and makefile variable relationship
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Package name, config entry name and makefile variable relationship
 
 In Buildroot, there is some relationship between:
 
@@ -31,13 +29,12 @@ using the following rules:
   +BR2_PACKAGE_FOO_BAR_BOO+);
 
 * the +*.mk+ file variable prefix is the upper case _package name_
-  `.` and `-` characters substituted with `_` (e.g.:
+  with `.` and `-` characters substituted with `_` (e.g.:
   +FOO_BAR_BOO_VERSION+).
 
 
 [[github-download-url]]
-How to add a package from github
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== How to add a package from github
 
 Packages on github often don't have a download area with release tarballs.
 However, it is possible to download tarballs directly from the repository

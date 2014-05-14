@@ -17,6 +17,9 @@ LINUX_HEADERS_SOURCE = linux-$(LINUX_HEADERS_VERSION).tar.xz
 
 LINUX_HEADERS_INSTALL_STAGING = YES
 
+# linux-headers is part of the toolchain so disable the toolchain dependency
+LINUX_HEADERS_ADD_TOOLCHAIN_DEPENDENCY = NO
+
 # For some architectures (eg. Arc, Cris, Hexagon, ia64, parisc,
 # score and xtensa), the Linux buildsystem tries to call the
 # cross-compiler, although it is not needed at all.
@@ -33,5 +36,14 @@ define LINUX_HEADERS_INSTALL_STAGING_CMDS
 			INSTALL_HDR_PATH=$(STAGING_DIR)/usr \
 			headers_install)
 endef
+
+ifeq ($(BR2_KERNEL_HEADERS_VERSION),y)
+define LINUX_HEADERS_CHECK_VERSION
+	$(call check_kernel_headers_version,\
+		$(STAGING_DIR),\
+		$(call qstrip,$(BR2_TOOLCHAIN_HEADERS_AT_LEAST)))
+endef
+LINUX_HEADERS_POST_INSTALL_STAGING_HOOKS += LINUX_HEADERS_CHECK_VERSION
+endif
 
 $(eval $(generic-package))

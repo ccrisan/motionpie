@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-SQLITE_VERSION = 3080100
+SQLITE_VERSION = 3080403
 SQLITE_SOURCE = sqlite-autoconf-$(SQLITE_VERSION).tar.gz
-SQLITE_SITE = http://www.sqlite.org/2013
+SQLITE_SITE = http://www.sqlite.org/2014
 SQLITE_LICENSE = Public domain
 SQLITE_INSTALL_STAGING = YES
 
@@ -31,10 +31,6 @@ endif
 
 ifeq ($(BR2_PACKAGE_SQLITE_SECURE_DELETE),y)
 SQLITE_CFLAGS += -DSQLITE_SECURE_DELETE
-endif
-
-ifeq ($(BR2_xtensa),y)
-SQLITE_CFLAGS += -mtext-section-literals
 endif
 
 SQLITE_CONF_ENV = CFLAGS="$(TARGET_CFLAGS) $(SQLITE_CFLAGS)"

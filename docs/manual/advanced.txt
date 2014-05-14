@@ -1,10 +1,11 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-Advanced usage
---------------
+== Advanced usage
 
 include::using-buildroot-toolchain.txt[]
+
+include::using-buildroot-debugger.txt[]
 
 include::ccache-support.txt[]
 

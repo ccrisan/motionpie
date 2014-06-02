@@ -241,6 +241,25 @@ $(BUILD_DIR)/%/.stamp_dircleaned:
 	rm -Rf $(@D)
 
 ################################################################################
+# virt-provides-single -- check that provider-pkg is the declared provider for
+# the virtual package virt-pkg
+#
+# argument 1 is the lower-case name of the virtual package
+# argument 2 is the upper-case name of the virtual package
+# argument 3 is the lower-case name of the provider
+#
+# example:
+#   $(call virt-provides-single,libegl,LIBEGL,rpi-userland)
+################################################################################
+define virt-provides-single
+ifneq ($$(call qstrip,$$(BR2_PACKAGE_PROVIDES_$(2))),$(3))
+$$(error Configuration error: both "$(3)" and $$(BR2_PACKAGE_PROVIDES_$(2))\
+are selected as providers for virtual package "$(1)". Only one provider can\
+be selected at a time. Please fix your configuration)
+endif
+endef
+
+################################################################################
 # inner-generic-package -- generates the make targets needed to build a
 # generic package
 #
@@ -512,7 +531,7 @@ $(1)-show-depends:
 $(1)-graph-depends:
 			@$(INSTALL) -d $(O)/graphs
 			@cd "$(CONFIG_DIR)"; \
-			$(TOPDIR)/support/scripts/graph-depends -p $(1) -d $(BR_GRAPH_DEPTH) \
+			$(TOPDIR)/support/scripts/graph-depends -p $(1) $(BR2_GRAPH_DEPS_OPTS) \
 			|tee $(O)/graphs/$$(@).dot \
 			|dot -T$(BR_GRAPH_OUT) -o $(O)/graphs/$$(@).$(BR_GRAPH_OUT)
 
@@ -626,10 +645,24 @@ endif # ifneq ($(call qstrip,$$($(2)_SOURCE)),)
 # configuration
 ifeq ($$($$($(2)_KCONFIG_VAR)),y)
 
+# Ensure the calling package is the declared provider for all the virtual
+# packages it claims to be an implementation of.
+ifneq ($$($(2)_PROVIDES),)
+$$(foreach pkg,$$($(2)_PROVIDES),\
+	$$(eval $$(call virt-provides-single,$$(pkg),$$(call UPPERCASE,$$(pkg)),$(1))$$(sep)))
+endif
+
 TARGETS += $(1)
+
+ifneq ($$($(2)_PERMISSIONS),)
 PACKAGES_PERMISSIONS_TABLE += $$($(2)_PERMISSIONS)$$(sep)
+endif
+ifneq ($$($(2)_DEVICES),)
 PACKAGES_DEVICES_TABLE += $$($(2)_DEVICES)$$(sep)
+endif
+ifneq ($$($(2)_USERS),)
 PACKAGES_USERS += $$($(2)_USERS)$$(sep)
+endif
 
 ifeq ($$($(2)_SITE_METHOD),svn)
 DL_TOOLS_DEPENDENCIES += svn

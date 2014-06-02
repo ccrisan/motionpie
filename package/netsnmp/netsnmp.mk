@@ -24,6 +24,8 @@ NETSNMP_CONF_OPT = --with-persistent-directory=/var/lib/snmp \
 		--with-out-mib-modules="$(call qstrip,$(BR2_PACKAGE_NETSNMP_WITHOUT_MIB_MODULES))" \
 		--with-out-transports="Unix" \
 		--disable-manuals
+NETSNMP_INSTALL_STAGING_OPT = DESTDIR=$(STAGING_DIR) LIB_LDCONFIG_CMD=true install
+NETSNMP_INSTALL_TARGET_OPT = DESTDIR=$(TARGET_DIR) LIB_LDCONFIG_CMD=true install
 NETSNMP_MAKE = $(MAKE1)
 NETSNMP_CONFIG_SCRIPTS = net-snmp-config
 
@@ -48,12 +50,13 @@ else
 	NETSNMP_CONF_OPT += --without-openssl
 endif
 
-# Docs
-NETSNMP_CONF_OPT += --disable-manuals
-
 ifneq ($(BR2_PACKAGE_NETSNMP_ENABLE_MIBS),y)
 	NETSNMP_CONF_OPT += --disable-mib-loading
 	NETSNMP_CONF_OPT += --disable-mibs
+endif
+
+ifneq ($(BR2_PACKAGE_NETSNMP_ENABLE_DEBUGGING),y)
+	NETSNMP_CONF_OPT += --disable-debugging
 endif
 
 # Remove IPv6 MIBs if there's no IPv6
@@ -61,21 +64,21 @@ ifneq ($(BR2_INET_IPV6),y)
 define NETSNMP_REMOVE_MIBS_IPV6
 	rm -f $(TARGET_DIR)/usr/share/snmp/mibs/IPV6*
 endef
+
+NETSNMP_POST_INSTALL_TARGET_HOOKS += NETSNMP_REMOVE_MIBS_IPV6
 endif
 
-ifneq ($(BR2_PACKAGE_NETSNMP_ENABLE_DEBUGGING),y)
-	NETSNMP_CONF_OPT += --disable-debugging
-endif
-
-define NETSNMP_INSTALL_TARGET_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) \
-		DESTDIR=$(TARGET_DIR) install
-	$(INSTALL) -D -m 0755 package/netsnmp/S59snmpd \
-		$(TARGET_DIR)/etc/init.d/S59snmpd
+define NETSNMP_REMOVE_BLOAT_MIBS
 	for mib in $(NETSNMP_BLOAT_MIBS); do \
 		rm -f $(TARGET_DIR)/usr/share/snmp/mibs/$$mib-MIB.txt; \
 	done
-	$(NETSNMP_REMOVE_MIBS_IPV6)
+endef
+
+NETSNMP_POST_INSTALL_TARGET_HOOKS += NETSNMP_REMOVE_BLOAT_MIBS
+
+define NETSNMP_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 0755 package/netsnmp/S59snmpd \
+		$(TARGET_DIR)/etc/init.d/S59snmpd
 endef
 
 define NETSNMP_STAGING_NETSNMP_CONFIG_FIXUP

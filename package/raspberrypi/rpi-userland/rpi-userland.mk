@@ -11,6 +11,8 @@ RPI_USERLAND_LICENSE_FILES = LICENCE
 RPI_USERLAND_INSTALL_STAGING = YES
 RPI_USERLAND_INSTALL_TARGET = YES
 
+RPI_USERLAND_PROVIDES = libegl libgles libopenmax libopenvg
+
 define RPI_USERLAND_POST_STAGING_CLEANUP
     rm -Rf $(STAGING_DIR)/opt/vc/{bin,sbin}
     rm -f  $(STAGING_DIR)/etc/init.d/vcfiled

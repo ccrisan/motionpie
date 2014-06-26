@@ -1,0 +1,102 @@
+#!/bin/sh
+
+sys_conf="/etc/wpa_supplicant.conf"
+conf="/data/etc/wpa_supplicant.conf"
+log="/var/log/wpa_supplicant.log"
+prog="/usr/sbin/wpa_supplicant"
+iface=wlan0
+watch_timeout=20
+
+if [ -f $sys_conf ] && ! [ -f $conf ]; then
+    mkdir -p $(dirname $conf)
+    cp $sys_conf $conf
+fi
+
+if ! [ -f $conf ] || ! [ -s $conf ]; then
+    exit 0
+fi
+
+SSID=$(cat ${conf} | grep ssid | cut -d '"' -f 2)
+
+if [ -z "$SSID" ]; then
+    exit 0
+fi
+
+connected() {
+	output=$(wpa_cli status 2>&1)
+	if [ -n "$(echo ${output} | grep ${SSID})" ] && [ -n "$(echo ${output} | grep COMPLETED)" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+watch() {
+    count=0
+    while true; do
+        sleep 5
+        if connected; then
+            count=0
+        else
+            if [ $count -lt $watch_timeout ]; then
+                count=$(($count + 5))
+            else
+                logger -t wifi -s "disconnected for $watch_timeout seconds, rebooting"
+                reboot
+            fi
+        fi
+    done
+}
+
+start() {
+	echo -n "Starting wpa_supplicant: "
+	$prog -i$iface -c$conf -B > $log 2>&1
+	count=0
+	while true; do
+		sleep 1
+		
+		if connected; then
+			break
+		fi
+
+		if [ $count -gt $watch_timeout ] || ! pidof wpa_supplicant > /dev/null; then
+			echo "failed"
+			reboot
+			return
+		fi
+
+		count=$(($count + 1))
+	done
+
+	watch &
+
+	echo "done"
+}
+
+stop() {
+	echo -n "Shutting down wpa_supplicant: "
+	kill `pidof wpa_supplicant`
+	echo "done"
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+  	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

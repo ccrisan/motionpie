@@ -3,14 +3,35 @@
 # Start the network....
 #
 
+start() {
+	# setup
+	mkdir -p /data/etc/
+	touch /data/etc/resolv.conf
+
+	# lo
+	ifup lo
+
+	# wlan0
+	if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" == "1" ]; then
+		dhclient wlan0
+	fi
+
+	# eth0
+	if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
+		dhclient eth0
+	fi
+}
+
 case "$1" in
   start)
- 	echo "Starting network..."
-	/sbin/ifup -a
+	echo -n "Starting network: "
+	start
+	echo "done"
 	;;
   stop)
-	echo -n "Stopping network..."
-	/sbin/ifdown -a
+	echo -n "Stopping network: "
+	killall dhclient
+	echo "done"
 	;;
   restart|reload)
 	"$0" stop
@@ -22,4 +43,3 @@ case "$1" in
 esac
 
 exit $?
-

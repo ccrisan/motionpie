@@ -1,0 +1,8 @@
+start_file=start_x.elf
+fixup_file=fixup_x.elf
+arm_freq=900
+core_freq=500
+sdram_freq=500
+over_voltage=6
+gpu_mem_256=96
+gpu_mem_512=96

@@ -1,0 +1,67 @@
+#!/bin/bash
+
+DISK_DEV="/dev/mmcblk0"
+DATA_DEV="${DISK_DEV}p3"
+set +e
+
+# don't execute the script if kernel cmdline has "nodatapart" keyword
+if /bin/cat /proc/cmdline | /bin/grep "nodatapart"; then
+    exit;
+fi
+
+
+start() {
+	echo "Setting up data partition"
+
+    # if the partition is not present, allocate it and issue a reboot
+    if ! [ -b $DATA_DEV ]; then
+        echo "Allocating data partition"
+        echo -e "n
+    p
+    3
+    \n
+    \n
+    w
+    " | /sbin/fdisk $DISK_DEV
+        sync
+        reboot -f
+    fi
+
+    # if the filesystem is not valid (not yet formatted), format it
+    if /usr/sbin/debugfs -R 'lcd /' $DATA_DEV 2>&1 | grep 'Bad magic'; then
+        echo "Formatting data partition"
+        mkfs.ext4 $DATA_DEV
+
+        mount /data # also mount it
+    fi
+
+    # make sure the log dir exists
+    mkdir -p /data/log
+}
+
+stop() {
+    echo -n
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+

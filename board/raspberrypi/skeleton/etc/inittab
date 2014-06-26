@@ -15,16 +15,14 @@
 
 # Startup the system
 null::sysinit:/bin/mount -t proc proc /proc
-null::sysinit:/bin/mount -o remount,rw / # REMOUNT_ROOTFS_RW
 null::sysinit:/bin/mkdir -p /dev/pts
 null::sysinit:/bin/mkdir -p /dev/shm
 null::sysinit:/bin/mount -a
-null::sysinit:/bin/hostname -F /etc/hostname
 # now run any rc scripts
 ::sysinit:/etc/init.d/rcS
 
 # Put a getty on the serial port
-tty1::respawn:/sbin/getty -L tty1 115200 vt100
+#tty1::respawn:/sbin/getty -L tty1 115200 vt100
 ttyAMA0::respawn:/sbin/getty -L ttyAMA0 115200 vt100
 
 # Stuff to do for the 3-finger salute

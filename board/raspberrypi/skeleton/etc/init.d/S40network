@@ -4,42 +4,42 @@
 #
 
 start() {
-	# setup
-	mkdir -p /data/etc/
-	touch /data/etc/resolv.conf
+    # lo
+    ifup lo
 
-	# lo
-	ifup lo
+    # wlan0
+    if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" == "1" ]; then
+        dhclient wlan0
+    fi
 
-	# wlan0
-	if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" == "1" ]; then
-		dhclient wlan0
-	fi
-
-	# eth0
-	if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
-		dhclient eth0
-	fi
+    # eth0
+    if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
+        dhclient eth0
+    fi
 }
 
 case "$1" in
-  start)
-	echo -n "Starting network: "
-	start
-	echo "done"
-	;;
-  stop)
-	echo -n "Stopping network: "
-	killall dhclient
-	echo "done"
-	;;
-  restart|reload)
-	"$0" stop
-	"$0" start
-	;;
-  *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
+    start)
+        echo -n "Starting network: "
+        start
+        echo "done"
+        ;;
+
+    stop)
+        echo -n "Stopping network: "
+        killall dhclient
+        echo "done"
+        ;;
+
+    restart|reload)
+        "$0" stop
+        "$0" start
+        ;;
+        
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
 esac
 
 exit $?
+

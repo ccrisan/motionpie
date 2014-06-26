@@ -1,11 +1,11 @@
 #!/bin/bash
 
 start() {
-	echo -n "Setting hostname: "
+    echo -n "Setting hostname: "
     sn=$(vcgencmd otp_dump | grep 28: | tail -c +4)
     hostname="motioneye$sn"
     /bin/hostname $hostname
-	echo "done"
+    echo "done"
 }
 
 stop() {
@@ -13,23 +13,26 @@ stop() {
 }
 
 restart() {
-	stop
-	start
+    stop
+    start
 }
 
 case "$1" in
-  start)
-	start
-	;;
-  stop)
-	stop
-	;;
-  restart|reload)
-	restart
-	;;
-  *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    restart|reload)
+        restart
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
 esac
 
 exit $?

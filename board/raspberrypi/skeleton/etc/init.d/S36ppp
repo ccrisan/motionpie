@@ -18,11 +18,11 @@ if ! [ -f $conf/modem ]; then
 fi
 
 connected() {
-	if ifconfig | grep ppp0 >/dev/null 2>&1; then
-		return 0
-	else
-		return 1
-	fi
+    if ifconfig | grep ppp0 >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 watch() {
@@ -64,7 +64,7 @@ start() {
         fi
     fi
 
-	echo -n "Starting pppd: "
+    echo -n "Starting pppd: "
 
     # wait for modem
     modem=$(head -n 1 $conf/modem)
@@ -82,54 +82,57 @@ start() {
         echo "modem /dev/$modem not present"
         return
     fi
-	
-	$prog call $provider
-	count=0
-	while true; do
-		sleep 1
-		
-		if connected; then
-			break
-		fi
+    
+    $prog call $provider
+    count=0
+    while true; do
+        sleep 1
+        
+        if connected; then
+            break
+        fi
 
-		if [ $count -gt $watch_timeout ] || ! pidof pppd > /dev/null; then
-			echo "failed"
-			reboot
-			return
-		fi
+        if [ $count -gt $watch_timeout ] || ! pidof pppd > /dev/null; then
+            echo "failed"
+            reboot
+            return
+        fi
 
-		count=$(($count + 1))
-	done
+        count=$(($count + 1))
+    done
 
-	watch &
+    watch &
 
-	echo "done"
+    echo "done"
 }
 
 stop() {
-	echo -n "Shutting down pppd: "
-	kill `pidof pppd`
-	echo "done"
+    echo -n "Shutting down pppd: "
+    kill `pidof pppd`
+    echo "done"
 }
 
 restart() {
-	stop
-	start
+    stop
+    start
 }
 
 case "$1" in
     start)
-  	    start
-	    ;;
+        start
+        ;;
+
     stop)
-  	    stop
-	    ;;
+        stop
+        ;;
+
     restart)
-  	    restart
-	    ;;
+        restart
+        ;;
+    
     *)
-	    echo "Usage: $0 {start|stop|restart}"
-	    exit 1
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
 esac
 
 exit $?

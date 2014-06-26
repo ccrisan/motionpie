@@ -11,7 +11,7 @@ fi
 
 
 start() {
-	echo "Setting up data partition"
+    echo "Setting up data partition"
 
     # if the partition is not present, allocate it and issue a reboot
     if ! [ -b $DATA_DEV ]; then
@@ -44,23 +44,26 @@ stop() {
 }
 
 restart() {
-	stop
-	start
+    stop
+    start
 }
 
 case "$1" in
-  start)
-	start
-	;;
-  stop)
-	stop
-	;;
-  restart|reload)
-	restart
-	;;
-  *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    restart|reload)
+        restart
+        ;;
+  
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
 esac
 
 exit $?

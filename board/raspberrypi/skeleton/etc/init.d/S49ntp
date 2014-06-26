@@ -14,38 +14,39 @@ test -x $DAEMON || exit 0
 # Read config file if it is present.
 if [ -r /etc/default/$NAME ]
 then
-	. /etc/default/$NAME
+    . /etc/default/$NAME
 fi
 
 case "$1" in
     start)
-	    #if [ -x $NTPDATE_BIN ]; then
-		#    echo -n "Starting ntpdate: "
-		#    $NTPDATE_BIN $NTPDATE_OPTS $NTPSERVERS > /dev/null 2>&1
-    	#	echo "done"
-    	#fi
+        #if [ -x $NTPDATE_BIN ]; then
+        #    echo -n "Starting ntpdate: "
+        #    $NTPDATE_BIN $NTPDATE_OPTS $NTPSERVERS > /dev/null 2>&1
+        #    echo "done"
+        #fi
 
-    	echo -n "Starting ntpd: "
-	    start-stop-daemon -S -q -x $DAEMON
-	    echo "done"
-	    ;;
+        echo -n "Starting ntpd: "
+        start-stop-daemon -S -q -x $DAEMON
+        echo "done"
+        ;;
 
     stop)
         echo -n "Stopping ntpd: "
-	    start-stop-daemon -K -q -n $NAME
-    	echo "done"
-	    ;;
+        start-stop-daemon -K -q -n $NAME
+        echo "done"
+        ;;
 
     restart)
-    	$0 stop
-    	sleep 1
-    	$0 start
-	    ;;
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
 
     *)
         echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
-	    exit 1
-    	;;
+        exit 1
+        ;;
 esac
 
 exit 0
+

@@ -328,7 +328,7 @@ END
             gzip $DISK_IMG
             mv $DISK_IMG.gz $DISK_IMG
         fi
-        
+
         ;;
 esac
 

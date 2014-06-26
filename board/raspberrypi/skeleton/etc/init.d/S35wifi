@@ -23,12 +23,12 @@ if [ -z "$SSID" ]; then
 fi
 
 connected() {
-	output=$(wpa_cli status 2>&1)
-	if [ -n "$(echo ${output} | grep ${SSID})" ] && [ -n "$(echo ${output} | grep COMPLETED)" ]; then
-		return 0
-	else
-		return 1
-	fi
+    output=$(wpa_cli status 2>&1)
+    if [ -n "$(echo ${output} | grep ${SSID})" ] && [ -n "$(echo ${output} | grep COMPLETED)" ]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 watch() {
@@ -49,54 +49,58 @@ watch() {
 }
 
 start() {
-	echo -n "Starting wpa_supplicant: "
-	$prog -i$iface -c$conf -B > $log 2>&1
-	count=0
-	while true; do
-		sleep 1
-		
-		if connected; then
-			break
-		fi
+    echo -n "Starting wpa_supplicant: "
+    $prog -i$iface -c$conf -B > $log 2>&1
+    count=0
+    while true; do
+        sleep 1
+        
+        if connected; then
+            break
+        fi
 
-		if [ $count -gt $watch_timeout ] || ! pidof wpa_supplicant > /dev/null; then
-			echo "failed"
-			reboot
-			return
-		fi
+        if [ $count -gt $watch_timeout ] || ! pidof wpa_supplicant > /dev/null; then
+            echo "failed"
+            reboot
+            return
+        fi
 
-		count=$(($count + 1))
-	done
+        count=$(($count + 1))
+    done
 
-	watch &
+    watch &
 
-	echo "done"
+    echo "done"
 }
 
 stop() {
-	echo -n "Shutting down wpa_supplicant: "
-	kill `pidof wpa_supplicant`
-	echo "done"
+    echo -n "Shutting down wpa_supplicant: "
+    kill `pidof wpa_supplicant`
+    echo "done"
 }
 
 restart() {
-	stop
-	start
+    stop
+    start
 }
 
 case "$1" in
-  start)
-  	start
-	;;
-  stop)
-  	stop
-	;;
-  restart)
-  	restart
-	;;
-  *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
+    start)
+        start
+        ;;
+        
+    stop)
+        stop
+        ;;
+        
+    restart)
+        restart
+        ;;
+    
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
 esac
 
 exit $?
+

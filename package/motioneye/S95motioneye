@@ -29,54 +29,72 @@ watch() {
 }
 
 start() {
-	echo -n "Starting motioneye: "
-        /usr/bin/python2.7 /programs/motioneye/motioneye.py >/var/log/motioneye.log 2>&1 &
+    echo -n "Starting motioneye: "
+    /usr/bin/python2.7 /programs/motioneye/motioneye.py >/var/log/motioneye.log 2>&1 &
 
-	count=0
-	while true; do
-		sleep 1
+    count=0
+    while true; do
+        sleep 1
 
-		if responsive; then
-			break
-		fi
+        if responsive; then
+            break
+        fi
 
-		if [ $count -gt $watch_timeout ]; then
-			echo "failed"
-			return
-		fi
+        if [ $count -gt $watch_timeout ]; then
+            echo "failed"
+            return
+        fi
 
-		count=$(($count + 1))
-	done
+        count=$(($count + 1))
+    done
+    
+    # add connected camera(s) with default settings
+    if responsive && ! [ -f /data/etc/motion.conf ]; then
+        count=$(ls /dev/video* 2>/dev/null | wc -l)
+        index=1
+        for device in $(ls /dev/video* 2>/dev/null); do
+            if [ "$count" -gt "1" ]; then
+                output_dir="/data/output/$index/"
+            else
+                output_dir="/data/output/"
+            fi
+            curl -m 60 --data "{\"device_uri\": \"$device\", \"proto\": \"v4l2\", \"root_directory\": \"$output_dir\"}" http://127.0.0.1:$port/config/add/
+            index=$(($index + 1))
+        done
+    fi
 
-	watch &
+    watch &
 
-	echo "done"
+    echo "done"
 }
 
 stop() {
-	echo -n "Shutting down motioneye: "
-	killall python2.7
-	echo "done"
+    echo -n "Shutting down motioneye: "
+    killall python2.7
+    echo "done"
 }
 
 restart() {
-	stop
-	start
+    stop
+    start
 }
 
 case "$1" in
-  start)
-  	start
-	;;
-  stop)
-  	stop
-	;;
-  restart)
-  	restart
-	;;
-  *)
-	echo "Usage: $0 {start|stop|restart}"
-	exit 1
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    restart)
+        restart
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
 esac
 
 exit $?

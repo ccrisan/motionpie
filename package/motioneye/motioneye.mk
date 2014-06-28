@@ -31,7 +31,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
         | cut -c $$(echo $(SRC_DIR) | wc -c)- | xargs -I xxx cp -p --parents xxx $(DST_DIR)
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'conf'))%'/data/etc'%" $(DST_DIR)/settings.py
-    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/data/output'%" $(DST_DIR)/settings.py
+    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/tmp'%" $(DST_DIR)/settings.py
     sed -i "s%SMB_SHARES = False%SMB_SHARES = True%" $(DST_DIR)/settings.py
     sed -i "s%SMB_MOUNT_ROOT = '/media'%SMB_MOUNT_ROOT = '/data/media'%" $(DST_DIR)/settings.py
     sed -i "s%WPA_SUPPLICANT_CONF = None%WPA_SUPPLICANT_CONF = '/data/etc/wpa_supplicant.conf'%" $(DST_DIR)/settings.py

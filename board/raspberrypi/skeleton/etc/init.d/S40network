@@ -12,8 +12,12 @@ start() {
     fi
 
     # eth0
-    if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
-        dhclient eth0
+    if [ -d /sys/class/net/eth0 ]; then
+        ifconfig eth0 up
+        sleep 3 # wait for interface to come up
+        if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
+            dhclient eth0
+        fi
     fi
 }
 

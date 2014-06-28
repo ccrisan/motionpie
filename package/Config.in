@@ -1,6 +1,7 @@
 menu "Target packages"
 
 source "package/busybox/Config.in"
+source "package/motioneye/Config.in"
 
 menu "Audio and video applications"
 source "package/alsa-utils/Config.in"

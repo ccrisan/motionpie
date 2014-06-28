@@ -1,0 +1,83 @@
+#!/bin/sh
+
+watch_timeout=20
+port=80
+
+responsive() {
+    if wget -q -t 1 -T 2 -O - http://127.0.0.1:$port/static/img/motioneye-logo.svg >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+watch() {
+    count=0
+    while true; do
+        sleep 5
+        if responsive; then
+            count=0
+        else
+            if [ $count -lt $watch_timeout ]; then
+                count=$(($count + 5))
+            else
+                logger -t motioneye -s "not responding for $watch_timeout seconds, rebooting"
+                reboot
+            fi
+        fi
+    done
+}
+
+start() {
+	echo -n "Starting motioneye: "
+        /usr/bin/python2.7 /programs/motioneye/motioneye.py >/var/log/motioneye.log 2>&1 &
+
+	count=0
+	while true; do
+		sleep 1
+
+		if responsive; then
+			break
+		fi
+
+		if [ $count -gt $watch_timeout ]; then
+			echo "failed"
+			return
+		fi
+
+		count=$(($count + 1))
+	done
+
+	watch &
+
+	echo "done"
+}
+
+stop() {
+	echo -n "Shutting down motioneye: "
+	killall python2.7
+	echo "done"
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+  	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+

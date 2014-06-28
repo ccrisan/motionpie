@@ -1,7 +1,6 @@
 #!/bin/sh
-#
-# Start the network....
-#
+
+mkdir -p /var/lib/dhcp
 
 start() {
     # lo

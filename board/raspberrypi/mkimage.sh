@@ -3,7 +3,7 @@
 test "root" != "$USER" && exec sudo $0 "$@"
 
 function usage() {
-    echo "Usage: $0 <-t update|full> [-i input_dir] [-o output_dir] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk] [-w] [-k] [-c]" 1>&2
+    echo "Usage: $0 [-t update|full] [-i input_dir] [-o output_dir] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk] [-w] [-k] [-c]" 1>&2
     exit 1
 }
 
@@ -14,6 +14,7 @@ function msg() {
 COMPRESS=false
 WRITE_CARD=false
 KEEP_IMG=false
+TYPE="full"
 
 while getopts "ci:km:n:o:s:t:v:w" o; do
     case "$o" in
@@ -58,10 +59,6 @@ while getopts "ci:km:n:o:s:t:v:w" o; do
     esac
 done
 
-if [ -z "$TYPE" ]; then
-    usage
-fi
-
 function cleanup {
     # unmount loop mounts
     set +e
@@ -77,11 +74,11 @@ cd $(dirname $0)
 SCRIPT_DIR=$(pwd)
 
 if [ -z "$INPUT_DIR" ]; then
-    INPUT_DIR=$SCRIPT_DIR
+    INPUT_DIR=$SCRIPT_DIR/../../output/images/
 fi
 
 if [ -z "$OUTPUT_DIR" ]; then
-    OUTPUT_DIR=$SCRIPT_DIR
+    OUTPUT_DIR=$SCRIPT_DIR/../../output/images/
 fi
 
 echo "type = $TYPE"

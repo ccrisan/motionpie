@@ -8,7 +8,7 @@
 
 # Check for the SSH1 RSA key
 if [ ! -f /etc/ssh_host_key ] ; then
-    echo Generating RSA Key...
+    echo Generating HOST Key...
     mount -o remount,rw /
     /usr/bin/ssh-keygen -t rsa1 -f /etc/ssh_host_key -C '' -N ''
 fi

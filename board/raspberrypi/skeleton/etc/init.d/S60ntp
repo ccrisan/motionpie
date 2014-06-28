@@ -19,15 +19,15 @@ fi
 
 case "$1" in
     start)
-        if [ -x $NTPDATE_BIN ] && ip route | grep default; then
+        if [ -x $NTPDATE_BIN ] && ip route | grep default > /dev/null 2>&1; then
             echo -n "Starting ntpdate: "
             $NTPDATE_BIN $NTPDATE_OPTS $NTPSERVERS > /dev/null 2>&1
             echo "done"
-        fi
 
-        echo -n "Starting ntpd: "
-        start-stop-daemon -S -q -x $DAEMON
-        echo "done"
+            echo -n "Starting ntpd: "
+            start-stop-daemon -S -q -x $DAEMON
+            echo "done"
+        fi
         ;;
 
     stop)

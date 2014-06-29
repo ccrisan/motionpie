@@ -1,132 +1,60 @@
-Buildroot for Raspberry Pi
-==========================
+# motionPie #
 
-This buildroot fork will produce a very light-weight and trimmed down
-toolchain, rootfs and kernel for the Raspberry Pi. It's intended for **advanced
-users** and specific embedded applications.
+## About #
 
-Before You Begin
-----------------
+**motionPie** is a Linux distribution that turns your [Raspberry PI](http://www.raspberrypi.org/) into a video surveillance system. The OS is based on [BuildRoot](http://buildroot.uclibc.org/) (credits go to Guillermo A. Amaral for [adapting BuildRoot to the Raspberry PI](https://github.com/gamaral/rpi-buildroot)).
 
-- If you're not familiar with Buildroot and what it can and can't do, please
-  take the time to [read the manual](http://buildroot.org/downloads/manual/manual.html).
+**motionPie** uses [motion](http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome) as a backend and [motionEye](https://bitbucket.org/ccrisan/motioneye/) for the frontend.
 
-- You must be pretty comfortable with **cross-compilation** in order to use
-  rpi-buildroot.
+## Features ##
 
-Test Drive
-----------
+* easy setup (see Install Instructions below)
+* **web-based**, mobile/tablet-friendly user interface
+* compatible with most **USB cameras** as well as with the Raspberry PI camera module
+* motion detection
+* **JPEG** files for still images, **AVI** files for videos
+* connects to the network using **ethernet** or **wifi**
+* file storage on **SD card**, **USB drive** or **network SMB share**
+* files on SD card visible in the local network as a **SMB share**
 
-You can test drive rpi-buildroot by following the instructions below:
+## Hardware Requirements ##
 
-	wget http://dl.guillermoamaral.com/rpi/sdcard.img.xz
-	xz -d sdcard.img.xz
-	sudo dd if=sdcard.img of=/dev/sdx # replace *sdx* with your actual sdcard device node
+* a Raspberry PI (any model and revision should be fine)
+* a USB camera or a Raspberry PI camera module
+* a micro-usb power supply capable of at least 1A (if your USB devices are power-hungry, consider using a powered USB hub)
+* an SD card (any capacity will do, as the OS itself requires less than 200M)
+* optionally, a USB wifi adapter if an ethernet connection is not possible
+* optionally, a USB drive for storing files
 
-The default user is **root**, no password will be requested.
+## Install Instructions ##
 
-### Toolchain
+### Stable Version ###
 
-I've added a toolchain, it has everything needed to cross-compile software for
-use with the test-drive image, download and usage instructions below:
+Stable releases are available from [here](https://github.com/ccrisan/motionPie/releases) and are marked date.
 
-	wget http://dl.guillermoamaral.com/rpi/rpi-buildroot-toolchain.tar.xz
-	tar -xvJf rpi-buildroot-toolchain.tar.xz
-	source rpi-buildroot-toolchain/env
-	$CC -I"${BUILDROOT_STAGING_DIR}/usr/include" \
-	    -I"${BUILDROOT_STAGING_DIR}/opt/vc/include" \
-	    -L"${BUILDROOT_STAGING_DIR}/opt/vc/lib" \
-	    -L"${BUILDROOT_STAGING_DIR}/usr/lib" \
-	    -L"${BUILDROOT_STAGING_DIR}/lib" \
-	    -L"${BUILDROOT_TARGET_DIR}/opt/vc/lib" \
-	    -L"${BUILDROOT_TARGET_DIR}/usr/lib" \
-	    -L"${BUILDROOT_TARGET_DIR}/lib" \
-	    main.c # example usage
+* step 1: download the latest archive (either zip or tar.gz)
+* step 2: extract the archive
+* step 3: copy the extracted image file to your SD card
 
-If you're interested in using the toolchain with CMake, you may want to
-download the toolchain cmake file used with Marshmallow Game Engine:
+### Latest GIT Version ###
 
-	wget https://github.com/gamaral/marshmallow_h/blob/master/cmake/Toolchain-buildroot.cmake
-	# The **env** file needs to be **sourced** before executing the following command
-	cmake -DCMAKE_TOOLCHAIN_FILE=Toolchain-buildroot.cmake .
-	make
+## How It Works ##
 
-Building
---------
+### First Boot ###
 
-	git clone --depth 1 git://github.com/gamaral/rpi-buildroot.git
-	cd rpi-buildroot
-	make raspberrypi_defconfig
-	make nconfig         # if you want to add packages or fiddle around with it
-	make                 # build (NOTICE: Don't use the **-j** switch, it's set to auto-detect)
+* ssh
+* password
+* auto config of video devices
+* longer duration
 
-Deploying
----------
+### Normal Boot ###
 
-### Script
+* ntp
+* samba
+* watchdogs
+* port 80
 
-I've added a script that can automatically flash your sdcard, you simply need
-to point it to the correct device node, confirm and you're done!
+## Configuration ##
 
-**Notice** you will need to replace *sdx* in the following commands with the
-actual device node for your sdcard.
-
-    # run the following as root (sudo)
-    board/raspberrypi/mksdcard /dev/sdx
-
-### Manual
-
-You will need to create two partitions in your sdcard, the first (boot) needs
-to be a small *W95 FAT16 (LBA)* patition (that's partition id **e**), about 32
-MB will do.
-
-**Notice** you will need to replace *sdx* in the following commands with the
-actual device node for your sdcard.
-
-Create the partitions on the SD card. Run the following as root.
-**Notice** all data on the SD card will be lost.
-
-	fdisk /dev/sdx
-	> p             # prints partition table
-	> d             # repeat until all partitions are deleted
-	> n             # create a new partition
-	> p             # create primary
-	> 1             # make it the first partition
-	> <enter>       # use the default sector
-	> +32M          # create a boot partition with 32MB of space
-	> n             # create rootfs partition
-	> p
-	> 2
-	> <enter>
-	> <enter>       # fill the remaining disk, adjust size to fit your needs
-	> p             # double check everything looks right
-	> w             # write partition table to disk.
-
-Now format the boot partition as FAT 16
-
-	# run the following as root
-	mkfs.vfat -F16 -n boot /dev/sdx1
-	mkdir -p /media/boot
-	mount /dev/sdx1 /media/boot
-
-You will need to copy all the files in *output/target/boot* to your *boot*
-partition.
-
-	# run the following as root
-	cp output/target/boot/* /media/boot
-	umount /media/boot
-
-The second (rootfs) can be as big as you want, but with a 200 MB minimum,
-and formated as *ext4*.
-
-	# run the following as root
-	mkfs.ext4 -L rootfs /dev/sdx2
-	mkdir -p /media/rootfs
-	mount /dev/sdx2 /media/rootfs
-
-You will need to extract *output/images/rootfs.tar* onto the partition, as **root**.
-
-	# run the following as root
-	tar -xvpsf output/images/rootfs.tar -C /media/rootfs # replace with your mount directory
-	umount /media/rootfs
+## Troubleshooting ##
 

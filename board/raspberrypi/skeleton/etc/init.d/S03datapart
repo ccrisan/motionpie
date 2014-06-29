@@ -34,9 +34,6 @@ start() {
 
         mount /data # also mount it
     fi
-
-    # make sure the log dir exists
-    mkdir -p /data/log
 }
 
 stop() {

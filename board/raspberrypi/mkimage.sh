@@ -3,7 +3,7 @@
 test "root" != "$USER" && exec sudo $0 "$@"
 
 function usage() {
-    echo "Usage: $0 [-t update|full] [-i input_dir] [-o output_dir] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk] [-w] [-k] [-c]" 1>&2
+    echo "Usage: $0  [-c] [-d sdcard_dev] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk]" 1>&2
     exit 1
 }
 
@@ -11,21 +11,15 @@ function msg() {
     echo "**** $1 ****"
 }
 
-COMPRESS=false
-WRITE_CARD=false
-KEEP_IMG=false
-TYPE="full"
+COMPRESSED=false
 
-while getopts "ci:km:n:o:s:t:v:w" o; do
+while getopts "cd:m:n:" o; do
     case "$o" in
         c)
-            COMPRESS=true
+            COMPRESSED=true
             ;;
-        i)
-            INPUT_DIR=$OPTARG
-            ;;
-        k)
-            KEEP_IMG=true
+        d)
+            SDCARD_DEV=$OPTARG
             ;;
         m)
             IFS=":" NETWORK=($OPTARG)
@@ -42,16 +36,6 @@ while getopts "ci:km:n:o:s:t:v:w" o; do
             IFS=":" NETWORK=($OPTARG)
             SSID=${NETWORK[0]}
             PSK=${NETWORK[1]}
-            ;;
-        o)
-            OUTPUT_DIR=$OPTARG
-            ;;
-        t)
-            TYPE=$OPTARG
-            test $TYPE == "update" || test $TYPE == "full" || usage
-            ;;
-        w)
-            WRITE_CARD=true
             ;;
         *)
             usage
@@ -73,41 +57,22 @@ trap cleanup EXIT
 cd $(dirname $0)
 SCRIPT_DIR=$(pwd)
 
-if [ -z "$INPUT_DIR" ]; then
-    INPUT_DIR=$SCRIPT_DIR/../../output/images/
-fi
-
-if [ -z "$OUTPUT_DIR" ]; then
-    OUTPUT_DIR=$SCRIPT_DIR/../../output/images/
-fi
-
-echo "type = $TYPE"
-echo "compress = $COMPRESS"
-echo "input dir = $INPUT_DIR"
-echo "output dir = $OUTPUT_DIR"
-echo "write card = $WRITE_CARD"
-echo "keep img = $KEEP_IMG"
-echo "network = $SSID:$PSK"
-echo "modem = $MODEM:$MODEM_BAUD:$MODEM_VID:$MODEM_PID:$MODEM_PIN:$APN:$APN_USER:$APN_PASS"
-
-SDCARD_DEV="/dev/mmcblk0"
+IMG_DIR=$SCRIPT_DIR/../../output/images/
 
 PROG_ROOT="/programs"
 PROG_DIR="$PROG_ROOT/motioneye/"
 
-BOOT_SRC=$INPUT_DIR/boot
-BOOT=$OUTPUT_DIR/.boot
-BOOT_IMG=$OUTPUT_DIR/boot.img
+BOOT_SRC=$IMG_DIR/boot
+BOOT=$IMG_DIR/.boot
+BOOT_IMG=$IMG_DIR/boot.img
 BOOT_SIZE="16" # MB
 
-ROOT_SRC=$INPUT_DIR/rootfs.tar
-ROOT=$OUTPUT_DIR/.root
-ROOT_IMG=$OUTPUT_DIR/root.img
+ROOT_SRC=$IMG_DIR/rootfs.tar
+ROOT=$IMG_DIR/.root
+ROOT_IMG=$IMG_DIR/root.img
 ROOT_SIZE="160" # MB
 
 DISK_SIZE="200" # MB
-
-mkdir -p $OUTPUT_DIR
 
 # boot filesystem
 echo "creating boot loop device"
@@ -146,7 +111,7 @@ losetup -f $ROOT_IMG
 
 msg "creating root filesystem"
 mkfs.ext4 $loop_dev
-#tune2fs -O^has_journal $loop_dev
+tune2fs -O^has_journal $loop_dev
 
 msg "mounting root loop device"
 mkdir -p $ROOT
@@ -212,48 +177,29 @@ msg "destroying root loop device"
 losetup -d $loop_dev
 sync
 
-case "$TYPE" in
-    update)
-        cd $OUTPUT_DIR
-        tar_opts="cvf"
-        tar_filename="motioneye-update.tar"
-        if [ "$COMPRESS" == "true" ]; then
-            tar_opts="z$tar_opts"
-            tar_filename=$tar_filename.gz
-        fi
+DISK_IMG=$IMG_DIR/disk.img
+BOOT_IMG=$IMG_DIR/boot.img
+ROOT_IMG=$IMG_DIR/root.img
 
-        tar $tar_opts $tar_filename boot.img root.img
+if ! [ -r $BOOT_IMG ]; then
+    echo "boot image missing"
+    exit -1
+fi
 
-        if [ "$KEEP_IMG" == "false" ]; then
-            rm boot.img root.img
-        fi
-        ;;
+if ! [ -r $ROOT_IMG ]; then
+    echo "root image missing"
+    exit -1
+fi
 
-    full)
-        cd $OUTPUT_DIR
-        DISK_IMG=$OUTPUT_DIR/disk.img
-        BOOT_IMG=$OUTPUT_DIR/boot.img
-        ROOT_IMG=$OUTPUT_DIR/root.img
+# disk image
+msg "creating disk loop device"
+dd if=/dev/zero of=$DISK_IMG bs=1M count=$DISK_SIZE
+loop_dev=$(losetup -f)
+losetup -f $DISK_IMG
 
-        if ! [ -r $BOOT_IMG ]; then
-            echo "boot image missing"
-            exit -1
-        fi
-
-        if ! [ -r $ROOT_IMG ]; then
-            echo "root image missing"
-            exit -1
-        fi
-
-        # disk image
-        msg "creating disk loop device"
-        dd if=/dev/zero of=$DISK_IMG bs=1M count=$DISK_SIZE
-        loop_dev=$(losetup -f)
-        losetup -f $DISK_IMG
-
-        msg "partitioning disk"
-        set +e
-        fdisk $loop_dev <<END
+msg "partitioning disk"
+set +e
+fdisk $loop_dev <<END
 o
 n
 p
@@ -273,61 +219,53 @@ a
 1
 w
 END
-        set -e
-        sync
+set -e
+sync
 
-        echo "reading partition offsets"
-        boot_offs=$(fdisk -l $loop_dev | grep -E 'loop[[:digit:]]p1' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
-        root_offs=$(fdisk -l $loop_dev | grep -E 'loop[[:digit:]]p2' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
+echo "reading partition offsets"
+boot_offs=$(fdisk -l $loop_dev | grep -E 'loop[[:digit:]]p1' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
+root_offs=$(fdisk -l $loop_dev | grep -E 'loop[[:digit:]]p2' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
 
-        echo "destroying disk loop device"
-        losetup -d $loop_dev
+echo "destroying disk loop device"
+losetup -d $loop_dev
 
-        msg "creating boot loop device"
-        loop_dev=$(losetup -f)
-        losetup -f -o $(($boot_offs * 512)) $DISK_IMG
+msg "creating boot loop device"
+loop_dev=$(losetup -f)
+losetup -f -o $(($boot_offs * 512)) $DISK_IMG
 
-        msg "copying boot image"
-        dd if=$BOOT_IMG of=$loop_dev
-        sync
+msg "copying boot image"
+dd if=$BOOT_IMG of=$loop_dev
+sync
 
-        echo "destroying boot loop device"
-        losetup -d $loop_dev
+echo "destroying boot loop device"
+losetup -d $loop_dev
 
-        msg "creating root loop device"
-        loop_dev=$(losetup -f)
-        losetup -f -o $(($root_offs * 512)) $DISK_IMG
-        sync
+msg "creating root loop device"
+loop_dev=$(losetup -f)
+losetup -f -o $(($root_offs * 512)) $DISK_IMG
+sync
 
-        msg "copying root image"
-        dd if=$ROOT_IMG of=$loop_dev
-        sync
+msg "copying root image"
+dd if=$ROOT_IMG of=$loop_dev
+sync
 
-        echo "destroying root loop device"
-        losetup -d $loop_dev
-        sync
+echo "destroying root loop device"
+losetup -d $loop_dev
+sync
 
-        if [ "$KEEP_IMG" == "false" ]; then
-            rm $ROOT_IMG $BOOT_IMG
-        fi
+mv $DISK_IMG $(dirname $DISK_IMG)/motionPie.img
+DISK_IMG=$(dirname $DISK_IMG)/motionPie.img
 
-        mv $DISK_IMG $(dirname $DISK_IMG)/motioneye-full.img
-        DISK_IMG=$(dirname $DISK_IMG)/motioneye-full.img
+if [ -n "$SDCARD_DEV" ]; then
+    umount ${SDCARD_DEV}* || true 2>/dev/null
+    echo "writing disk image to sdcard"
+    dd if=$DISK_IMG of=$SDCARD_DEV
+    sync
+fi
 
-        if [ "$WRITE_CARD" == "true" ]; then
-            umount ${SDCARD_DEV}* || true
-            echo "writing disk image to sdcard"
-            dd if=$DISK_IMG of=$SDCARD_DEV
-            sync
-        fi
-
-        if [ "$COMPRESS" == "true" ]; then
-            gzip $DISK_IMG
-            mv $DISK_IMG.gz $DISK_IMG
-        fi
-
-        ;;
-esac
+if [ "$COMPRESSED" == "true" ]; then
+    gzip $DISK_IMG
+fi
 
 msg "done"
 

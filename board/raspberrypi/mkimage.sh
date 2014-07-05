@@ -3,7 +3,7 @@
 test "root" != "$USER" && exec sudo $0 "$@"
 
 function usage() {
-    echo "Usage: $0  [-c] [-d sdcard_dev] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk]" 1>&2
+    echo "Usage: $0 [-c] [-d sdcard_dev] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk]" 1>&2
     exit 1
 }
 
@@ -257,7 +257,7 @@ mv $DISK_IMG $(dirname $DISK_IMG)/motionPie.img
 DISK_IMG=$(dirname $DISK_IMG)/motionPie.img
 
 if [ -n "$SDCARD_DEV" ]; then
-    umount ${SDCARD_DEV}* || true 2>/dev/null
+    umount ${SDCARD_DEV}* 2>/dev/null || true
     echo "writing disk image to sdcard"
     dd if=$DISK_IMG of=$SDCARD_DEV
     sync

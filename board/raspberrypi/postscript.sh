@@ -14,7 +14,7 @@ cp $RPI_DIR/config.txt $TARGET/../images/boot/config.txt
 cp $RPI_DIR/cmdline.txt $TARGET/../images/boot/cmdline.txt
 
 # disable startup scripts
-rm -f $TARGET/etc/init.d/S15watchdog # replaced by S98watchdog
+rm -f $TARGET/etc/init.d/S15watchdog # replaced by S02watchdog
 rm -f $TARGET/etc/init.d/S49ntp # replaced by S60ntp
 rm -f $TARGET/etc/init.d/S20urandom
 

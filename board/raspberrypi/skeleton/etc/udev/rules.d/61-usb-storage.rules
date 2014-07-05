@@ -1,0 +1,3 @@
+SUBSYSTEMS=="block", ENV{ID_FS_TYPE}=="vfat|ext2|ext3|ext4" RUN+="/bin/mkdir -p /data/media/%k", RUN+="/bin/mount /dev/%k /data/media/%k"
+SUBSYSTEMS=="block", ENV{ID_FS_TYPE}=="ntfs" RUN+="/bin/mkdir -p /data/media/%k", RUN+="/usr/bin/ntfs-3g /dev/%k /data/media/%k"
+

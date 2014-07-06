@@ -33,8 +33,12 @@ start() {
         mkfs.ext4 $DATA_DEV
 
         mount /data # also mount it
-        mkdir -p /data/etc
         
+        # create necessary directories
+        mkdir -p /data/etc
+        mkdir -p /data/output
+        mkdir -p /data/media
+
         echo "Setting root password..."
         echo 'root::::::::' > /data/etc/shadow
         chmod go-rwx /data/etc/shadow

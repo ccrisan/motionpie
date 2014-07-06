@@ -101,7 +101,7 @@ def download(version):
 
         shutil.rmtree(_DOWNLOAD_DIR, ignore_errors=True)
         os.makedirs(_DOWNLOAD_DIR)
-        subprocess.check_call(['/usr/bin/wget', url, '-O', _DOWNLOAD_FILE_NAME])
+        subprocess.check_call(['/usr/bin/wget', url, '--no-check-certificate', '-O', _DOWNLOAD_FILE_NAME])
 
     except Exception as e:
         logging.error('could not download update: %s' % e)

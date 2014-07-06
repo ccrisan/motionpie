@@ -5,15 +5,6 @@
 
 # Check for the SSH1 RSA key
 if [ ! -f /data/etc/ssh_host_key ] ; then
-    echo "Remounting root rw..."
-    mount -o remount,rw /
-
-    echo "Setting root password..."
-    pwd=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
-    echo -en "$pwd\n$pwd\n" | passwd
-    # removes password expiration
-    sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /etc/shadow
-
     echo "Generating HOST Key..."
     /usr/bin/ssh-keygen -t rsa1 -f /data/etc/ssh_host_key -C '' -N ''
 fi
@@ -40,10 +31,6 @@ fi
 if [ ! -f /data/etc/ssh_host_ed25519_key ]; then
     echo "Generating ed25519 Key..."
     /usr/bin/ssh-keygen -t ed25519 -f /data/etc/ssh_host_ed25519_key -C '' -N ''
-    
-    echo "Rebooting..."
-    sync
-    reboot
 fi
 
 umask 077

@@ -33,6 +33,14 @@ start() {
         mkfs.ext4 $DATA_DEV
 
         mount /data # also mount it
+        
+        echo "Setting root password..."
+        echo 'root::::::::' > /data/etc/shadow
+        chmod go-rwx /data/etc/shadow
+        pwd=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
+        echo -en "$pwd\n$pwd\n" | passwd
+        # removes password expiration
+        sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /data/etc/shadow
     fi
 }
 

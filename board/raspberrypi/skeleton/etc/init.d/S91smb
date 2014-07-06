@@ -4,25 +4,26 @@
 
 mkdir -p /var/log/samba
 mkdir -p /var/lib/samba/private
+mkdir -p /data/output
 
 start() {
     echo -n "Starting SMB services: "
     smbd -D
-    [ $? == 0 ] && echo "OK" || echo "FAIL"
+    [ $? == 0 ] && echo "done" || echo "failed"
 
     echo -n "Starting NMB services: "
     nmbd -D
-    [ $? == 0 ] && echo "OK" || echo "FAIL"
+    [ $? == 0 ] && echo "done" || echo "failed"
 }
 
 stop() {
     echo -n "Shutting down SMB services: "
-    kill -9 `pidof smbd`
-    [ $? == 0 ] && echo "OK" || echo "FAIL"
+    kill -9 `pidof smbd` 2>/dev/null
+    [ $? == 0 ] && echo "done" || echo "failed"
 
     echo -n "Shutting down NMB services: "
-    kill -9 `pidof nmbd`
-    [ $? == 0 ] && echo "OK" || echo "FAIL"
+    kill -9 `pidof nmbd` 2>/dev/null
+    [ $? == 0 ] && echo "done" || echo "failed"
 }
 
 restart() {
@@ -31,9 +32,9 @@ restart() {
 }
 
 reload() {
-        echo -n "Reloading smb.conf file: "
-    kill -HUP `pidof smbd`
-    [ $? == 0 ] && echo "OK" || echo "FAIL"
+    echo -n "Reloading smb.conf file: "
+    kill -HUP `pidof smbd` 2>/dev/null
+    [ $? == 0 ] && echo "done" || echo "failed"
 }
 
 case "$1" in
@@ -59,4 +60,3 @@ case "$1" in
 esac
 
 exit $?
-

@@ -97,7 +97,7 @@ def download(version):
     url = _DOWNLOAD_URL % {'version': version}
 
     try:
-        logging.debug('downloading %s...' % url)
+        logging.info('downloading %s...' % url)
 
         shutil.rmtree(_DOWNLOAD_DIR, ignore_errors=True)
         os.makedirs(_DOWNLOAD_DIR)
@@ -109,7 +109,7 @@ def download(version):
         raise
 
     try:
-        logging.debug('decompressing %s...' % _DOWNLOAD_FILE_NAME)
+        logging.info('decompressing %s...' % _DOWNLOAD_FILE_NAME)
 
         subprocess.check_call(['/usr/bin/gunzip', _DOWNLOAD_FILE_NAME])
 
@@ -121,7 +121,7 @@ def download(version):
     extracted_file_name = _DOWNLOAD_FILE_NAME.replace('.gz', '')
 
     try:
-        logging.debug('reading partiton table...')
+        logging.info('reading partiton table...')
 
         output = subprocess.check_output(['/sbin/fdisk', '-l', extracted_file_name])
         lines = [l.strip().replace('*', ' ') for l in output.split('\n') if l.startswith(extracted_file_name)]
@@ -137,7 +137,7 @@ def download(version):
         raise
         
     try:
-        logging.debug('extracting boot.img...')
+        logging.info('extracting boot.img...')
 
         subprocess.check_call(['/bin/dd', 'if=' + extracted_file_name, 'of=' + os.path.join(_DOWNLOAD_DIR, 'boot.img'),
                 'bs=2048', 'skip=' + str(boot_start / 4), 'count=' + str((boot_end - boot_start + 1) / 4)])
@@ -148,7 +148,7 @@ def download(version):
         raise
 
     try:
-        logging.debug('extracting root.img...')
+        logging.info('extracting root.img...')
 
         subprocess.check_call(['/bin/dd', 'if=' + extracted_file_name, 'of=' + os.path.join(_DOWNLOAD_DIR, 'root.img'),
                 'bs=2048', 'skip=' + str(root_start / 4), 'count=' + str((root_end - root_start + 1) / 4)])
@@ -162,19 +162,19 @@ def download(version):
 def perform_update(version):
     logging.info('updating to version %(version)s...' % {'version': version})
     
-    logging.debug('killing motioneye init script...')
+    logging.info('killing motioneye init script...')
     os.system('kill $(pidof S95motioneye)')
 
     download(version)
     
-    logging.debug('unmounting boot partition')
+    logging.info('unmounting boot partition...')
     if os.system('/bin/umount /boot'):
         logging.error('failed to unmount boot partition')
 
         raise Exception('failed to unmount boot partition')
 
     try:
-        logging.info('installing boot image')
+        logging.info('installing boot image...')
         boot_img = os.path.join(_DOWNLOAD_DIR, 'boot.img')
         
         subprocess.check_call(['/bin/dd', 'if=' + boot_img, 'of=/dev/mmcblk0p1', 'bs=1M'])
@@ -184,12 +184,13 @@ def perform_update(version):
 
         raise
 
-    logging.debug('mounting boot partition read-write')
+    logging.info('mounting boot partition read-write...')
     if os.system('/bin/mount -o rw /dev/mmcblk0p1 /boot'):
         logging.error('failed to mount boot partition')
     
         raise Exception('failed to mount boot partition')
 
+    logging.info('preparing to boot in fwupdate mode...')
     try:
         config_lines = [c.strip() for c in open('/boot/config.txt', 'r').readlines() if c.strip()]
         
@@ -210,10 +211,10 @@ def perform_update(version):
         
         raise
         
-    logging.info('rebooting')
+    logging.info('rebooting...')
 
     if os.system('/sbin/reboot'):
         logging.error('failed to reboot')
-        logging.info('hard rebooting')
+        logging.info('hard rebooting...')
         open('/proc/sysrq-trigger', 'w').write('b') # reboot
 

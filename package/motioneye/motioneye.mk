@@ -37,7 +37,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -r -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'conf'))%'/data/etc'%" $(DST_DIR)/settings.py
     sed -r -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/tmp'%" $(DST_DIR)/settings.py
     sed -r -i "s%REPO = ('ccrisan', 'motioneye')%REPO = ('ccrisan', 'motionPie')%" $(DST_DIR)/settings.py
-    sed -r -i "s%LOG_LEVEL = logging.INFO%LOG_LEVEL = logging.DEBUG%" $(DST_DIR)/settings.py
+    #sed -r -i "s%LOG_LEVEL = logging.INFO%LOG_LEVEL = logging.DEBUG%" $(DST_DIR)/settings.py
     sed -r -i "s%8765%80%" $(DST_DIR)/settings.py
     sed -r -i "s%WPA_SUPPLICANT_CONF = None%WPA_SUPPLICANT_CONF = '/data/etc/wpa_supplicant.conf'%" $(DST_DIR)/settings.py
     sed -r -i "s%SMB_SHARES = False%SMB_SHARES = True%" $(DST_DIR)/settings.py
@@ -48,8 +48,6 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -r -i "s%VERSION = '[a-bA-B0-9.]+'%VERSION = '$(MOTIONPIE_VERSION)'%" $(DST_DIR)/motioneye.py
     sed -r -i "s%motionEye is up to date%motionPie is up to date%" $(DST_DIR)/static/js/main.js
     sed -r -i "s%motionEye was successfully updated%motionPie was successfully updated%" $(DST_DIR)/static/js/main.js
-
-    # update timeout
     sed -r -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js
 endef
 

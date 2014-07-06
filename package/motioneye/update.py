@@ -31,7 +31,7 @@ _DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s
 _LIST_VERSIONS_URL = 'https://api.github.com/repos/{owner}/{repo}/releases'.format(
         owner=settings.REPO[0], repo=settings.REPO[1])
 _DOWNLOAD_DIR = '/data/.firmware_update'
-_DOWNLOAD_FILE_NAME = os.path.join(_DOWNLOAD_DIR, 'firmware')
+_DOWNLOAD_FILE_NAME = os.path.join(_DOWNLOAD_DIR, 'firmware.gz')
 
 
 # versions
@@ -109,12 +109,52 @@ def download(version):
         raise
 
     try:
-        logging.debug('extracting %s...' % _DOWNLOAD_FILE_NAME)
+        logging.debug('decompressing %s...' % _DOWNLOAD_FILE_NAME)
 
-        subprocess.check_call(['/usr/bin/tar', 'zxf', _DOWNLOAD_FILE_NAME, '-C', _DOWNLOAD_DIR])
+        subprocess.check_call(['/usr/bin/gunzip', _DOWNLOAD_FILE_NAME])
 
     except Exception as e:
-        logging.error('could not extract archive: %s' % e)
+        logging.error('could not decompress archive: %s' % e)
+        
+        raise
+    
+    extracted_file_name = _DOWNLOAD_FILE_NAME.replace('.gz', '')
+
+    try:
+        logging.debug('reading partiton table...')
+
+        output = subprocess.check_output(['/sbin/fdisk', '-l', extracted_file_name])
+        lines = [l.strip().replace('*', ' ') for l in output.split('\n') if l.startswith(extracted_file_name)]
+        boot_info = lines[0].split()
+        root_info = lines[1].split()
+        
+        boot_start, boot_end = int(boot_info[1]), int(boot_info[2])
+        root_start, root_end = int(root_info[1]), int(root_info[2])
+        
+    except Exception as e:
+        logging.error('could not read partition table: %s' % e)
+        
+        raise
+        
+    try:
+        logging.debug('extracting boot.img...')
+
+        subprocess.check_call(['/bin/dd', 'if=' + extracted_file_name, 'of=' + os.path.join(_DOWNLOAD_DIR, 'boot.img'),
+                'bs=2048', 'skip=' + str(boot_start / 4), 'count=' + str((boot_end - boot_start + 1) / 4)])
+
+    except Exception as e:
+        logging.error('could not extract boot.img: %s' % e)
+        
+        raise
+
+    try:
+        logging.debug('extracting root.img...')
+
+        subprocess.check_call(['/bin/dd', 'if=' + extracted_file_name, 'of=' + os.path.join(_DOWNLOAD_DIR, 'root.img'),
+                'bs=2048', 'skip=' + str(root_start / 4), 'count=' + str((root_end - root_start + 1) / 4)])
+
+    except Exception as e:
+        logging.error('could not extract root.img: %s' % e)
         
         raise
 
@@ -122,6 +162,9 @@ def download(version):
 def perform_update(version):
     logging.info('updating to version %(version)s...' % {'version': version})
     
+    logging.debug('killing motioneye init script...')
+    os.system('kill $(pidof S95motioneye)')
+
     download(version)
     
     logging.debug('unmounting boot partition')

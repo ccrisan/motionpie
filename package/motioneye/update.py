@@ -15,24 +15,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-import datetime
 import json
 import logging
 import os.path
 import shutil
-import signal
 import subprocess
-import tempfile
 import time
 import urllib2
-
-from tornado.ioloop import IOLoop
 
 import settings
 
 
-_DOWNLOAD_URL = '%(root)s/%(owner)s/%(repo)s/get/%(version)s.tar.gz'
-_LIST_VERSIONS_URL = '%(root)s/api/1.0/repositories/%(owner)s/%(repo)s/tags'
+_DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s/motionPie-%(version)s.img.gz'.format(
+        owner=settings.REPO[0], repo=settings.REPO[1])
+_LIST_VERSIONS_URL = 'https://api.github.com/repos/{owner}/{repo}/releases'.format(
+        owner=settings.REPO[0], repo=settings.REPO[1])
 _DOWNLOAD_DIR = '/data/.firmware_update'
 _DOWNLOAD_FILE_NAME = os.path.join(_DOWNLOAD_DIR, 'firmware')
 
@@ -53,12 +50,12 @@ def get_all_versions():
         logging.debug('fetching %s...' % url)
         
         response = urllib2.urlopen(url, timeout=settings.REMOTE_REQUEST_TIMEOUT)
-        response = json.load(response)
-        versions = response.keys()
+        versions = json.load(response)
+        versions = [v['name'] for v in versions if not v.get('prerelease')]
         
         logging.debug('available versions: %(versions)s' % {
                 'versions': ', '.join(versions)})
-        
+
         return sorted(versions)
 
     except Exception as e:
@@ -98,7 +95,6 @@ def compare_versions(version1, version2):
 
 def download(version):
     url = _DOWNLOAD_URL % {'version': version}
-    url += '?_=' + str(int(time.time())) # prevents caching
 
     try:
         logging.debug('downloading %s...' % url)
@@ -125,6 +121,8 @@ def download(version):
 
 def perform_update(version):
     logging.info('updating to version %(version)s...' % {'version': version})
+    
+    download(version)
     
     logging.debug('unmounting boot partition')
     if os.system('/bin/umount /boot'):

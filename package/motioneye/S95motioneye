@@ -54,11 +54,11 @@ start() {
         index=1
         for device in $(ls /dev/video* 2>/dev/null); do
             if [ "$count" -gt "1" ]; then
-                output_dir="/data/output/$index/"
+                output_dir="/output/$index/"
             else
-                output_dir="/data/output/"
+                output_dir="/output/"
             fi
-            curl --user admin: -s -m 60 --data "{\"device_uri\": \"$device\", \"proto\": \"v4l2\", \"root_directory\": \"$output_dir\"}" http://127.0.0.1:$port/config/add/ > /dev/null
+            curl --user admin: -s -m 60 --data "{\"device_uri\": \"$device\", \"proto\": \"v4l2\", \"root_directory\": \"$output_dir\", \"storage_device\": \"local-disk-dev-mmcblk0p3\"}" http://127.0.0.1:$port/config/add/ > /dev/null
             index=$(($index + 1))
         done
     fi

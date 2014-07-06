@@ -9,6 +9,9 @@ cp $TARGET/../build/linux-*/System.map $TARGET/System.map
 # copy kernel
 cp $TARGET/../images/zImage $TARGET/../images/boot/kernel.img
 
+# copy fwupdater initramfs
+cp $RPI_DIR/fwupdater.gz $TARGET/../images/boot/fwupdater.gz
+
 # custom rpi config
 cp $RPI_DIR/config.txt $TARGET/../images/boot/config.txt
 cp $RPI_DIR/cmdline.txt $TARGET/../images/boot/cmdline.txt

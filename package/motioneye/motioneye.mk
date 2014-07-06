@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-MOTIONEYE_VERSION = 0.1
+MOTIONEYE_VERSION = 0.13
+MOTIONPIE_VERSION = 20140706
 MOTIONEYE_SITE = $(TOPDIR)/package/motioneye
 MOTIONEYE_SITE_METHOD = local
 SRC_DIR = /media/data/projects/motioneye/
@@ -12,6 +13,7 @@ DST_DIR = $(TARGET_DIR)/programs/motioneye
 
 define MOTIONEYE_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/S95motioneye $(TARGET_DIR)/etc/init.d/S95motioneye
+    $(INSTALL) -D -m 0644 $(@D)/update.py $(DST_DIR)/src/update.py
     mkdir -p $(DST_DIR)
     cd $(SRC_DIR) && find $(SRC_DIR) \(\
         -name '*.py' -o \
@@ -29,6 +31,8 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
         \! -path '$(SRC_DIR)run*' \
         \! -path '$(SRC_DIR)conf*' \
         | cut -c $$(echo $(SRC_DIR) | wc -c)- | xargs -I xxx cp -p --parents xxx $(DST_DIR)
+
+    # settings
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'conf'))%'/data/etc'%" $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/tmp'%" $(DST_DIR)/settings.py
@@ -38,6 +42,13 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%SMB_SHARES = False%SMB_SHARES = True%" $(DST_DIR)/settings.py
     sed -i "s%SMB_MOUNT_ROOT = '/media'%SMB_MOUNT_ROOT = '/data/media'%" $(DST_DIR)/settings.py
     sed -i "s%ENABLE_REBOOT = False%ENABLE_REBOOT = True%" $(DST_DIR)/settings.py
+
+    # version
+    sed -i "s%VERSION = '[a-bA-B0-9.]+'%VERSION = '$(MOTIONPIE_VERSION)'%" $(DST_DIR)/motioneye.py
+    
+    # update timeout
+    sed -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js
 endef
 
 $(eval $(generic-package))
+

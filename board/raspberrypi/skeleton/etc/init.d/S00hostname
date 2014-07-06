@@ -3,7 +3,7 @@
 start() {
     echo -n "Setting hostname: "
     sn=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
-    hostname="motioneye$sn"
+    hostname="motionPie$sn"
     /bin/hostname $hostname
     echo "done"
 }

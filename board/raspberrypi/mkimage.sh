@@ -265,7 +265,7 @@ if [ -n "$SDCARD_DEV" ]; then
 fi
 
 if [ "$COMPRESSED" == "true" ]; then
-    gzip $DISK_IMG
+    gzip -f $DISK_IMG
 fi
 
 msg "done"

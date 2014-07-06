@@ -33,6 +33,7 @@ start() {
         mkfs.ext4 $DATA_DEV
 
         mount /data # also mount it
+        mkdir -p /data/etc
         
         echo "Setting root password..."
         echo 'root::::::::' > /data/etc/shadow

@@ -1,52 +1,49 @@
-#! /bin/sh
-#
-# System-V init script for the openntp daemon
-#
+#!/bin/sh
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-NAME=ntpd
-DAEMON=/usr/sbin/$NAME
-NTPDATE_BIN=/usr/bin/ntpdate
+[ -f /etc/ntp.conf ] || exit 0
 
-# Gracefully exit if the package has been removed.
-test -x $DAEMON || exit 0
+mkdir -p /var/lib/ntp
 
-# Read config file if it is present.
-if [ -r /etc/default/$NAME ]
-then
-    . /etc/default/$NAME
-fi
+start() {
+    server=$(cat /etc/ntp.conf | grep server | head -n 1 | cut -d ' ' -f 2)
+    if [ -n "$server" ]; then
+        echo -n "Starting ntpdate: "
+        ntpdate $server > /dev/null
+        [ $? == 0 ] && echo "done" || echo "failed"
+    fi
+
+    echo -n "Starting ntpd: "
+    ntpd -g -c /etc/ntp.conf
+    [ $? == 0 ] && echo "done" || echo "failed"
+}
+
+stop() {
+    echo -n "Shutting down ntpd: "
+    kill `pidof ntpd` 2>/dev/null
+    [ $? == 0 ] && echo "done" || echo "failed"
+}
+
+restart() {
+    stop
+    start
+}
 
 case "$1" in
     start)
-        if [ -x $NTPDATE_BIN ] && ip route | grep default > /dev/null 2>&1; then
-            echo -n "Starting ntpdate: "
-            $NTPDATE_BIN $NTPDATE_OPTS $NTPSERVERS > /dev/null 2>&1
-            echo "done"
-
-            echo -n "Starting ntpd: "
-            start-stop-daemon -S -q -x $DAEMON
-            echo "done"
-        fi
+        start
         ;;
 
     stop)
-        echo -n "Stopping ntpd: "
-        start-stop-daemon -K -q -n $NAME
-        echo "done"
+        stop
         ;;
 
     restart)
-        $0 stop
-        sleep 1
-        $0 start
+        restart
         ;;
 
     *)
-        echo "Usage: $SCRIPTNAME {start|stop|restart}" >&2
+        echo "Usage: $0 {start|stop|restart}"
         exit 1
-        ;;
 esac
 
-exit 0
-
+exit $?

@@ -56,7 +56,7 @@ start() {
     count=0
     while true; do
         sleep 1
-        
+
         if connected; then
             break
         fi

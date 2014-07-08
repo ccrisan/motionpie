@@ -5,7 +5,7 @@
 ################################################################################
 
 MOTIONEYE_VERSION = 0.13
-MOTIONPIE_VERSION = 20140705
+MOTIONPIE_VERSION = 20140706
 MOTIONEYE_SITE = $(TOPDIR)/package/motioneye
 MOTIONEYE_SITE_METHOD = local
 SRC_DIR = /media/data/projects/motioneye/

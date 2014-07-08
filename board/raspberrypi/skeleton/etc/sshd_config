@@ -8,8 +8,9 @@ HostKey /data/etc/ssh_host_ecdsa_key
 HostKey /data/etc/ssh_host_ed25519_key
 
 PermitRootLogin yes
-AuthorizedKeysFile      /data/etc/ssh_authorized_keys
+AuthorizedKeysFile /data/etc/ssh_authorized_keys
+UseDNS no
+Banner /proc/sys/kernel/hostname
 
 UsePrivilegeSeparation sandbox
-Subsystem       sftp    /usr/libexec/sftp-server
-
+Subsystem sftp /usr/libexec/sftp-server

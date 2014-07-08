@@ -47,18 +47,18 @@ start() {
 
         count=$(($count + 1))
     done
-    
+
     # add connected camera(s) with default settings
     if responsive && ! [ -f /data/etc/motion.conf ]; then
         count=$(ls /dev/video* 2>/dev/null | wc -l)
         index=1
         for device in $(ls /dev/video* 2>/dev/null); do
             if [ "$count" -gt "1" ]; then
-                output_dir="/output/$index/"
+                output_dir="/data/output/$index/"
             else
-                output_dir="/output/"
+                output_dir="/data/output/"
             fi
-            curl --user admin: -s -m 60 --data "{\"device_uri\": \"$device\", \"proto\": \"v4l2\", \"root_directory\": \"$output_dir\", \"storage_device\": \"local-disk-dev-mmcblk0p3\"}" http://127.0.0.1:$port/config/add/ > /dev/null
+            curl --user admin: -s -m 60 --data "{\"device_uri\": \"$device\", \"proto\": \"v4l2\", \"root_directory\": \"$output_dir\", \"storage_device\": \"custom-path\"}" http://127.0.0.1:$port/config/add/ > /dev/null
             index=$(($index + 1))
         done
     fi

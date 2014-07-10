@@ -5,7 +5,7 @@ start() {
     sn=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
     hostname="motionpie_$sn"
     /bin/hostname $hostname
-    echo $hostname > /var/cache/sshd_banner
+    echo "Welcome to $hostname!" > /var/cache/sshd_banner
     echo "done"
 }
 

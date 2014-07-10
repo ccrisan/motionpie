@@ -39,7 +39,7 @@ start() {
         mkdir -p /data/output
         mkdir -p /data/media
 
-        ln -s /usr/share/zoneinfo/UTC /data/etc/zoneinfo
+        ln -s /usr/share/zoneinfo/UTC /data/etc/localtime
 
         echo "Setting root password..."
         echo 'root::::::::' > /data/etc/shadow

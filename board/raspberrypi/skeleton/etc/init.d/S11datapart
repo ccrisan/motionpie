@@ -33,11 +33,13 @@ start() {
         mkfs.ext4 $DATA_DEV
 
         mount /data # also mount it
-        
-        # create necessary directories
+
+        # create necessary directories and files
         mkdir -p /data/etc
         mkdir -p /data/output
         mkdir -p /data/media
+
+        ln -s /usr/share/zoneinfo/UTC /data/etc/zoneinfo
 
         echo "Setting root password..."
         echo 'root::::::::' > /data/etc/shadow
@@ -70,7 +72,7 @@ case "$1" in
     restart|reload)
         restart
         ;;
-  
+
     *)
         echo "Usage: $0 {start|stop|restart}"
         exit 1

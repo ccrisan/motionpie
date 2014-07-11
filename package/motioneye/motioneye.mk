@@ -5,7 +5,7 @@
 ################################################################################
 
 MOTIONEYE_VERSION = 0.13
-MOTIONPIE_VERSION = 20140706
+MOTIONPIE_VERSION = 20140711
 MOTIONEYE_SITE = $(TOPDIR)/package/motioneye
 MOTIONEYE_SITE_METHOD = local
 SRC_DIR = /media/data/projects/motioneye/
@@ -53,4 +53,3 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
-

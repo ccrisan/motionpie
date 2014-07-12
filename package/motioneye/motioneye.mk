@@ -5,18 +5,13 @@
 #############################################################
 
 MOTIONEYE_VERSION = b7a37ad
-MOTIONPIE_VERSION = 20140711
+MOTIONPIE_VERSION = 20140712
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
 MOTIONEYE_LICENSE_FILES = LICENCE
 MOTIONEYE_INSTALL_TARGET = YES
 DST_DIR = $(TARGET_DIR)/programs/motioneye
-
-#define MOTIONEYE_EXTRACT_CMDS
-#	cd $(BUILD_DIR); \
-#	sh $(DL_DIR)/$(FIRMWARE_IMX_SOURCE) --force --auto-accept
-#endef
 
 define MOTIONEYE_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 package/motioneye/S95motioneye $(TARGET_DIR)/etc/init.d/S95motioneye

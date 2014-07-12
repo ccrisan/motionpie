@@ -17,6 +17,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 package/motioneye/S95motioneye $(TARGET_DIR)/etc/init.d/S95motioneye
     mkdir -p $(DST_DIR)
     cp -r $(@D)/* $(DST_DIR)/
+    cp package/motioneye/update.py $(DST_DIR)/src/update.py
 
     # settings
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
@@ -39,4 +40,3 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
-

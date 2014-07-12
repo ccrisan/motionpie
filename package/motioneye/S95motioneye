@@ -1,6 +1,6 @@
 #!/bin/sh
 
-watch_timeout=20
+watch_timeout=120
 port=80
 
 responsive() {

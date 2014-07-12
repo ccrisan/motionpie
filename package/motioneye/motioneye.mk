@@ -1,36 +1,27 @@
-################################################################################
+#############################################################
 #
 # motioneye
 #
-################################################################################
+#############################################################
 
-MOTIONEYE_VERSION = 0.13
+MOTIONEYE_VERSION = b7a37ad
 MOTIONPIE_VERSION = 20140711
-MOTIONEYE_SITE = $(TOPDIR)/package/motioneye
-MOTIONEYE_SITE_METHOD = local
-SRC_DIR = /media/data/projects/motioneye/
+MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
+MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
+MOTIONEYE_LICENSE = GPLv3
+MOTIONEYE_LICENSE_FILES = LICENCE
+MOTIONEYE_INSTALL_TARGET = YES
 DST_DIR = $(TARGET_DIR)/programs/motioneye
 
+#define MOTIONEYE_EXTRACT_CMDS
+#	cd $(BUILD_DIR); \
+#	sh $(DL_DIR)/$(FIRMWARE_IMX_SOURCE) --force --auto-accept
+#endef
+
 define MOTIONEYE_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/S95motioneye $(TARGET_DIR)/etc/init.d/S95motioneye
+    $(INSTALL) -D -m 0755 package/motioneye/S95motioneye $(TARGET_DIR)/etc/init.d/S95motioneye
     mkdir -p $(DST_DIR)
-    cd $(SRC_DIR) && find $(SRC_DIR) \(\
-        -name '*.py' -o \
-        -name '*.sh' -o \
-        -name '*.js' -o \
-        -name '*.html' -o \
-        -name '*.css' -o \
-        -name '*.ttf' -o \
-        -name '*.woff' -o \
-        -name '*.svg' -o \
-        -name '*.eot' -o \
-        -name '*.png' -o \
-        -name '*.jpg' -o \
-        -name '*.gif' \) \
-        \! -path '$(SRC_DIR)run*' \
-        \! -path '$(SRC_DIR)conf*' \
-        | cut -c $$(echo $(SRC_DIR) | wc -c)- | xargs -I xxx cp -p --parents xxx $(DST_DIR)
-    $(INSTALL) -D -m 0644 $(@D)/update.py $(DST_DIR)/src/update.py
+    cp -r $(@D)/* $(DST_DIR)/
 
     # settings
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
@@ -53,3 +44,4 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+

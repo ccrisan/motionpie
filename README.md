@@ -6,6 +6,8 @@
 
 **motionPie** uses [motion](http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome) as a backend and [motionEye](https://bitbucket.org/ccrisan/motioneye/) for the frontend.
 
+Check this [link](https://bitbucket.org/ccrisan/motioneye/wiki/Screenshots) for some screenshots.
+
 ## Features ##
 
 * easy setup (see Install Instructions below)

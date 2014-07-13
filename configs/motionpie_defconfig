@@ -1,9 +1,10 @@
 BR2_arm=y
 BR2_arm1176jzf_s=y
 BR2_ARM_EABIHF=y
+BR2_DEFCONFIG="$(CONFIG_DIR)/configs/motionpie_defconfig"
 BR2_DL_DIR="$(TOPDIR)/../.buildroot-dl"
 BR2_CCACHE=y
-BR2_CCACHE_DIR="/media/data/pi/.buildroot-ccache"
+BR2_CCACHE_DIR="$(TOPDIR)/../.buildroot-ccache"
 BR2_OPTIMIZE_2=y
 BR2_KERNEL_HEADERS_VERSION=y
 BR2_DEFAULT_KERNEL_VERSION="3.12.24"

@@ -47,7 +47,7 @@ Although not recommended, you may want to compile the latest GIT version. You ne
 
 3. use the default configuration:
 
-        make defconfig
+        make motionpie_defconfig
 
 4. compile everything (don't use `-j`):
 
@@ -65,7 +65,6 @@ Although not recommended, you may want to compile the latest GIT version. You ne
 
         sudo dd if=output/images/motionPie.img of=/dev/mmcblk0 bs=1M
 
-
 ### First Boot ###
 
 When booting a fresh image installation, a few initialization steps will take place and therefore the system won't be ready for about 1-2 minutes. These steps are:
@@ -81,14 +80,51 @@ Of course your motionPie needs an IP address before you can communicate with it 
 
 ## Configuration ##
 
-### Normal Use ###
+The web user interface allows you to configure pretty much everything. You'll probably want to enable the advanced settings option. Here are the most important things you should take care of when configuring your motionPie for the first time:
 
-* web UI port 80
-* admin/surveillance user
-* samba
+* set a password for the two users (`admin` and `user`)
+* set the correct timezone for your region
+* enable the wireless connection, if you have one
+* configure your video device(s) (resolution, framerate etc)
+* configure the file storage if you want your pictures/movies saved on a network or USB drive
+* enable still images and/or motion movies if you want any information to be recorded
+
+The installed video devices are normally automatically detected and configured for you, but you can however add more devices (including remote devices) from the settings panel.
+
+If you know your way around Linux and you wish to tweak advanced settings you'll find a few configuration files on the third partition of the SD card, in the folder `etc`. You'll probably find `motion.conf`, `thread-x.conf` and `wpa_supplicant.conf` of interest.
+
+## Normal Use ##
+
+There are two users that can be used to access the web interface: `admin` and `user`. The former is meant for administrative purposes while the later should be used for surveillance.
+
+Most modern browsers, including the mobile ones, should work fine with the web interface. Just point your browser to the IP address of your motionPie (on port 80) and enter your credentials. The cameras will automatically refresh according to their configured streaming refresh rate. You can click on any of them to display it alone or you can use the *full screen* button of each camera to open a full window/tab displaying only that camera.
+
+Movies and pictures taken by each camera can be browsed, previewed and downloaded using the media browser window which opens by clicking on the *pictures* or *movies* buttons.
+
+These pictures and movies recored by motionPie are visible on the local network as well. Just look for your motionPie in your network in a Windows Explorer window or use the `smb://your_motion_pie/` URL if on Linux. The two shares, `sdcard` and `storage` represent the local SD card data partition and any other attached storage, respectively.
 
 ## Troubleshooting ##
 
-* watchdogs
-* ntp
+### System Rebooting ###
+
+The system will reboot whenever something goes wrong (i.e. disconnected from network, software hangs or kernel crashes). This is accomplished using the hardware watchdog as well as software watch scripts. It is therefore possible that the system enter an indefinite reboot loop if, for example, the network is misconfigured.
+
+### Date & Time ###
+
+NTP is used to synchronize the system time, so an Internet connection is required. The local time is established by the time zone setting in the web UI.
+
+### Remote Shell ###
+
+You can log into your motionPie using SSH. It listens on the standard 22 port. The only enabled user is `root` and the password is the serial number of your PI unit. Don't worry, the serial number is part of motionPie's hostname and will appear as part of the welcome banner when you're asked for a password.
+
+The SD card has 3 partitions, as follows:
+* the boot partition, mounted at `/boot`, read-only
+* the root partition, mounted at `/`, read-only
+* the data partition, mounted at `/data`, writable
+
+If you want to make changes on any of the read-only partitions, you need to mount them read-write first. For example:
+
+    mount -o remount,rw /
+
+If you want to dig deeper you can log in on the serial port of your PI. Just connect it to your PC's serial port and use your favorite serial terminal program to log in or simply watch the output of the system. The serial port is configured as 115200 8N1.
 

@@ -36,6 +36,7 @@ start() {
 
         # create necessary directories and files
         mkdir -p /data/etc
+        mkdir -p /data/log
         mkdir -p /data/output
         mkdir -p /data/media
 

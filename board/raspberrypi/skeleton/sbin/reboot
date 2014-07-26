@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set +e
+/usr/bin/killall watchdog
+/bin/echo -e '\0' > /dev/watchdog
+/bin/busybox reboot
+

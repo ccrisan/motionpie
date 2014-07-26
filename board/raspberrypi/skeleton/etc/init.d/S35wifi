@@ -52,6 +52,7 @@ watch() {
 start() {
     echo -n "Starting wpa_supplicant: "
     ifconfig $iface up > /dev/null 2>&1
+    iwconfig $iface power off > /dev/null 2>&1
     $prog -i$iface -c$conf -D$driver -B > $log 2>&1
     count=0
     while true; do

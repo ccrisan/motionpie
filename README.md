@@ -36,7 +36,13 @@ All releases are available from [here](https://github.com/ccrisan/motionPie/rele
 
 1. download the latest stable release (called `motionPie-YYYYmmdd.img.gz`)
 2. extract the image file called `motionPie.img` from the archive
-3. write the image file to your SD card (follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md) if you don't know how)
+3. write the image file to your SD card:
+
+    **if you run Linux**, there's a `writeimage.sh` script that will do everything for you, including the setup of a wireless network connection (replace `/dev/mmcblk0` and  `yournet:yourkey` with appropriate values):
+    
+        ./writeimage.sh -d /dev/mmcblk0 -n yournet:yourkey
+
+    **if you don't know how to do it**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 
 ### Latest GIT Version ###
 
@@ -106,6 +112,10 @@ Movies and pictures taken by each camera can be browsed, previewed and downloade
 These pictures and movies recored by motionPie are visible on the local network as well. Just look for your motionPie in your network in a Windows Explorer window or use the `smb://your_motion_pie/` URL if on Linux. The two shares, `sdcard` and `storage` represent the local SD card data partition and any other attached storage, respectively.
 
 ## Troubleshooting ##
+
+### Stuck With Rainbow On Display ###
+
+MotionPie has no video driver compiled in and therefore it won't control your display in any way. The rainbow you see is what PI's GPU shows by default when powered on. Nevertheless things happen in the background and your motionPie should be up and running (i.e. listening on port 80) in less than 2 minutes.
 
 ### System Rebooting ###
 

@@ -24,7 +24,8 @@ start() {
     w
     " | /sbin/fdisk $DISK_DEV
         sync
-        reboot -f
+        sleep 1
+        echo b > /proc/sysrq-trigger
     fi
 
     # if the filesystem is not valid (not yet formatted), format it
@@ -34,7 +35,6 @@ start() {
 
         mount /data # also mount it
 
-        # create necessary directories and files
         mkdir -p /data/etc
 
         ln -s /usr/share/zoneinfo/UTC /data/etc/localtime
@@ -43,14 +43,16 @@ start() {
         echo 'root::::::::' > /data/etc/shadow
         chmod go-rwx /data/etc/shadow
         pwd=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
-        echo -en "$pwd\n$pwd\n" | passwd
+        echo -en "$pwd\n$pwd\n" | passwd 2>/dev/null
         # removes password expiration
         sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /data/etc/shadow
     fi
 
-    mkdir -p /data/log
-    mkdir -p /data/output
-    mkdir -p /data/media
+    if df /dev/mmcblk0p3 >/dev/null 2>&1; then
+        mkdir -p /data/log
+        mkdir -p /data/output
+        mkdir -p /data/media
+    fi
 }
 
 stop() {

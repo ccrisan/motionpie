@@ -22,6 +22,10 @@ rm -f $TARGET/etc/init.d/S49ntp # replaced by S60ntp
 rm -f $TARGET/etc/init.d/S20urandom
 
 # some cleanups
+rm -f $TARGET/etc/network
+rm -f $TARGET/etc/default/ntp
+rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
+
 find $TARGET -name '*libmount*' | xargs rm -f
 
 rm -f $TARGET/bin/more
@@ -93,8 +97,6 @@ rm -f $TARGET/usr/bin/getopt
 rm -f $TARGET/bin/isosize
 rm -f $TARGET/usr/sbin/fdformat
 
-rm -f $TARGET/etc/default/ntp
-
 rm -f $TARGET/usr/bin/ssh
 rm -f $TARGET/usr/bin/slogin
 rm -f $TARGET/usr/bin/ssh-keyscan
@@ -109,6 +111,5 @@ rm -f $TARGET/usr/libexec/rmt
 
 rm -rf $TARGET/usr/share/locale/*
 
-rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
 
 exit 0

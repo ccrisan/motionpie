@@ -4,7 +4,7 @@ mkdir -p /var/lib/dhcp
 
 start() {
     # lo
-    ifup lo
+    ifconfig lo up
 
     # wlan0
     if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" == "1" ]; then
@@ -19,6 +19,9 @@ start() {
             dhclient eth0
         fi
     fi
+    
+    # print the current network configuration
+    ifconfig
 }
 
 case "$1" in

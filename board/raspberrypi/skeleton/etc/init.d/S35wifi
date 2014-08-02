@@ -51,7 +51,19 @@ watch() {
 
 start() {
     echo -n "Starting wpa_supplicant: "
-    ifconfig $iface up > /dev/null 2>&1
+
+    # wait for interface
+    count=0
+    while ! ifconfig $iface >/dev/null 2>&1 && [ $count -lt 5 ]; do
+        sleep 1
+        count=$(($count + 1))
+    done
+
+    if ! ifconfig $iface up > /dev/null 2>&1; then
+        echo "interface $iface not present"
+        return
+    fi
+
     iwconfig $iface power off > /dev/null 2>&1
     $prog -i$iface -c$conf -D$driver -B > $log 2>&1
     count=0
@@ -78,7 +90,8 @@ start() {
 
 stop() {
     echo -n "Shutting down wpa_supplicant: "
-    kill `pidof wpa_supplicant`
+    kill `pidof wpa_supplicant` 2>/dev/null
+    ps | grep wifi | grep -v $$ | grep -v grep | tr -s ' ' | cut -d ' ' -f 2 | xargs -r kill
     echo "done"
 }
 

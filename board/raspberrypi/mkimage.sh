@@ -8,7 +8,7 @@ function usage() {
 }
 
 function msg() {
-    echo "**** $1 ****"
+    echo ":: $1"
 }
 
 COMPRESSED=false
@@ -44,8 +44,9 @@ while getopts "cd:m:n:" o; do
 done
 
 function cleanup {
-    # unmount loop mounts
     set +e
+    
+    # unmount loop mounts
     mount | grep /dev/loop | cut -d ' ' -f 3 | xargs -r umount
 
     # remove loop devices
@@ -75,7 +76,7 @@ ROOT_SIZE="160" # MB
 DISK_SIZE="200" # MB
 
 # boot filesystem
-echo "creating boot loop device"
+msg "creating boot loop device"
 dd if=/dev/zero of=$BOOT_IMG bs=1M count=$BOOT_SIZE
 loop_dev=$(losetup -f)
 losetup -f $BOOT_IMG
@@ -223,11 +224,11 @@ END
 set -e
 sync
 
-echo "reading partition offsets"
+msg "reading partition offsets"
 boot_offs=$(fdisk -l $loop_dev | grep -E 'loop[[:digit:]]p1' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
 root_offs=$(fdisk -l $loop_dev | grep -E 'loop[[:digit:]]p2' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
 
-echo "destroying disk loop device"
+msg "destroying disk loop device"
 losetup -d $loop_dev
 
 msg "creating boot loop device"
@@ -238,7 +239,7 @@ msg "copying boot image"
 dd if=$BOOT_IMG of=$loop_dev
 sync
 
-echo "destroying boot loop device"
+msg "destroying boot loop device"
 losetup -d $loop_dev
 
 msg "creating root loop device"
@@ -250,7 +251,7 @@ msg "copying root image"
 dd if=$ROOT_IMG of=$loop_dev
 sync
 
-echo "destroying root loop device"
+msg "destroying root loop device"
 losetup -d $loop_dev
 sync
 
@@ -259,8 +260,8 @@ DISK_IMG=$(dirname $DISK_IMG)/motionPie.img
 
 if [ -n "$SDCARD_DEV" ]; then
     umount ${SDCARD_DEV}* 2>/dev/null || true
-    echo "writing disk image to sdcard"
-    dd if=$DISK_IMG of=$SDCARD_DEV
+    msg "writing disk image to sdcard"
+    dd if=$DISK_IMG of=$SDCARD_DEV bs=1M
     sync
 fi
 

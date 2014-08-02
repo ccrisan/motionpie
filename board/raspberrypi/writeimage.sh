@@ -3,7 +3,7 @@
 test "root" != "$USER" && exec sudo $0 "$@"
 
 function usage() {
-    echo "Usage: $0 <-d sdcard_dev> [-n ssid:psk]" 1>&2
+    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-n ssid:psk]" 1>&2
     exit 1
 }
 
@@ -11,10 +11,13 @@ function msg() {
     echo ":: $1"
 }
 
-while getopts "d:n:" o; do
+while getopts "d:i:n:" o; do
     case "$o" in
         d)
             SDCARD_DEV=$OPTARG
+            ;;
+        i)
+            DISK_IMG=$OPTARG
             ;;
         n)
             IFS=":" NETWORK=($OPTARG)
@@ -27,7 +30,7 @@ while getopts "d:n:" o; do
     esac
 done
 
-if [ -z "$SDCARD_DEV" ]; then
+if [ -z "$SDCARD_DEV" ] || [ -z "$DISK_IMG" ]; then
     usage
 fi
 
@@ -40,12 +43,10 @@ function cleanup {
 
 trap cleanup EXIT
 
-cd $(dirname $0)
-WD=$(pwd)
-DISK_IMG=$(ls -1 motionPie*.img 2>/dev/null)
+ROOT=$(dirname $0)/.root
 
 if ! [ -f $DISK_IMG ]; then
-    echo "could not find motionPie.img"
+    echo "could not find image file $DISK_IMG"
     exit 1
 fi
 
@@ -56,16 +57,15 @@ sync
 
 if [ -n "$SSID" ]; then
     msg "mounting sdcard"
-    mkdir -p $WD/tmp
-    root_dev=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
+    mkdir -p $ROOT
+    ROOT_DEV=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
     if ! [ -e ${SDCARD_DEV}p2 ]; then
-        root_dev=${SDCARD_DEV}2 # e.g. /dev/sdc2
+        ROOT_DEV=${SDCARD_DEV}2 # e.g. /dev/sdc2
     fi
-    root=$WD/tmp
-    mount $root_dev $root
+    mount $ROOT_DEV $ROOT
 
     msg "creating wireless configuration"
-    conf=$root/etc/wpa_supplicant.conf
+    conf=$ROOT/etc/wpa_supplicant.conf
     echo "update_config=1" > $conf
     echo "ctrl_interface=/var/run/wpa_supplicant" >> $conf
     echo "network={" >> $conf
@@ -77,8 +77,8 @@ if [ -n "$SSID" ]; then
     sync
     
     msg "unmounting sdcard"
-    umount $root
-    rmdir $root
+    umount $ROOT
+    rmdir $ROOT
 fi
 
 msg "you can now remove the sdcard"

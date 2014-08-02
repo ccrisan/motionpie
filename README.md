@@ -38,11 +38,11 @@ All releases are available from [here](https://github.com/ccrisan/motionPie/rele
 2. extract the image file called `motionPie.img` from the archive
 3. write the image file to your SD card:
 
-    **if you run Linux**, there's a `writeimage.sh` script that will do everything for you, including the setup of a wireless network connection (replace `/dev/mmcblk0` and  `yournet:yourkey` with appropriate values):
+    **If you run Linux**, there's a [writeimage.sh](https://github.com/ccrisan/motionPie/blob/master/board/raspberrypi/writeimage.sh) script that will do everything for you, including the setup of a wireless network connection. Just run the script as follows (replacing the arguments with appropriate values):
     
-        ./writeimage.sh -d /dev/mmcblk0 -n yournet:yourkey
+        ./writeimage.sh -d /dev/mmcblk0 -i /path/to/motionPie.img -n yournet:yourkey
 
-    **if you don't know how to do it**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+    **If you don't know how to do it**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 
 ### Latest GIT Version ###
 

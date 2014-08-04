@@ -27,12 +27,12 @@ The default user is **root**, no password will be requested.
 
 ### Toolchain
 
-I've added a toolchain, it has everything needed to cross-compile software for
+I've added a x86 64-bit toolchain, it has everything needed to cross-compile software for
 use with the test-drive image, download and usage instructions below:
 
 	wget http://dl.guillermoamaral.com/rpi/rpi-buildroot-toolchain.tar.xz
 	tar -xvJf rpi-buildroot-toolchain.tar.xz
-	source rpi-buildroot-toolchain/env
+	source rpi-buildroot-toolchain-x86_64/env
 	$CC -I"${BUILDROOT_STAGING_DIR}/usr/include" \
 	    -I"${BUILDROOT_STAGING_DIR}/opt/vc/include" \
 	    -L"${BUILDROOT_STAGING_DIR}/opt/vc/lib" \

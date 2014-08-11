@@ -25,6 +25,7 @@ rm -f $TARGET/etc/init.d/S20urandom
 rm -f $TARGET/etc/network
 rm -f $TARGET/etc/default/ntp
 rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
+rm -f $TARGET/etc/motion-dist.conf
 
 find $TARGET -name '*libmount*' | xargs rm -f
 

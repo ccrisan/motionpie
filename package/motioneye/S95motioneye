@@ -30,7 +30,7 @@ watch() {
 
 start() {
     echo -n "Starting motioneye: "
-    /usr/bin/python2.7 /programs/motioneye/motioneye.py >/var/log/motioneye.log 2>&1 &
+    /usr/bin/python2.7 /programs/motioneye/motioneye.py >>/var/log/motioneye.log 2>&1 &
 
     count=0
     while true; do

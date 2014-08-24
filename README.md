@@ -13,7 +13,8 @@ Check this [link](https://bitbucket.org/ccrisan/motioneye/wiki/Screenshots) for 
 * easy setup (see Install Instructions below)
 * **web-based**, mobile/tablet-friendly user interface
 * compatible with most **USB cameras** as well as with the Raspberry PI camera module
-* motion detection
+* support for IP cameras
+* motion detection with email notifications and working schedule
 * **JPEG** files for still images, **AVI** files for videos
 * connects to the network using **ethernet** or **wifi**
 * file storage on **SD card**, **USB drive** or **network SMB share**

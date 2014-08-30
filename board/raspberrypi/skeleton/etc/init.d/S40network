@@ -14,7 +14,7 @@ start_wlan0() {
     fi
     
     echo "wlan0: starting dhclient"
-    dhclient -cf "/var/cache/dhclient.conf" /varwlan0
+    dhclient -cf "/var/cache/dhclient.conf" wlan0
 }
 
 start_eth0() {

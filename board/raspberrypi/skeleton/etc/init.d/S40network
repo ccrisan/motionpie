@@ -2,26 +2,59 @@
 
 mkdir -p /var/lib/dhcp
 
-start() {
-    # lo
+start_lo() {
     ifconfig lo up
+}
 
-    # wlan0
-    if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" == "1" ]; then
-        dhclient wlan0
-    fi
-
-    # eth0
-    if [ -d /sys/class/net/eth0 ]; then
-        ifconfig eth0 up
-        sleep 3 # wait for interface to come up
-        if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
-            dhclient eth0
-        fi
+start_wlan0() {
+    if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" != "1" ]; then
+        echo "wlan0: no carrier"
+        return
     fi
     
+    echo "wlan0: starting dhclient"
+    dhclient wlan0
+}
+
+start_eth0() {
+    # wait for driver
+    count=0
+    while ! ifconfig eth0 >/dev/null 2>&1 && [ $count -lt 3 ]; do
+        sleep 1
+        count=$(($count + 1))
+    done
+    
+    if ! ifconfig eth0 >/dev/null 2>&1; then
+        echo "eth0: no device"
+        return # no device
+    fi
+
+    # bring it up
+    ifconfig eth0 up
+    
+    # wait for carrier
+    count=0
+    while [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" != "1" ] && [ $count -lt 3 ]; do
+        sleep 1
+        count=$(($count + 1))
+    done
+    
+    if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" != "1" ]; then
+        echo "eth0: no carrier"
+        return # no carrier
+    fi
+    
+    echo "eth0: starting dhclient"
+    dhclient eth0
+}
+
+start() {
+    start_lo
+    start_wlan0
+    start_eth0
+
     # print the current network configuration
-    ifconfig
+    ifconfig -a
 }
 
 case "$1" in

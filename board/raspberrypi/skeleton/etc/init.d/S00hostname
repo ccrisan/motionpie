@@ -4,10 +4,10 @@ start() {
     echo -n "Setting hostname: "
 
     sn=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
-    hostname="motionpie-$sn"
+    hostname="mp-$sn"
     /bin/hostname $hostname
     echo "Welcome to $hostname!" > /var/cache/sshd_banner
-    sed -i "s/\"motionpie\"/\"$hostname\"/g" /etc/dhcp/dhclient.conf
+    echo "send host-name = \"$hostname\";" > /var/cache/dhclient.conf
 
     echo "done"
 }

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 mkdir -p /var/lib/dhcp
+config="/var/cache/dhclient.conf"
 
 start_lo() {
     ifconfig lo up
@@ -13,7 +14,7 @@ start_wlan0() {
     fi
     
     echo "wlan0: starting dhclient"
-    dhclient wlan0
+    dhclient -cf "/var/cache/dhclient.conf" /varwlan0
 }
 
 start_eth0() {
@@ -45,7 +46,7 @@ start_eth0() {
     fi
     
     echo "eth0: starting dhclient"
-    dhclient eth0
+    dhclient -cf "/var/cache/dhclient.conf" eth0
 }
 
 start() {

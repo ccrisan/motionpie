@@ -26,6 +26,7 @@ rm -f $TARGET/etc/network
 rm -f $TARGET/etc/default/ntp
 rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
 rm -f $TARGET/etc/motion-dist.conf
+rm -f $TARGET/etc/hostname
 
 find $TARGET -name '*libmount*' | xargs rm -f
 

@@ -1,4 +1,4 @@
-config BR2_TARGET_RPI_FIRMWARE
+config BR2_PACKAGE_RPI_FIRMWARE
 	bool "rpi-firmware"
 	depends on BR2_arm
 	help

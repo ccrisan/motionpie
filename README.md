@@ -83,7 +83,7 @@ When booting a fresh image installation, a few initialization steps will take pl
 * setting the default root password for remote login (to the PI's serial number)
 * auto-configuring any installed video devices
 
-As soon as your motionPie is ready it will listen on port 80 and present you with a web user interface. Use `admin` with no password when asked for credentials.
+As soon as your motionPie is ready it will listen on port 80 and present you with a web user interface. Click on the key icon on the upper left side of the page to *switch user* to admin. Use `admin` with no password when asked for credentials.
 
 Of course your motionPie needs an IP address before you can communicate with it so you'll have to use the ethernet connection with DHCP enabled, at least for the first configuration.
 

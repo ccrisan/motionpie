@@ -2,6 +2,9 @@
 
 mkdir -p /var/lib/dhcp
 config="/var/cache/dhclient.conf"
+static_ip=""
+static_gw=""
+static_dns=""
 
 start_lo() {
     ifconfig lo up
@@ -13,8 +16,14 @@ start_wlan0() {
         return
     fi
     
-    echo "wlan0: starting dhclient"
-    dhclient -cf "/var/cache/dhclient.conf" wlan0
+    if [ -n "$static_ip" ]; then
+        echo "wlan0: setting static IP to $static_ip"
+        ifconfig wlan0 $static_ip up
+        static_ip="" # won't be used again
+    else    
+        echo "wlan0: starting dhclient"
+        dhclient -cf "$config" wlan0
+    fi
 }
 
 start_eth0() {
@@ -24,7 +33,7 @@ start_eth0() {
         sleep 1
         count=$(($count + 1))
     done
-    
+
     if ! ifconfig eth0 >/dev/null 2>&1; then
         echo "eth0: no device"
         return # no device
@@ -32,27 +41,43 @@ start_eth0() {
 
     # bring it up
     ifconfig eth0 up
-    
+
     # wait for carrier
     count=0
     while [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" != "1" ] && [ $count -lt 3 ]; do
         sleep 1
         count=$(($count + 1))
     done
-    
+
     if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" != "1" ]; then
         echo "eth0: no carrier"
         return # no carrier
     fi
-    
-    echo "eth0: starting dhclient"
-    dhclient -cf "/var/cache/dhclient.conf" eth0
+
+    if [ -n "$static_ip" ]; then
+        echo "eth0: setting static IP to $static_ip"
+        ifconfig eth0 $static_ip up
+        static_ip="" # won't be used again
+    else    
+        echo "eth0: starting dhclient"
+        dhclient -cf "$config" eth0
+    fi
 }
 
 start() {
     start_lo
     start_wlan0
     start_eth0
+    
+    if [ -n "$static_gw" ]; then
+        echo "setting static gateway to $static_gw"
+        ip route add default via $static_gw
+    fi
+    
+    if [ -n "$static_dns" ]; then
+        echo "setting static DNS server to $static_dns"
+        echo "nameserver $static_dns" > /etc/resolv.conf
+    fi
 
     # print the current network configuration
     ifconfig -a

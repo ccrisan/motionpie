@@ -22,7 +22,7 @@ function msg() {
     echo ":: $1"
 }
 
-while getopts "d:i:ln:o:" o; do
+while getopts "d:i:ln:o:s:" o; do
     case "$o" in
         d)
             SDCARD_DEV=$OPTARG
@@ -158,6 +158,10 @@ fi
 
 if [ -n "$IP" ] && [ -n "$GW" ] && [ -n "$DNS" ]; then
     msg "setting static IP configuration"
+    conf=$ROOT/etc/init.d/S40network
+    sed -i "s%static_ip=\"\"%static_ip=\"$IP\"%" $conf
+    sed -i "s%static_gw=\"\"%static_gw=\"$GW\"%" $conf
+    sed -i "s%static_dns=\"\"%static_dns=\"$DNS\"%" $conf
 fi
 
 msg "unmounting sdcard"

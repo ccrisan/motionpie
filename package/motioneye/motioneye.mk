@@ -36,6 +36,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     # version & name
     sed -r -i "s%VERSION = '[a-bA-B0-9.]+'%VERSION = '$(MOTIONPIE_VERSION)'%" $(DST_DIR)/motioneye.py
     sed -i "s%>motionEye<%>motionPie<%" $(DST_DIR)/templates/main.html
+    sed -i "s%}motionEye{%}motionPie{%" $(DST_DIR)/templates/main.html
     sed -i "s%motionEye is up to date%motionPie is up to date%" $(DST_DIR)/static/js/main.js
     sed -i "s%motionEye was successfully updated%motionPie was successfully updated%" $(DST_DIR)/static/js/main.js
     sed -r -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js

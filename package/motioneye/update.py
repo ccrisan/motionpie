@@ -167,6 +167,12 @@ def perform_update(version):
 
     download(version)
     
+    logging.info('backing up /boot/config.txt')
+    if os.system('/bin/cp /boot/config.txt /tmp/config.txt'):
+        logging.error('failed to backup /boot/config.txt')
+
+        raise Exception('failed to backup /boot/config.txt')
+    
     logging.info('unmounting boot partition...')
     if os.system('/bin/umount /boot'):
         logging.error('failed to unmount boot partition')
@@ -190,6 +196,12 @@ def perform_update(version):
     
         raise Exception('failed to mount boot partition')
 
+    logging.info('restoring up /boot/config.txt')
+    if os.system('/bin/cp /tmp/config.txt /boot/config.txt'):
+        logging.error('failed to restore /boot/config.txt')
+
+        raise Exception('failed to restore /boot/config.txt')
+    
     logging.info('preparing to boot in fwupdate mode...')
     try:
         config_lines = [c.strip() for c in open('/boot/config.txt', 'r').readlines() if c.strip()]

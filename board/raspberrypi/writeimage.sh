@@ -1,17 +1,27 @@
 #!/bin/bash -e
 
-test "root" != "$USER" && exec sudo $0 "$@"
 
 function usage() {
-    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-n ssid:psk]" 1>&2
+    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-l] [-n ssid:psk] [-o none|modest|medium|high|turbo]" 1>&2
+    echo "    -d sdcard_dev - indicates the path to the sdcard block device"
+    echo "    -i image_file - indicates the path to the image file"
+    echo "    -l - disables the LED of the CSI camera module"
+    echo "    -n ssid:psk - sets the wireless network name and key"
+    echo "    -o none|modest|medium|high|turbo - overclocks the PI according to a preset"
     exit 1
 }
+
+if [ -z "$1" ]; then
+    usage
+fi
+
+test "root" != "$USER" && exec sudo $0 "$@"
 
 function msg() {
     echo ":: $1"
 }
 
-while getopts "d:i:n:" o; do
+while getopts "d:i:ln:o:" o; do
     case "$o" in
         d)
             SDCARD_DEV=$OPTARG
@@ -19,10 +29,16 @@ while getopts "d:i:n:" o; do
         i)
             DISK_IMG=$OPTARG
             ;;
+        l)
+            DISABLE_LED=true
+            ;;
         n)
             IFS=":" NETWORK=($OPTARG)
             SSID=${NETWORK[0]}
             PSK=${NETWORK[1]}
+            ;;
+        o)
+            OC_PRESET=$OPTARG
             ;;
         *)
             usage
@@ -43,6 +59,7 @@ function cleanup {
 
 trap cleanup EXIT
 
+BOOT=$(dirname $0)/.boot
 ROOT=$(dirname $0)/.root
 
 if ! [ -f $DISK_IMG ]; then
@@ -55,15 +72,71 @@ msg "writing disk image to sdcard"
 dd if=$DISK_IMG of=$SDCARD_DEV bs=1M
 sync
 
-if [ -n "$SSID" ]; then
-    msg "mounting sdcard"
-    mkdir -p $ROOT
-    ROOT_DEV=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
-    if ! [ -e ${SDCARD_DEV}p2 ]; then
-        ROOT_DEV=${SDCARD_DEV}2 # e.g. /dev/sdc2
-    fi
-    mount $ROOT_DEV $ROOT
+msg "mounting sdcard"
+mkdir -p $BOOT
+mkdir -p $ROOT
+BOOT_DEV=${SDCARD_DEV}p1 # e.g. /dev/mmcblk0p1
+ROOT_DEV=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
+if ! [ -e ${SDCARD_DEV}p1 ]; then
+    BOOT_DEV=${SDCARD_DEV}1 # e.g. /dev/sdc1
+    ROOT_DEV=${SDCARD_DEV}2 # e.g. /dev/sdc2
+fi
+mount $BOOT_DEV $BOOT
+mount $ROOT_DEV $ROOT
 
+if [ -n "$DISABLE_LED" ]; then
+    msg "disabling camera LED"
+    echo "disable_camera_led=1" >> $BOOT/config.txt
+fi
+
+if [ -n "$OC_PRESET" ]; then
+    msg "setting overclocking to $OC_PRESET"
+    case $OC_PRESET in
+        none)
+            ARM_FREQ="700"
+            CORE_FREQ="250"
+            SDRAM_FREQ="400"
+            OVER_VOLTAGE="0"
+            ;;
+
+        modest)
+            ARM_FREQ="800"
+            CORE_FREQ="250"
+            SDRAM_FREQ="400"
+            OVER_VOLTAGE="0"
+            ;;
+
+        medium)
+            ARM_FREQ="900"
+            CORE_FREQ="250"
+            SDRAM_FREQ="450"
+            OVER_VOLTAGE="2"
+            ;;
+
+        high)
+            ARM_FREQ="950"
+            CORE_FREQ="250"
+            SDRAM_FREQ="450"
+            OVER_VOLTAGE="6"
+            ;;
+
+        turbo)
+            ARM_FREQ="1000"
+            CORE_FREQ="500"
+            SDRAM_FREQ="600"
+            OVER_VOLTAGE="6"
+            ;;
+    esac
+
+    if [ -n "$ARM_FREQ" ]; then
+        sed -Ei "s/arm_freq=[[:digit:]]+/arm_freq=$ARM_FREQ/" $BOOT/config.txt
+        sed -Ei "s/core_freq=[[:digit:]]+/core_freq=$CORE_FREQ/" $BOOT/config.txt
+        sed -Ei "s/sdram_freq=[[:digit:]]+/sdram_freq=$SDRAM_FREQ/" $BOOT/config.txt
+        sed -Ei "s/over_voltage=[[:digit:]]+/over_voltage=$OVER_VOLTAGE/" $BOOT/config.txt
+    fi
+fi
+
+if [ -n "$SSID" ]; then
     msg "creating wireless configuration"
     conf=$ROOT/etc/wpa_supplicant.conf
     echo "update_config=1" > $conf
@@ -74,12 +147,14 @@ if [ -n "$SSID" ]; then
         echo "    psk=\"$PSK\"" >> $conf
     fi
     echo -e "}\n" >> $conf
-    sync
-    
-    msg "unmounting sdcard"
-    umount $ROOT
-    rmdir $ROOT
 fi
+
+msg "unmounting sdcard"
+sync
+umount $BOOT
+umount $ROOT
+rmdir $BOOT
+rmdir $ROOT
 
 msg "you can now remove the sdcard"
 

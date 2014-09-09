@@ -2,12 +2,13 @@
 
 
 function usage() {
-    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-l] [-n ssid:psk] [-o none|modest|medium|high|turbo]" 1>&2
-    echo "    -d sdcard_dev - indicates the path to the sdcard block device"
-    echo "    -i image_file - indicates the path to the image file"
+    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-l] [-n ssid:psk] [-o none|modest|medium|high|turbo] [-s ip/cidr:gw:dns]" 1>&2
+    echo "    -d sdcard_dev - indicates the path to the sdcard block device (e.g. -d /dev/mmcblk0)"
+    echo "    -i image_file - indicates the path to the image file (e.g. -i /home/user/Download/motionPie.img)"
     echo "    -l - disables the LED of the CSI camera module"
-    echo "    -n ssid:psk - sets the wireless network name and key"
-    echo "    -o none|modest|medium|high|turbo - overclocks the PI according to a preset"
+    echo "    -n ssid:psk - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
+    echo "    -o none|modest|medium|high|turbo - overclocks the PI according to a preset (e.g. -o high)"
+    echo "    -s ip/cidr:gw:dns - sets a static IP configuration instead of DHCP (e.g. -s 192.168.3.107/24:192.168.3.1:8.8.8.8)"
     exit 1
 }
 
@@ -39,6 +40,12 @@ while getopts "d:i:ln:o:" o; do
             ;;
         o)
             OC_PRESET=$OPTARG
+            ;;
+        s)
+            IFS=":" S_IP=($OPTARG)
+            IP=${S_IP[0]}
+            GW=${S_IP[1]}
+            DNS=${S_IP[2]}
             ;;
         *)
             usage
@@ -147,6 +154,10 @@ if [ -n "$SSID" ]; then
         echo "    psk=\"$PSK\"" >> $conf
     fi
     echo -e "}\n" >> $conf
+fi
+
+if [ -n "$IP" ] && [ -n "$GW" ] && [ -n "$DNS" ]; then
+    msg "setting static IP configuration"
 fi
 
 msg "unmounting sdcard"

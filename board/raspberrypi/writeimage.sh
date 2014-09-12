@@ -158,10 +158,10 @@ fi
 
 if [ -n "$IP" ] && [ -n "$GW" ] && [ -n "$DNS" ]; then
     msg "setting static IP configuration"
-    conf=$ROOT/etc/init.d/S40network
-    sed -i "s%static_ip=\"\"%static_ip=\"$IP\"%" $conf
-    sed -i "s%static_gw=\"\"%static_gw=\"$GW\"%" $conf
-    sed -i "s%static_dns=\"\"%static_dns=\"$DNS\"%" $conf
+    conf=$ROOT/etc/static_ip.conf
+    echo "static_ip=\"$IP\"" > $conf
+    echo "static_gw=\"$GW\"" >> $conf
+    echo "static_dns=\"$DNS\"" >> $conf
 fi
 
 msg "unmounting sdcard"

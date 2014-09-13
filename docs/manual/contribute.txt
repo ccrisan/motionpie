@@ -1,7 +1,7 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-= Contributing to Buildroot
+== Contributing to Buildroot
 
 There are many ways in which you can contribute to Buildroot: analyzing
 and fixing bugs, analyzing and fixing package build failures detected by
@@ -14,7 +14,7 @@ If you are interested in contributing to Buildroot, the first thing you
 should do is to subscribe to the Buildroot mailing list. This list is
 the main way of interacting with other Buildroot developers and to send
 contributions to. If you aren't subscribed yet, then refer to
-xref:mailing-list-subscribe[].
+xref:community-resources[] for the subscription link.
 
 If you are going to touch the code, it is highly recommended to use a
 git repository of Buildroot, rather than starting from an extracted
@@ -22,7 +22,7 @@ source code tarball. Git is the easiest way to develop from and directly
 send your patches to the mailing list. Refer to xref:getting-buildroot[]
 for more information on obtaining a Buildroot git tree.
 
-== Reproducing, analyzing and fixing bugs
+=== Reproducing, analyzing and fixing bugs
 
 A first way of contributing is to have a look at the open bug reports in
 the https://bugs.busybox.net/buglist.cgi?product=buildroot[Buildroot bug
@@ -31,7 +31,7 @@ help in reproducing, analyzing and fixing reported bugs is more than
 welcome. Don't hesitate to add a comment to bug reports reporting your
 findings, even if you don't yet see the full picture.
 
-== Analyzing and fixing autobuild failures
+=== Analyzing and fixing autobuild failures
 
 The Buildroot autobuilders are a set of build machines that continuously
 run Buildroot builds based on random configurations. This is done for
@@ -76,7 +76,7 @@ basically two things that can be done:
 Fixes http://autobuild.buildroot.org/results/51000a9d4656afe9e0ea6f07b9f8ed374c2e4069
 ---------------------
 
-== Reviewing and testing patches
+=== Reviewing and testing patches
 
 With the amount of patches sent to the mailing list each day, the
 maintainer has a very hard job to judge which patches are ready to apply
@@ -142,7 +142,30 @@ Buildroot's Patchwork website can be used to pull in patches for testing
 purposes. Please see xref:apply-patches-patchwork[] for more
 information on using Buildroot's Patchwork website to apply patches.
 
-== Work on items from the TODO list
+[[apply-patches-patchwork]]
+==== Applying Patches from Patchwork
+
+The main use of Buildroot's Patchwork website for a developer is for
+pulling in patches into their local git repository for testing
+purposes.
+
+When browsing patches in the patchwork management interface, an +mbox+
+link is provided at the top of the page. Copy this link address and
+run the following commands:
+
+---------------------
+$ git checkout -b <test-branch-name>
+$ wget -O - <mbox-url> | git am
+---------------------
+
+Another option for applying patches is to create a bundle. A bundle is
+a set of patches that you can group together using the patchwork
+interface. Once the bundle is created and the bundle is made public,
+you can copy the +mbox+ link for the bundle and apply the bundle
+using the above commands.
+
+
+=== Work on items from the TODO list
 
 If you want to contribute to Buildroot but don't know where to start,
 and you don't like any of the above topics, you can always work on items
@@ -152,7 +175,7 @@ Do edit the wiki to indicate when you start working on an item, so we
 avoid duplicate efforts.
 
 [[submitting-patches]]
-== Submitting patches
+=== Submitting patches
 
 [NOTE]
 _Please, do not attach patches to bugs, send them to the mailing list
@@ -196,7 +219,7 @@ If you do not use +git send-email+, make sure posted *patches are not
 line-wrapped*, otherwise they cannot easily be applied. In such a case,
 fix your e-mail client, or better yet, learn to use +git send-email+.
 
-=== Cover letter
+==== Cover letter
 
 If you want to present the whole patch set in a separate mail, add
 +--cover-letter+ to the +git format-patch+ command (see +man
@@ -215,13 +238,16 @@ in the following cases:
 * whenever you feel it will help presenting your work, your choices,
   the review process, etc.
 
-=== Patch revision changelog
+==== Patch revision changelog
 
 When improvements are requested, the new revision of each commit
 should include a changelog of the modifications between each
 submission. Note that when your patch series is introduced by a cover
 letter, an overall changelog may be added to the cover letter in
 addition to the changelog in the individual commits.
+The best thing to rework a patch series is by interactive rebasing:
++git rebase -i origin/master+. Consult the git manual for more
+information.
 
 When added to the individual commits, this changelog is added when
 editing the commit message.  Below the +Signed-off-by+ section, add
@@ -269,19 +295,19 @@ This can be easily handled with +git format-patch+ by using the option
 
 ---------------------
 $ git format-patch --subject-prefix "PATCH v4" \
-    -M -o outgoing origin/master
+    -M -s -o outgoing origin/master
 ---------------------
 
 [[reporting-bugs]]
-== Reporting issues/bugs or getting help
+=== Reporting issues/bugs or getting help
 
-Before reporting any issue, please check
-xref:mailing-list-subscribe[the mailing list archive] in case someone has
-already reported and fixed a similar problem.
+Before reporting any issue, please check in
+xref:community-resources[the mailing list archive] whether someone has
+already reported and/or fixed a similar problem.
 
 However you choose to report bugs or get help, either by
-xref:bugtracker[opening a bug] or by
-xref:mailing-list-subscribe[sending a mail to the mailing list], there are
+opening a bug in the xref:community-resources[bug tracker] or by
+xref:community-resources[sending a mail to the mailing list], there are
 a number of details to provide in order to help people reproduce and
 find a solution to the issue.
 

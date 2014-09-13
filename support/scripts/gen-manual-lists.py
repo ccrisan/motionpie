@@ -75,8 +75,6 @@ def get_symbol_subset(root, filter_func):
         raise Exception(message)
     for item in get_items():
         if item.is_symbol():
-            if not item.prompts:
-                continue
             if not filter_func(item):
                 continue
             yield item
@@ -111,52 +109,33 @@ def get_symbol_parents(item, root=None, enable_choice=False):
 
 
 def format_asciidoc_table(root, get_label_func, filter_func=lambda x: True,
-                          enable_choice=False, sorted=True, sub_menu=True,
+                          format_func=lambda x: x,
+                          enable_choice=False, sorted=True,
                           item_label=None):
     """ Return the asciidoc formatted table of the items and their location.
 
     :param root:           Root item of the item subset
     :param get_label_func: Item's label getter function
     :param filter_func:    Filter function to apply on the item subset
+    :param format_func:    Function to format a symbol and the table header
     :param enable_choice:  Enable choices to appear as part of the item's
                            location
     :param sorted:         Flag to alphabetically sort the table
-    :param sub_menu:       Output the column with the sub-menu path
 
     """
-    def _format_entry(item, parents, sub_menu):
-        """ Format an asciidoc table entry.
 
-        """
-        if sub_menu:
-            return "| {0:<40} <| {1}\n".format(item, " -> ".join(parents))
-        else:
-            return "| {0:<40}\n".format(item)
     lines = []
     for item in get_symbol_subset(root, filter_func):
-        if not item.is_symbol() or not item.prompts:
-            continue
-        loc = get_symbol_parents(item, root, enable_choice=enable_choice)
-        lines.append(_format_entry(get_label_func(item), loc, sub_menu))
+        lines.append(format_func(what="symbol", symbol=item, root=root,
+                                 get_label_func=get_label_func,
+                                 enable_choice=enable_choice))
     if sorted:
         lines.sort(key=lambda x: x.lower())
-    if hasattr(root, "get_title"):
-        loc_label = get_symbol_parents(root, None, enable_choice=enable_choice)
-        loc_label += [root.get_title(), "..."]
-    else:
-        loc_label = ["Location"]
-    if not item_label:
-        item_label = "Items"
     table = ":halign: center\n\n"
-    if sub_menu:
-        width = "100%"
-        columns = "^1,4"
-    else:
-        width = "30%"
-        columns = "^1"
+    width, columns = format_func(what="layout")
     table = "[width=\"{0}\",cols=\"{1}\",options=\"header\"]\n".format(width, columns)
     table += "|===================================================\n"
-    table += _format_entry(item_label, loc_label, sub_menu)
+    table += format_func(what="header", header=item_label, root=root)
     table += "\n" + "".join(lines) + "\n"
     table += "|===================================================\n"
     return table
@@ -183,23 +162,30 @@ class Buildroot:
         'target-packages': {
             'filename': "package-list",
             'root_menu': "Target packages",
-            'filter': "_is_package",
+            'filter': "_is_real_package",
+            'format': "_format_symbol_prompt_location",
             'sorted': True,
-            'sub_menu': True,
         },
         'host-packages': {
             'filename': "host-package-list",
             'root_menu': "Host utilities",
-            'filter': "_is_package",
+            'filter': "_is_real_package",
+            'format': "_format_symbol_prompt",
             'sorted': True,
-            'sub_menu': False,
+        },
+        'virtual-packages': {
+            'filename': "virtual-package-list",
+            'root_menu': "Target packages",
+            'filter': "_is_virtual_package",
+            'format': "_format_symbol_virtual",
+            'sorted': True,
         },
         'deprecated': {
             'filename': "deprecated-list",
             'root_menu': None,
             'filter': "_is_deprecated",
+            'format': "_format_symbol_prompt_location",
             'sorted': False,
-            'sub_menu': True,
         },
     }
 
@@ -238,14 +224,25 @@ class Buildroot:
         return bool([ symbol for x in symbol.get_referenced_symbols()
             if x.get_name().startswith(self._deprecated.get_name()) ])
 
-    def _is_package(self, symbol):
+    def _is_package(self, symbol, type='real'):
         """ Return True if the symbol is a package or a host package, otherwise
         False.
 
+        :param symbol:  The symbol to check
+        :param type:    Limit to 'real' or 'virtual' types of packages,
+                        with 'real' being the default.
+                        Note: only 'real' is (implictly) handled for now
+
         """
+        if not symbol.is_symbol():
+            return False
+        if type == 'real' and not symbol.prompts:
+            return False
+        if type == 'virtual' and symbol.prompts:
+            return False
         if not self.re_pkg_prefix.match(symbol.get_name()):
             return False
-        pkg_name = re.sub("BR2_PACKAGE_(HOST_)?(.*)", r"\2", symbol.get_name())
+        pkg_name = self._get_pkg_name(symbol)
 
         pattern = "^(HOST_)?" + pkg_name + "$"
         pattern = re.sub("_", ".", pattern)
@@ -274,9 +271,44 @@ class Buildroot:
                     pkg_list.append(re.sub(r"(.*?)\.mk", r"\1", file_))
             setattr(self, "_package_list", pkg_list)
         for pkg in getattr(self, "_package_list"):
-            if pattern.match(pkg):
+            if type == 'real':
+                if pattern.match(pkg) and not self._exists_virt_symbol(pkg):
+                    return True
+            if type == 'virtual':
+                if pattern.match('has_' + pkg):
+                    return True
+        return False
+
+    def _is_real_package(self, symbol):
+        return self._is_package(symbol, 'real')
+
+    def _is_virtual_package(self, symbol):
+        return self._is_package(symbol, 'virtual')
+
+    def _exists_virt_symbol(self, pkg_name):
+        """ Return True if a symbol exists that defines the package as
+        a virtual package, False otherwise
+
+        :param pkg_name:    The name of the package, for which to check if
+                            a symbol exists defining it as a virtual package
+
+        """
+        virt_pattern = "BR2_PACKAGE_HAS_" + pkg_name + "$"
+        virt_pattern = re.sub("_", ".", virt_pattern)
+        virt_pattern = re.compile(virt_pattern, re.IGNORECASE)
+        for sym in self.config:
+            if virt_pattern.match(sym.get_name()):
                 return True
         return False
+
+    def _get_pkg_name(self, symbol):
+        """ Return the package name of the specified symbol.
+
+        :param symbol:      The symbol to get the package name of
+
+        """
+
+        return re.sub("BR2_PACKAGE_(HOST_)?(.*)", r"\2", symbol.get_name())
 
     def _get_symbol_label(self, symbol, mark_deprecated=True):
         """ Return the label (a.k.a. prompt text) of the symbol.
@@ -289,6 +321,110 @@ class Buildroot:
         if self._is_deprecated(symbol) and mark_deprecated:
             label += " *(deprecated)*"
         return label
+
+    def _format_symbol_prompt(self, what=None, symbol=None, root=None,
+                                    enable_choice=False, header=None,
+                                    get_label_func=lambda x: x):
+        if what == "layout":
+            return ( "30%", "^1" )
+
+        if what == "header":
+            return "| {0:<40}\n".format(header)
+
+        if what == "symbol":
+            return "| {0:<40}\n".format(get_label_func(symbol))
+
+        message = "Invalid argument 'what': '%s'\n" % str(what)
+        message += "Allowed values are: 'layout', 'header' and 'symbol'"
+        raise Exception(message)
+
+    def _format_symbol_prompt_location(self, what=None, symbol=None, root=None,
+                                             enable_choice=False, header=None,
+                                             get_label_func=lambda x: x):
+        if what == "layout":
+            return ( "100%", "^1,4" )
+
+        if what == "header":
+            if hasattr(root, "get_title"):
+                loc_label = get_symbol_parents(root, None, enable_choice=enable_choice)
+                loc_label += [root.get_title(), "..."]
+            else:
+                loc_label = ["Location"]
+            return "| {0:<40} <| {1}\n".format(header, " -> ".join(loc_label))
+
+        if what == "symbol":
+            parents = get_symbol_parents(symbol, root, enable_choice)
+            return "| {0:<40} <| {1}\n".format(get_label_func(symbol),
+                                               " -> ".join(parents))
+
+        message = "Invalid argument 'what': '%s'\n" % str(what)
+        message += "Allowed values are: 'layout', 'header' and 'symbol'"
+        raise Exception(message)
+
+    def _format_symbol_virtual(self, what=None, symbol=None, root=None,
+                                     enable_choice=False, header=None,
+                                     get_label_func=lambda x: "?"):
+        def _symbol_is_legacy(symbol):
+            selects = [ s.get_name() for s in symbol.get_selected_symbols() ]
+            return ("BR2_LEGACY" in selects)
+
+        def _get_parent_package(sym):
+            if self._is_real_package(sym):
+                return None
+            # Trim the symbol name from its last component (separated with
+            # underscores), until we either find a symbol which is a real
+            # package, or until we have no component (i.e. just 'BR2')
+            name = sym.get_name()
+            while name != "BR2":
+                name = name.rsplit("_", 1)[0]
+                s = self.config.get_symbol(name)
+                if s is None:
+                    continue
+                if self._is_real_package(s):
+                    return s
+            return None
+
+        def _get_providers(symbol):
+            providers = list()
+            for sym in self.config:
+                if not sym.is_symbol():
+                    continue
+                if _symbol_is_legacy(sym):
+                    continue
+                selects = sym.get_selected_symbols()
+                if not selects:
+                    continue
+                for s in selects:
+                    if s == symbol:
+                        if sym.prompts:
+                            l = self._get_symbol_label(sym,False)
+                            parent_pkg = _get_parent_package(sym)
+                            if parent_pkg is not None:
+                                l = self._get_symbol_label(parent_pkg, False) \
+                                  + " (w/ " + l + ")"
+                            providers.append(l)
+                        else:
+                            providers.extend(_get_providers(sym))
+            return providers
+
+        if what == "layout":
+            return ( "100%", "^1,4,4" )
+
+        if what == "header":
+            return "| {0:<20} <| {1:<32} <| Providers\n".format("Virtual packages", "Symbols")
+
+        if what == "symbol":
+            pkg = re.sub(r"^BR2_PACKAGE_HAS_(.+)$", r"\1", symbol.get_name())
+            providers = _get_providers(symbol)
+
+            return "| {0:<20} <| {1:<32} <| {2}\n".format(pkg.lower(),
+                                                          '+' + symbol.get_name() + '+',
+                                                          ", ".join(providers))
+
+        message = "Invalid argument 'what': '%s'\n" % str(what)
+        message += "Allowed values are: 'layout', 'header' and 'symbol'"
+        raise Exception(message)
+
 
     def print_list(self, list_type, enable_choice=True, enable_deprecated=True,
                    dry_run=False, output=None):
@@ -322,6 +458,7 @@ class Buildroot:
             root_item = self.config
         filter_ = getattr(self, list_config.get('filter'))
         filter_func = lambda x: filter_(x)
+        format_func = getattr(self, list_config.get('format'))
         if not enable_deprecated and list_type != "deprecated":
             filter_func = lambda x: filter_(x) and not self._is_deprecated(x)
         mark_depr = list_type != "deprecated"
@@ -330,9 +467,9 @@ class Buildroot:
 
         table = format_asciidoc_table(root_item, get_label,
                                       filter_func=filter_func,
+                                      format_func=format_func,
                                       enable_choice=enable_choice,
                                       sorted=list_config.get('sorted'),
-                                      sub_menu=list_config.get('sub_menu'),
                                       item_label=item_label)
 
         content = self.list_in.format(table=table)
@@ -357,7 +494,7 @@ class Buildroot:
 
 
 if __name__ == '__main__':
-    list_types = ['target-packages', 'host-packages', 'deprecated']
+    list_types = ['target-packages', 'host-packages', 'virtual-packages', 'deprecated']
     parser = ArgumentParser()
     parser.add_argument("list_type", nargs="?", choices=list_types,
                         help="""\
@@ -368,6 +505,8 @@ Generate the given list (generate all lists if unspecified)""")
                         help="Output target package file")
     parser.add_argument("--output-host", dest="output_host",
                         help="Output host package file")
+    parser.add_argument("--output-virtual", dest="output_virtual",
+                        help="Output virtual package file")
     parser.add_argument("--output-deprecated", dest="output_deprecated",
                         help="Output deprecated file")
     args = parser.parse_args()

@@ -5,7 +5,7 @@
 ################################################################################
 
 VALGRIND_VERSION = 3.9.0
-VALGRIND_SITE    = http://valgrind.org/downloads/
+VALGRIND_SITE    = http://valgrind.org/downloads
 VALGRIND_SOURCE  = valgrind-$(VALGRIND_VERSION).tar.bz2
 VALGRIND_LICENSE = GPLv2 GFDLv1.2
 VALGRIND_LICENSE_FILES = COPYING COPYING.DOCS
@@ -23,7 +23,7 @@ VALGRIND_CONF_OPT += \
 endif
 
 define VALGRIND_INSTALL_UCLIBC_SUPP
-	install -D -m 0644 package/valgrind/uclibc.supp $(TARGET_DIR)/usr/lib/valgrind/uclibc.supp
+	$(INSTALL) -D -m 0644 package/valgrind/uclibc.supp $(TARGET_DIR)/usr/lib/valgrind/uclibc.supp
 endef
 
 VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_INSTALL_UCLIBC_SUPP

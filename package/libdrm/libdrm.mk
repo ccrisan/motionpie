@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-LIBDRM_VERSION = 2.4.54
+LIBDRM_VERSION = 2.4.56
 LIBDRM_SOURCE = libdrm-$(LIBDRM_VERSION).tar.bz2
-LIBDRM_SITE = http://dri.freedesktop.org/libdrm/
+LIBDRM_SITE = http://dri.freedesktop.org/libdrm
 LIBDRM_LICENSE = MIT
 
 LIBDRM_INSTALL_STAGING = YES
@@ -67,6 +67,10 @@ LIBDRM_CONF_OPT += --enable-udev
 LIBDRM_DEPENDENCIES += udev
 else
 LIBDRM_CONF_OPT += --disable-udev
+endif
+
+ifeq ($(BR2_PACKAGE_LIBDRM_INSTALL_TESTS),y)
+LIBDRM_CONF_OPT += --enable-install-test-programs
 endif
 
 $(eval $(autotools-package))

@@ -14,7 +14,7 @@ else ifeq ($(BR2_TARGET_MXS_BOOTLETS_CUSTOM_GIT),y)
 	MXS_BOOTLETS_VERSION = $(call qstrip,$(BR2_TARGET_MXS_BOOTLETS_CUSTOM_GIT_VERSION))
 else
 	MXS_BOOTLETS_VERSION = 10.12.01
-	MXS_BOOTLETS_SITE = http://download.ossystems.com.br/bsp/freescale/source/
+	MXS_BOOTLETS_SITE = http://download.ossystems.com.br/bsp/freescale/source
 	MXS_BOOTLETS_SOURCE = imx-bootlets-src-$(MXS_BOOTLETS_VERSION).tar.gz
 endif
 
@@ -34,6 +34,7 @@ ifeq ($(BR2_TARGET_MXS_BOOTLETS_HAS_IVT),y)
 endif
 
 MXS_BOOTLETS_DEPENDENCIES = host-elftosb
+MXS_BOOTLETS_LICENSE = GPLv2+
 
 ifeq ($(BR2_TARGET_MXS_BOOTLETS_BAREBOX),y)
 MXS_BOOTLETS_DEPENDENCIES += barebox

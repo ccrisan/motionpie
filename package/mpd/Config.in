@@ -7,7 +7,6 @@ menuconfig BR2_PACKAGE_MPD
 	# avr32, sparc & CS powerpc gcc are too old
 	depends on !(BR2_avr32 || BR2_sparc)
 	depends on !(BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201103 || BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201009)
-	depends on !BR2_UCLIBC_VERSION_0_9_32 # lacks signalfd
 	select BR2_PACKAGE_LIBGLIB2
 	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
 	select BR2_PACKAGE_MPD_TREMOR if !(BR2_PACKAGE_MPD_MAD || BR2_PACKAGE_MPD_MPG123 || BR2_PACKAGE_MPD_VORBIS || BR2_PACKAGE_MPD_WAVPACK || BR2_PACKAGE_MPD_FLAC || BR2_PACKAGE_MPD_MUSEPACK || BR2_PACKAGE_MPD_FFMPEG)
@@ -27,7 +26,6 @@ config BR2_PACKAGE_MPD_ALSA
 	select BR2_PACKAGE_ALSA_LIB
 	select BR2_PACKAGE_ALSA_LIB_PCM
 	select BR2_PACKAGE_ALSA_LIB_MIXER
-	depends on BR2_TOOLCHAIN_HAS_THREADS # alsa-lib
 	help
 	  Enable alsa output support.
 
@@ -46,12 +44,15 @@ config BR2_PACKAGE_MPD_AUDIOFILE
 
 config BR2_PACKAGE_MPD_PULSEAUDIO
 	bool "pulseaudio"
-	depends on BR2_TOOLCHAIN_HAS_THREADS # pulseaudio
 	depends on BR2_LARGEFILE # pulseaudio -> libsndfile
-	depends on BR2_USE_MMU # pulseaudio
+	depends on BR2_ARCH_HAS_ATOMICS # pulseaudio
 	select BR2_PACKAGE_PULSEAUDIO
 	help
 	  Enable pulseaudio output support.
+
+comment "pulseaudio support needs a toolchain w/ largefile"
+	depends on BR2_ARCH_HAS_ATOMICS
+	depends on !BR2_LARGEFILE
 
 config BR2_PACKAGE_MPD_BZIP2
 	bool "bzip2"
@@ -97,12 +98,6 @@ config BR2_PACKAGE_MPD_LAME
 	help
 	  Enable lame (mp3) encoding support.
 
-config BR2_PACKAGE_MPD_LIBCUE
-	bool "libcue"
-	select BR2_PACKAGE_LIBCUE
-	help
-	  Enable cue file support.
-
 config BR2_PACKAGE_MPD_LIBSAMPLERATE
 	bool "libsamplerate"
 	select BR2_PACKAGE_LIBSAMPLERATE
@@ -118,7 +113,7 @@ config BR2_PACKAGE_MPD_LIBSNDFILE
 	  Enable libsndfile input/streaming support.
 	  Select this if you want to play back WAV files.
 
-comment "mpd-libsndfile needs a toolchain w/ largefile"
+comment "libsndfile support needs a toolchain w/ largefile"
 	depends on !BR2_LARGEFILE
 
 config BR2_PACKAGE_MPD_MAD
@@ -150,6 +145,7 @@ config BR2_PACKAGE_MPD_MUSEPACK
 config BR2_PACKAGE_MPD_OPUS
 	bool "opus"
 	select BR2_PACKAGE_OPUS
+	select BR2_PACKAGE_LIBOGG
 	help
 	  Enable opus input support.
 	  Select this if you want to play back OPUS encoded files.
@@ -183,6 +179,16 @@ config BR2_PACKAGE_MPD_TREMOR
 	help
 	  Enable vorbis input support.
 	  Select this if you want to play back OGG files on softfloat targets.
+
+config BR2_PACKAGE_MPD_TWOLAME
+	bool "twolame"
+	depends on BR2_LARGEFILE # twolame -> libsndfile
+	select BR2_PACKAGE_TWOLAME
+	help
+	  Enable TwoLAME mp2 encoding.
+
+comment "twolame support needs a toolchain w/ largefile"
+        depends on !BR2_LARGEFILE
 
 config BR2_PACKAGE_MPD_VORBIS
 	bool "vorbis"

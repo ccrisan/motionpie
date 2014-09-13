@@ -7,14 +7,26 @@ config BR2_PACKAGE_ICU
 	# file, and it cannot easily be changed to generate FLAT
 	# format.
 	depends on !BR2_BINFMT_FLAT
-	depends on !BR2_arc # atomic builtins
+	depends on BR2_ARCH_HAS_ATOMICS
 	help
 	  International Components for Unicode.
 
 	  http://site.icu-project.org/
 
+if BR2_PACKAGE_ICU
+
+config BR2_PACKAGE_ICU_CUSTOM_DATA_PATH
+	string "Path to custom data library file"
+	help
+	  This option allows to define the path to a custom data
+	  library generated with
+	  http://apps.icu-project.org/datacustom/ICUData51.html. Leave
+	  empty to not use this functionality.
+
+endif
+
 comment "icu needs a toolchain w/ C++, wchar, threads"
-	depends on !BR2_arc
 	depends on !BR2_BINFMT_FLAT
+	depends on BR2_ARCH_HAS_ATOMICS
 	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_USE_WCHAR || \
 		!BR2_TOOLCHAIN_HAS_THREADS

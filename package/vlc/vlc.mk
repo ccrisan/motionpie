@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VLC_VERSION = 2.1.2
+VLC_VERSION = 2.1.5
 VLC_SITE = http://download.videolan.org/pub/videolan/vlc/$(VLC_VERSION)
 VLC_SOURCE = vlc-$(VLC_VERSION).tar.xz
 VLC_LICENSE = GPLv2+ LGPLv2.1+
@@ -49,8 +49,7 @@ ifeq ($(BR2_PREFER_STATIC_LIB),)
 VLC_CONF_OPT += --disable-static
 endif
 
-# Set powerpc altivec appropriately
-ifeq ($(BR2_powerpc_7400)$(BR2_powerpc_7450)$(BR2_powerpc_970),y)
+ifeq ($(BR2_POWERPC_CPU_HAS_ALTIVEC),y)
 VCL_CONF_OPT += --enable-altivec
 else
 VLC_CONF_OPT += --disable-altivec

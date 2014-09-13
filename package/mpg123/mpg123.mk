@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MPG123_VERSION = 1.18.0
+MPG123_VERSION = 1.20.1
 MPG123_SOURCE = mpg123-$(MPG123_VERSION).tar.bz2
 MPG123_SITE = http://downloads.sourceforge.net/project/mpg123/mpg123/$(MPG123_VERSION)
 MPG123_CONF_OPT = --disable-lfs-alias
@@ -14,8 +14,16 @@ MPG123_LICENSE_FILES = COPYING
 
 MPG123_CPU = $(if $(BR2_SOFT_FLOAT),generic_nofpu,generic_fpu)
 
+ifeq ($(BR2_aarch64),y)
+MPG123_CPU = aarch64
+endif
+
 ifeq ($(BR2_arm),y)
+ifeq ($(or $(BR2_ARM_CPU_HAS_NEON),$(BR2_ARM_CPU_HAS_VFPV2)),y)
+MPG123_CPU = arm_fpu
+else
 MPG123_CPU = arm_nofpu
+endif
 endif
 
 ifeq ($(BR2_i386),y)
@@ -23,13 +31,13 @@ MPG123_CPU = x86
 endif
 
 ifeq ($(BR2_powerpc),y)
-ifneq ($(BR2_powerpc_7400)$(BR2_powerpc_7450)$(BR2_powerpc_970),)
+ifeq ($(BR2_POWERPC_CPU_HAS_ALTIVEC),y)
 MPG123_CPU = altivec
 endif
 ifeq ($(BR2_SOFT_FLOAT),y)
 MPG123_CPU = ppc_nofpu
 endif
-endif
+endif # powerpc
 
 ifeq ($(BR2_x86_64),y)
 MPG123_CPU = x86-64

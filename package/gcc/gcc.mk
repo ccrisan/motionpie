@@ -16,9 +16,9 @@ GCC_SNAP_DATE = $(call qstrip,$(BR2_GCC_SNAP_DATE))
 endif
 
 ifneq ($(GCC_SNAP_DATE),)
-GCC_SITE = ftp://gcc.gnu.org/pub/gcc/snapshots/$(GCC_SNAP_DATE)/
+GCC_SITE = ftp://gcc.gnu.org/pub/gcc/snapshots/$(GCC_SNAP_DATE)
 else ifeq ($(findstring avr32,$(GCC_VERSION)),avr32)
-GCC_SITE = ftp://www.at91.com/pub/buildroot/
+GCC_SITE = ftp://www.at91.com/pub/buildroot
 else ifeq ($(BR2_arc),y)
 GCC_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,gcc,$(GCC_VERSION))
 GCC_SOURCE = gcc-$(GCC_VERSION).tar.gz
@@ -152,6 +152,13 @@ endif
 ifeq ($(BR2_GCC_NEEDS_MPC),y)
 HOST_GCC_COMMON_DEPENDENCIES += host-mpc
 HOST_GCC_COMMON_CONF_OPT += --with-mpc=$(HOST_DIR)/usr
+endif
+
+ifeq ($(BR2_GCC_ENABLE_GRAPHITE),y)
+HOST_GCC_COMMON_DEPENDENCIES += host-isl host-cloog
+HOST_GCC_COMMON_CONF_OPT += --with-isl=$(HOST_DIR)/usr --with-cloog=$(HOST_DIR)/usr
+else
+HOST_GCC_COMMON_CONF_OPT += --without-isl --without-cloog
 endif
 
 ifneq ($(BR2_arc)$(BR2_GCC_VERSION_SNAP),)

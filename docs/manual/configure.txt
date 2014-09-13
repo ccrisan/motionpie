@@ -2,12 +2,27 @@
 // vim: set syntax=asciidoc:
 
 [[configure]]
-== Details on Buildroot configuration
+== Buildroot configuration
 
 All the configuration options in +make *config+ have a help text
-providing details about the option. However, a number of topics
-require additional details that cannot easily be covered in the help
-text and are there covered in the following sections.
+providing details about the option.
+
+The +make *config+ commands also offer a search tool. Read the help
+message in the different frontend menus to know how to use it:
+
+* in _menuconfig_, the search tool is called by pressing +/+;
+* in _xconfig_, the search tool is called by pressing +Ctrl+ + +f+.
+
+The result of the search shows the help message of the matching items.
+In _menuconfig_, numbers in the left column provide a shortcut to the
+corresponding entry. Just type this number to directly jump to the
+entry, or to the containing menu in case the entry is not selectable due
+to a missing dependency.
+
+Although the menu structure and the help text of the entries should be
+sufficiently self-explanatory, a number of topics require additional
+explanation that cannot easily be covered in the help text and are
+therefore covered in the following sections.
 
 === Cross-compilation toolchain
 
@@ -215,6 +230,20 @@ Drawbacks of this backend:
   fix from the toolchain vendor, unless you build your external
   toolchain by yourself using Crosstool-NG.
 
+===== External toolchain wrapper
+
+When using an external toolchain, Buildroot generates a wrapper program,
+that transparently passes the appropriate options (according to the
+configuration) to the external toolchain programs. In case you need to
+debug this wrapper to check exactly what arguments are passed, you can
+set the environment variable +BR2_DEBUG_WRAPPER+ to either one of:
+
+* +0+, empty or not set: no debug
+
+* +1+: trace all arguments on a single line
+
+* +2+: trace one argument per line
+
 === /dev management
 
 On a Linux system, the +/dev+ directory contains special files, called
@@ -230,7 +259,7 @@ different solutions to handle the +/dev+ directory :
  * The first solution is *Static using device table*. This is the old
    classical way of handling device files in Linux. With this method,
    the device files are persistently stored in the root filesystem
-   (i.e. they persist accross reboots), and there is nothing that will
+   (i.e. they persist across reboots), and there is nothing that will
    automatically create and remove those device files when hardware
    devices are added or removed from the system. Buildroot therefore
    creates a standard set of device files using a _device table_, the
@@ -257,14 +286,14 @@ different solutions to handle the +/dev+ directory :
    possible to use this option). When mounted in +/dev+, this virtual
    filesystem will automatically make _device files_ appear and
    disappear as hardware devices are added and removed from the
-   system. This filesystem is not persistent accross reboots: it is
+   system. This filesystem is not persistent across reboots: it is
    filled dynamically by the kernel. Using _devtmpfs_ requires the
    following kernel configuration options to be enabled:
    +CONFIG_DEVTMPFS+ and +CONFIG_DEVTMPFS_MOUNT+. When Buildroot is in
    charge of building the Linux kernel for your embedded device, it
    makes sure that those two options are enabled. However, if you
    build your Linux kernel outside of Buildroot, then it is your
-   responsability to enable those two options (if you fail to do so,
+   responsibility to enable those two options (if you fail to do so,
    your Buildroot system will not boot).
 
  * The third solution is *Dynamic using mdev*. This method also relies
@@ -272,7 +301,7 @@ different solutions to handle the +/dev+ directory :
    requirement to have +CONFIG_DEVTMPFS+ and +CONFIG_DEVTMPFS_MOUNT+
    enabled in the kernel configuration still apply), but adds the
    +mdev+ userspace utility on top of it. +mdev+ is a program part of
-   Busybox that the kernel will call every time a device is added or
+   BusyBox that the kernel will call every time a device is added or
    removed. Thanks to the +/etc/mdev.conf+ configuration file, +mdev+
    can be configured to for example, set specific permissions or
    ownership on a device file, call a script or application whenever a
@@ -314,16 +343,16 @@ graphical applications, other network servers, etc.).
 Buildroot allows to use three different types of init systems, which
 can be chosen from +System configuration+, +Init system+:
 
- * The first solution is *Busybox*. Amongst many programs, Busybox has
+ * The first solution is *BusyBox*. Amongst many programs, BusyBox has
    an implementation of a basic +init+ program, which is sufficient
    for most embedded systems. Enabling the +BR2_INIT_BUSYBOX+ will
-   ensure Busybox will build and install its +init+ program. This is
-   the default solution in Buildroot. The Busybox +init+ program will
+   ensure BusyBox will build and install its +init+ program. This is
+   the default solution in Buildroot. The BusyBox +init+ program will
    read the +/etc/inittab+ file at boot to know what to do. The syntax
    of this file can be found in
    http://git.busybox.net/busybox/tree/examples/inittab (note that
-   Busybox +inittab+ syntax is special: do not use a random +inittab+
-   documentation from the Internet to learn about Busybox
+   BusyBox +inittab+ syntax is special: do not use a random +inittab+
+   documentation from the Internet to learn about BusyBox
    +inittab+). The default +inittab+ in Buildroot is stored in
    +system/skeleton/etc/inittab+. Apart from mounting a few important
    filesystems, the main job the default inittab does is to start the
@@ -336,7 +365,7 @@ can be chosen from +System configuration+, +Init system+:
    Linux distributions, until they switched to more recent
    alternatives such as Upstart or Systemd. +sysvinit+ also works with
    an +inittab+ file (which has a slightly different syntax than the
-   one from Busybox). The default +inittab+ installed with this init
+   one from BusyBox). The default +inittab+ installed with this init
    solution is located in +package/sysvinit/inittab+.
 
  * The third solution is *systemd*. +systemd+ is the new generation
@@ -353,5 +382,5 @@ can be chosen from +System configuration+, +Init system+:
    http://www.freedesktop.org/wiki/Software/systemd.
 
 The solution recommended by Buildroot developers is to use the
-*Busybox init* as it is sufficient for most embedded
+*BusyBox init* as it is sufficient for most embedded
 systems. *systemd* can be used for more complex situations.

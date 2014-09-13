@@ -10,11 +10,13 @@ POSTGRESQL_SITE = http://ftp.postgresql.org/pub/source/v$(POSTGRESQL_VERSION)
 POSTGRESQL_LICENSE = PostgreSQL
 POSTGRESQL_LICENSE_FILES = COPYRIGHT
 
+POSTGRESQL_INSTALL_STAGING = YES
+
 ifneq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
 	POSTGRESQL_CONF_OPT += --disable-thread-safety
 endif
 
-ifeq ($(BR2_microblazeel)$(BR2_microblazebe),y)
+ifeq ($(BR2_microblazeel)$(BR2_microblazebe)$(BR2_nios2),y)
 	POSTGRESQL_CONF_OPT += --disable-spinlocks
 endif
 
@@ -49,6 +51,7 @@ endef
 
 define POSTGRESQL_INSTALL_TARGET_FIXUP
 	$(INSTALL) -dm 0700 $(TARGET_DIR)/var/lib/pgsql
+	$(RM) -rf $(TARGET_DIR)/usr/lib/postgresql/pgxs
 endef
 
 POSTGRESQL_POST_INSTALL_TARGET_HOOKS += POSTGRESQL_INSTALL_TARGET_FIXUP

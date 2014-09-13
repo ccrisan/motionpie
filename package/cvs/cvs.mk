@@ -7,7 +7,7 @@
 CVS_VERSION = 1.12.13
 CVS_SOURCE = cvs_$(CVS_VERSION).orig.tar.gz
 CVS_PATCH = cvs_$(CVS_VERSION)-12.diff.gz
-CVS_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/c/cvs/
+CVS_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/c/cvs
 CVS_DEPENDENCIES = ncurses
 
 CVS_CONF_ENV = cvs_cv_func_printf_ptr=yes
@@ -46,7 +46,7 @@ endif
 CVS_POST_PATCH_HOOKS += CVS_DEBIAN_PATCHES
 
 define CVS_INSTALL_TARGET_CMDS
-	install -D $(@D)/src/cvs $(TARGET_DIR)/usr/bin/cvs
+	$(INSTALL) -D $(@D)/src/cvs $(TARGET_DIR)/usr/bin/cvs
 endef
 
 $(eval $(autotools-package))

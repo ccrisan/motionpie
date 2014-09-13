@@ -4,21 +4,27 @@
 #
 ################################################################################
 
-LUAROCKS_VERSION = 2.1.2
-LUAROCKS_SITE = http://luarocks.org/releases/
+LUAROCKS_VERSION = 2.2.0beta1
+LUAROCKS_SITE = http://luarocks.org/releases
 LUAROCKS_LICENSE = MIT
 LUAROCKS_LICENSE_FILES = COPYING
 
-HOST_LUAROCKS_DEPENDENCIES = host-lua
+HOST_LUAROCKS_DEPENDENCIES = host-luainterpreter
 
 LUAROCKS_CONFIG_DIR  = $(HOST_DIR)/usr/etc/luarocks
 LUAROCKS_CONFIG_FILE = $(LUAROCKS_CONFIG_DIR)/config-$(LUAINTERPRETER_ABIVER).lua
 
+HOST_LUAROCKS_CONF_OPT = \
+	--prefix=$(HOST_DIR)/usr \
+	--sysconfdir=$(LUAROCKS_CONFIG_DIR) \
+	--with-lua=$(HOST_DIR)/usr
+
+ifeq ($(BR2_PACKAGE_LUAJIT),y)
+HOST_LUAROCKS_CONF_OPT += --lua-suffix=jit
+endif
+
 define HOST_LUAROCKS_CONFIGURE_CMDS
-	cd $(@D) && ./configure \
-		--prefix=$(HOST_DIR)/usr \
-		--sysconfdir=$(LUAROCKS_CONFIG_DIR) \
-		--with-lua=$(HOST_DIR)/usr
+	cd $(@D) && ./configure $(HOST_LUAROCKS_CONF_OPT)
 endef
 
 define HOST_LUAROCKS_INSTALL_CMDS
@@ -38,9 +44,17 @@ define HOST_LUAROCKS_INSTALL_CMDS
 	echo "gcc_rpath = false"                                >> $(LUAROCKS_CONFIG_FILE)
 	echo "rocks_trees = { [[$(TARGET_DIR)/usr]] }"          >> $(LUAROCKS_CONFIG_FILE)
 	echo "wrap_bin_scripts = false"                         >> $(LUAROCKS_CONFIG_FILE)
+	echo "deps_mode = [[none]]"                             >> $(LUAROCKS_CONFIG_FILE)
 endef
 
 $(eval $(host-generic-package))
 
 LUAROCKS_RUN = LUA_PATH="$(HOST_DIR)/usr/share/lua/$(LUAINTERPRETER_ABIVER)/?.lua" \
-	$(HOST_DIR)/usr/bin/lua $(HOST_DIR)/usr/bin/luarocks
+	$(LUA_RUN) $(HOST_DIR)/usr/bin/luarocks
+
+define LUAROCKS_FINALIZE_TARGET
+	rm -rf $(TARGET_DIR)/usr/lib/luarocks
+endef
+
+TARGET_FINALIZE_HOOKS += LUAROCKS_FINALIZE_TARGET
+

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for cvs, to be called from the download wrapper script
+# Expected arguments:
+#   $1: output file
+#   $2: cvs repo
+#   $3: cvs revision
+#   $4: package's name (eg. foobar)
+#   $5: package's basename (eg. foobar-1.2.3)
+# And this environment:
+#   CVS      : the cvs command to call
+
+output="${1}"
+repo="${2}"
+rev="${3}"
+rawname="${4}"
+basename="${5}"
+
+${CVS} -z3 -d":pserver:anonymous@${repo}" \
+       co -d "${basename}" -r ":${rev}" -P "${rawname}"
+
+tar czf "${output}" "${basename}"

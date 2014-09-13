@@ -16,28 +16,52 @@ Copyright (C) 2004-2014 The Buildroot developers
 
 image::logo.png[]
 
-:leveloffset: 1
+= Getting started
 
 include::introduction.txt[]
 
-include::starting-up.txt[]
+include::prerequisite.txt[]
 
-include::working-with.txt[]
+include::getting.txt[]
+
+include::quickstart.txt[]
+
+include::resources.txt[]
+
+= User guide
+
+include::configure.txt[]
+
+include::configure-other-components.txt[]
+
+include::common-usage.txt[]
+
+include::customize.txt[]
 
 include::faq-troubleshooting.txt[]
 
 include::known-issues.txt[]
 
-include::going-further.txt[]
-
-include::developer-guide.txt[]
-
 include::legal-notice.txt[]
 
 include::beyond-buildroot.txt[]
 
-include::get-involved.txt[]
+= Developer guide
+
+include::how-buildroot-works.txt[]
+
+include::writing-rules.txt[]
+
+include::adding-packages.txt[]
+
+include::patch-policy.txt[]
+
+include::download-infra.txt[]
+
+include::debugging-buildroot.txt[]
 
 include::contribute.txt[]
+
+= Appendix
 
 include::appendix.txt[]

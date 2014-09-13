@@ -4,12 +4,11 @@
 #
 ################################################################################
 
-GETTEXT_VERSION = 0.18.3.2
+GETTEXT_VERSION = 0.19.2
 GETTEXT_SITE = $(BR2_GNU_MIRROR)/gettext
 GETTEXT_INSTALL_STAGING = YES
 GETTEXT_LICENSE = GPLv2+
 GETTEXT_LICENSE_FILES = COPYING
-GETTEXT_AUTORECONF = YES
 
 GETTEXT_DEPENDENCIES = $(if $(BR2_PACKAGE_LIBICONV),libiconv)
 HOST_GETTEXT_DEPENDENCIES = # we don't want the libiconv dependency
@@ -23,8 +22,7 @@ GETTEXT_CONF_OPT += \
 	--disable-native-java \
 	--disable-csharp \
 	--disable-relocatable \
-	--without-emacs \
-	--disable-tools
+	--without-emacs
 
 HOST_GETTEXT_CONF_OPT = \
 	--disable-libasprintf \
@@ -37,6 +35,34 @@ HOST_GETTEXT_CONF_OPT = \
 	--disable-relocatable \
 	--without-emacs
 
+# For the target version, we only need the runtime, and for the host
+# version, we only need the tools.
+GETTEXT_SUBDIR = gettext-runtime
+HOST_GETTEXT_SUBDIR = gettext-tools
+
+# Disable the build of documentation and examples of gettext-tools,
+# and the build of documentation and tests of gettext-runtime.
+define HOST_GETTEXT_DISABLE_UNNEEDED
+	$(SED) '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' $(@D)/gettext-tools/Makefile.in
+	$(SED) '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' $(@D)/gettext-runtime/Makefile.in
+endef
+
+GETTEXT_POST_PATCH_HOOKS += HOST_GETTEXT_DISABLE_UNNEEDED
+HOST_GETTEXT_POST_PATCH_HOOKS += HOST_GETTEXT_DISABLE_UNNEEDED
+
+define GETTEXT_REMOVE_UNNEEDED
+	$(RM) -rf $(TARGET_DIR)/usr/share/gettext/ABOUT-NLS
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/gettext
+endef
+
+GETTEXT_POST_INSTALL_TARGET_HOOKS += GETTEXT_REMOVE_UNNEEDED
+
+define GETTEXT_GETTEXTIZE_EYE_CANDY
+	$(SED) '/Press Return\|read dummy/d' $(HOST_DIR)/usr/bin/gettextize
+endef
+
+HOST_GETTEXT_POST_INSTALL_HOOKS += GETTEXT_GETTEXTIZE_EYE_CANDY
+
 # Force build with NLS support, otherwise libintl is not built
 # This is needed because some packages (eg. libglib2) requires
 # locales, but do not properly depend on BR2_ENABLE_LOCALE, and
@@ -46,22 +72,13 @@ ifeq ($(BR2_ENABLE_LOCALE),)
 GETTEXT_CONF_OPT += --enable-nls
 endif
 
-# When the gettext tools are not enabled in the configuration, we only
-# install libintl to the target.
-ifeq ($(BR2_PACKAGE_GETTEXT_TOOLS),)
-# When static libs are preferred the .so files aren't created
-ifeq ($(BR2_PREFER_STATIC_LIB),)
-define GETTEXT_INSTALL_TARGET_CMDS
-	cp -dpf $(STAGING_DIR)/usr/lib/libintl*.so* $(TARGET_DIR)/usr/lib/
-endef
-endif
-endif # GETTEXT_TOOLS = n
-
 # Disable interactive confirmation in host gettextize for package fixups
 define HOST_GETTEXT_GETTEXTIZE_CONFIRMATION
 	$(SED) '/read dummy/d' $(HOST_DIR)/usr/bin/gettextize
 endef
 HOST_GETTEXT_POST_INSTALL_HOOKS += HOST_GETTEXT_GETTEXTIZE_CONFIRMATION
+
+GETTEXTIZE = $(HOST_CONFIGURE_OPTS) AUTOM4TE=$(HOST_DIR)/usr/bin/autom4te $(HOST_DIR)/usr/bin/gettextize -f
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

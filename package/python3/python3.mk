@@ -5,9 +5,11 @@
 ################################################################################
 
 PYTHON3_VERSION_MAJOR = 3.4
-PYTHON3_VERSION = $(PYTHON3_VERSION_MAJOR).0
+PYTHON3_VERSION = $(PYTHON3_VERSION_MAJOR).1
 PYTHON3_SOURCE = Python-$(PYTHON3_VERSION).tar.xz
 PYTHON3_SITE = http://python.org/ftp/python/$(PYTHON3_VERSION)
+PYTHON3_LICENSE = Python software foundation license v2, others
+PYTHON3_LICENSE_FILES = LICENSE
 
 # Python needs itself and a "pgen" program to build itself, both being
 # provided in the Python sources. So in order to cross-compile Python,
@@ -49,6 +51,13 @@ ifeq ($(BR2_PACKAGE_PYTHON3_CURSES),y)
 PYTHON3_DEPENDENCIES += ncurses
 else
 PYTHON3_CONF_OPT += --disable-curses
+endif
+
+ifeq ($(BR2_PACKAGE_PYTHON3_DECIMAL),y)
+PYTHON3_DEPENDENCIES += mpdecimal
+PYTHON3_CONF_OPT += --with-libmpdec=system
+else
+PYTHON3_CONF_OPT += --with-libmpdec=none
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_PYEXPAT),y)
@@ -96,6 +105,7 @@ PYTHON3_CONF_ENV += \
 	ac_cv_have_long_long_format=yes \
 	ac_cv_file__dev_ptmx=yes \
 	ac_cv_file__dev_ptc=yes \
+	ac_cv_working_tzset=yes
 
 PYTHON3_CONF_OPT += \
 	--without-ensurepip	\

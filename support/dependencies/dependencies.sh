@@ -51,18 +51,20 @@ if test -n "$PERL_MM_OPT" ; then
 	exit 1
 fi
 
-# Verify that which is installed
-if ! which which > /dev/null ; then
-	echo
-	echo "You must install 'which' on your build machine";
-	exit 1;
-fi;
+check_prog_host()
+{
+	prog="$1"
+	if ! which $prog > /dev/null ; then
+		echo >&2
+		echo "You must install '$prog' on your build machine" >&2
+		exit 1
+	fi
+}
 
-if ! which sed > /dev/null ; then
-	echo
-	echo "You must install 'sed' on your build machine"
-	exit 1
-fi
+# Verify that which is installed
+check_prog_host "which"
+# Verify that sed is installed
+check_prog_host "sed"
 
 # Check make
 MAKE=$(which make 2> /dev/null)
@@ -185,22 +187,23 @@ if grep ^BR2_TOOLCHAIN_BUILDROOT=y $BR2_CONFIG > /dev/null && \
 	fi
 fi
 
-if grep -q ^BR2_PACKAGE_CLASSPATH=y $BR2_CONFIG ; then
-	for prog in javac jar; do
-		if ! which $prog > /dev/null ; then
-			echo >&2
-			echo "You must install '$prog' on your build machine" >&2
-			exit 1
-		fi
-	done
+if grep -q ^BR2_NEEDS_HOST_JAVA=y $BR2_CONFIG ; then
+	check_prog_host "java"
+	JAVA_GCJ=$(java -version 2>&1 | grep gcj)
+	if [ ! -z "$JAVA_GCJ" ] ; then
+		echo
+		echo "$JAVA_GCJ is not sufficient to compile your package selection."
+		echo "Please install an OpenJDK/IcedTea/Oracle Java."
+		exit 1 ;
+	fi
 fi
 
-if grep -q ^BR2_NEEDS_HOST_JAVA=y $BR2_CONFIG ; then
-	if ! which java > /dev/null ; then
-		echo >&2
-		echo "You must install 'java' on your build machine" >&2
-		exit 1
-	fi
+if grep -q ^BR2_NEEDS_HOST_JAVAC=y $BR2_CONFIG ; then
+	check_prog_host "javac"
+fi
+
+if grep -q ^BR2_NEEDS_HOST_JAR=y $BR2_CONFIG ; then
+	check_prog_host "jar"
 fi
 
 if grep -q ^BR2_HOSTARCH_NEEDS_IA32_LIBS=y $BR2_CONFIG ; then
@@ -209,8 +212,9 @@ if grep -q ^BR2_HOSTARCH_NEEDS_IA32_LIBS=y $BR2_CONFIG ; then
 		echo "Your Buildroot configuration uses pre-built tools for the x86 architecture,"
 		echo "but your build machine uses the x86-64 architecture without the 32 bits compatibility"
 		echo "library."
-		echo "If you're running a Debian/Ubuntu distribution, install the libc6:i386,"
-		echo "libstdc++6:i386, and zlib1g:i386 packages."
+		echo "If you're running a Debian/Ubuntu distribution, install the libc6-386,"
+		echo "lib32stdc++6, and lib32z1 packages (or alternatively libc6:i386,"
+		echo "libstdc++6:i386, and zlib1g:i386)."
 		echo "For other distributions, refer to the documentation on how to install the 32 bits"
 		echo "compatibility libraries."
 		exit 1

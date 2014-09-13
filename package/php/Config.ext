@@ -31,6 +31,11 @@ config BR2_PACKAGE_PHP_EXT_BZIP2
 	help
 	  bzip2 read/write support
 
+config BR2_PACKAGE_PHP_EXT_PHAR
+	bool "phar"
+	help
+	  PHP Archive support
+
 config BR2_PACKAGE_PHP_EXT_ZIP
 	bool "zip"
 	select BR2_PACKAGE_ZLIB
@@ -161,15 +166,15 @@ config BR2_PACKAGE_PHP_EXT_INTL
 	select BR2_PACKAGE_ICU
 	depends on BR2_INSTALL_LIBSTDCPP
 	depends on BR2_USE_WCHAR
-	depends on !BR2_arc # icu -> atomic builtins
 	depends on !BR2_BINFMT_FLAT # icu
 	depends on BR2_TOOLCHAIN_HAS_THREADS # icu
+	depends on BR2_ARCH_HAS_ATOMICS # icu
 	help
 	  Internationalization support
 
 comment "intl support needs a toolchain w/ C++, wchar, threads"
-	depends on !BR2_arc
 	depends on !BR2_BINFMT_FLAT
+	depends on BR2_ARCH_HAS_ATOMICS
 	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS
 
 comment "Image processing"

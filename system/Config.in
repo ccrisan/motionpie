@@ -77,7 +77,7 @@ choice
 	default BR2_INIT_BUSYBOX
 
 config BR2_INIT_BUSYBOX
-	bool "Busybox"
+	bool "BusyBox"
 	select BR2_PACKAGE_BUSYBOX
 
 config BR2_INIT_SYSV
@@ -96,12 +96,12 @@ config BR2_INIT_SYSTEMD
 	depends on BR2_TOOLCHAIN_HAS_SSP
 	depends on BR2_USE_MMU
 	depends on !BR2_PREFER_STATIC_LIB
-	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8
+	depends on BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_10
 	select BR2_PACKAGE_SYSTEMD
 
-comment 'systemd needs an (e)glibc toolchain, headers >= 3.8'
+comment 'systemd needs an (e)glibc toolchain, headers >= 3.10'
 	depends on !(BR2_TOOLCHAIN_USES_GLIBC \
-		&& BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8)
+		&& BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_10)
 
 config BR2_INIT_NONE
 	bool "None"
@@ -267,6 +267,19 @@ config BR2_TARGET_GENERIC_GETTY_OPTIONS
 endmenu
 endif
 
+config BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW
+	bool "remount root filesystem read-write during boot"
+	default y
+	help
+	  The root filesystem is typically mounted read-only at boot.
+	  By default, buildroot remounts it in read-write mode early during the
+	  boot process.
+	  Say no here if you would rather like your root filesystem to remain
+	  read-only.
+	  If unsure, say Y.
+
+endif # BR2_ROOTFS_SKELETON_DEFAULT
+
 config BR2_TARGET_TZ_INFO
 	bool "Install timezone info"
 	# No timezone for musl; only for uClibc or (e)glibc.
@@ -305,19 +318,6 @@ config BR2_TARGET_LOCALTIME
 	  expressed in UTC.
 
 endif # BR2_TARGET_TZ_INFO
-
-config BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW
-	bool "remount root filesystem read-write during boot"
-	default y
-	help
-	  The root filesystem is typically mounted read-only at boot.
-	  By default, buildroot remounts it in read-write mode early during the
-	  boot process.
-	  Say no here if you would rather like your root filesystem to remain
-	  read-only.
-	  If unsure, say Y.
-
-endif # BR2_ROOTFS_SKELETON_DEFAULT
 
 config BR2_ROOTFS_USERS_TABLES
 	string "Path to the users tables"

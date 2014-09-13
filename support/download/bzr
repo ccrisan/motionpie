@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for bzr, to be called from the download wrapper script
+# Expected arguments:
+#   $1: output file
+#   $2: bzr repo
+#   $3: bzr revision
+#   $4: basename
+# And this environment:
+#   BZR      : the bzr command to call
+
+output="${1}"
+repo="${2}"
+rev="${3}"
+basename="${4}"
+
+${BZR} export --root="${basename}/" --format=tgz "${output}" "${repo}" -r "${rev}"

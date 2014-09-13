@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-MUSL_VERSION = 1.1.0
-MUSL_SITE = http://www.musl-libc.org/releases/
+MUSL_VERSION = 1.1.4
+MUSL_SITE = http://www.musl-libc.org/releases
 MUSL_LICENSE = MIT
 MUSL_LICENSE_FILES = COPYRIGHT
 
@@ -29,7 +29,7 @@ MUSL_INSTALL_STAGING = YES
 define MUSL_CONFIGURE_CALL
 	(cd $(@D); \
 		$(TARGET_CONFIGURE_OPTS) \
-		CFLAGS="$(filter-out -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64,$(TARGET_CFLAGS))" \
+		CFLAGS="$(filter-out -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64,$(TARGET_CFLAGS)) $(MUSL_EXTRA_CFLAGS)" \
 		CPPFLAGS="$(filter-out -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64,$(TARGET_CPPFLAGS))" \
 		./configure \
 			--target=$(GNU_TARGET_NAME) \

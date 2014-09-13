@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-LFTP_VERSION = 4.4.15
+LFTP_VERSION = 4.5.2
 LFTP_SITE    = http://lftp.yar.ru/ftp
 LFTP_LICENSE = GPLv3+
 LFTP_LICENSE_FILES = COPYING
 LFTP_AUTORECONF = YES
-LFTP_DEPENDENCIES  = readline zlib
+LFTP_DEPENDENCIES = readline zlib host-pkgconf
 
 ifneq ($(BR2_PREFER_STATIC_LIB),y)
 LFTP_CONF_OPT += --with-modules

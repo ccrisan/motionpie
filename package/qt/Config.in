@@ -28,6 +28,13 @@ config BR2_PACKAGE_QT_DEMOS
 	help
 	  If unsure, say N.
 
+config BR2_PACKAGE_QT_TRANSLATION_FILES
+	bool "Install translation files"
+	help
+	  Install binary .qm translation files.
+	  Say y if you need these files. They will take about 8 MB
+	  on the target root filesystem.
+
 config BR2_PACKAGE_QT_EXAMPLES
 	bool "Compile and install Qt examples (with code)"
 	select BR2_PACKAGE_QT_GUI_MODULE

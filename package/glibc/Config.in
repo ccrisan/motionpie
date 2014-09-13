@@ -1,21 +1,51 @@
-if BR2_TOOLCHAIN_BUILDROOT_GLIBC
+if BR2_TOOLCHAIN_BUILDROOT_EGLIBC
+
+# For legal-info
+config BR2_PACKAGE_EGLIBC
+	bool
+	default y
 
 choice
-	prompt "glibc version"
-	default BR2_GLIBC_VERSION_2_18
-	# Architectures supported in mainline glibc
-	depends on BR2_arm    || BR2_armeb    || BR2_aarch64 || \
-		   BR2_i386   || BR2_mips     || BR2_mipsel  || \
-		   BR2_mips64 || BR2_mips64el || BR2_powerpc || \
-		   BR2_sh     || BR2_sh64     || BR2_sparc   || \
-		   BR2_x86_64 || BR2_microblaze
+	prompt "eglibc version"
+	default BR2_EGLIBC_VERSION_2_18
 
-config BR2_GLIBC_VERSION_2_18
-       bool "2.18"
+config BR2_EGLIBC_VERSION_2_18
+	bool "2.18-svnr23787"
 
-config BR2_GLIBC_VERSION_2_19
-       bool "2.19"
+config BR2_EGLIBC_VERSION_2_19
+	bool "2.19-svnr25243"
+	# Build breakage
+	depends on !BR2_powerpc_SPE
 
 endchoice
 
 endif
+
+if BR2_TOOLCHAIN_BUILDROOT_GLIBC
+
+# For legal-info
+config BR2_PACKAGE_GLIBC
+	bool
+	default y
+
+choice
+	prompt "glibc version"
+	default BR2_GLIBC_VERSION_2_18
+
+config BR2_GLIBC_VERSION_2_18
+	bool "2.18"
+	depends on !BR2_powerpc64le
+
+config BR2_GLIBC_VERSION_2_19
+	bool "2.19"
+
+endchoice
+
+endif
+
+config BR2_GLIBC_VERSION_STRING
+	string
+	default "2.18-svnr23787" if BR2_EGLIBC_VERSION_2_18
+	default "2.19-svnr25243" if BR2_EGLIBC_VERSION_2_19
+	default "2.18" if BR2_GLIBC_VERSION_2_18
+	default "2.19" if BR2_GLIBC_VERSION_2_19

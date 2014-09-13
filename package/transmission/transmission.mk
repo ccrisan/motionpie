@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-TRANSMISSION_VERSION = 2.82
-TRANSMISSION_SITE = http://download.transmissionbt.com/files/
+TRANSMISSION_VERSION = 2.84
+TRANSMISSION_SITE = http://download.transmissionbt.com/files
 TRANSMISSION_SOURCE = transmission-$(TRANSMISSION_VERSION).tar.xz
 TRANSMISSION_DEPENDENCIES = \
 	host-pkgconf \
@@ -15,10 +15,11 @@ TRANSMISSION_DEPENDENCIES = \
 	openssl \
 	zlib
 TRANSMISSION_AUTORECONF = YES
-
 TRANSMISSION_CONF_OPT = \
 	--disable-libnotify \
 	--enable-lightweight
+TRANSMISSION_LICENSE = GPLv2 or GPLv3 with OpenSSL exception
+TRANSMISSION_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_TRANSMISSION_UTP),y)
 	TRANSMISSION_CONF_OPT += --enable-utp

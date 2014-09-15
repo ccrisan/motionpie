@@ -14,7 +14,6 @@ define RPI_FIRMWARE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0644 $(@D)/boot/start$(BR2_TARGET_RPI_FIRMWARE_BOOT).elf $(BINARIES_DIR)/boot/start.elf
 	$(INSTALL) -D -m 0644 $(@D)/boot/fixup$(BR2_TARGET_RPI_FIRMWARE_BOOT).dat $(BINARIES_DIR)/boot/fixup.dat
 	$(INSTALL) -D -m 0644 boot/rpi-firmware/config.txt $(BINARIES_DIR)/boot/config.txt
-	$(INSTALL) -D -m 0644 boot/rpi-firmware/cmdline.txt $(BINARIES_DIR)/boot/cmdline.txt
 endef
 
 $(eval $(generic-package))

@@ -23,6 +23,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'conf'))%'/data/etc'%" $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/tmp'%" $(DST_DIR)/settings.py
+    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'log'))%'/var/log'%" $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'media'))%'/data/output'%" $(DST_DIR)/settings.py
     sed -i "s%REPO = ('ccrisan', 'motioneye')%REPO = ('ccrisan', 'motionPie')%" $(DST_DIR)/settings.py
     #sed -i "s%LOG_LEVEL = logging.INFO%LOG_LEVEL = logging.DEBUG%" $(DST_DIR)/settings.py

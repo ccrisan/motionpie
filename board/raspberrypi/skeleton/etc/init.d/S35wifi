@@ -17,7 +17,7 @@ if ! [ -f $conf ] || ! [ -s $conf ]; then
     exit 0
 fi
 
-SSID=$(cat ${conf} | grep ssid | cut -d '"' -f 2)
+SSID=$(cat ${conf} | grep ssid | grep -v scan_ssid | cut -d '"' -f 2)
 
 if [ -z "$SSID" ]; then
     exit 0

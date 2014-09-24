@@ -149,6 +149,7 @@ if [ -n "$SSID" ]; then
     echo "update_config=1" > $conf
     echo "ctrl_interface=/var/run/wpa_supplicant" >> $conf
     echo "network={" >> $conf
+    echo "    scan_ssid=1" >> $conf
     echo "    ssid=\"$SSID\"" >> $conf
     if [ -n "$PSK" ]; then
         echo "    psk=\"$PSK\"" >> $conf

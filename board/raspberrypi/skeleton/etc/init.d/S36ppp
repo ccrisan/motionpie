@@ -45,7 +45,7 @@ watch() {
 start() {
     if [ -s $conf/usb_modeswitch ]; then
         IFS=: venprod=($(cat $conf/usb_modeswitch))
-        vendor=${venprod[0]}                                           
+        vendor=${venprod[0]}
         product=${venprod[1]}
         # wait for usb device
         if [ -n "$vendor" ] && [ -n "$product" ]; then
@@ -73,7 +73,7 @@ start() {
         if [ -e /dev/$modem ] || [ $count -gt $modem_timeout ]; then
             break
         fi
-        
+
         count=$(($count + 1))
         sleep 1
     done
@@ -82,12 +82,12 @@ start() {
         echo "modem /dev/$modem not present"
         return
     fi
-    
+
     $prog call $provider
     count=0
     while true; do
         sleep 1
-        
+
         if connected; then
             break
         fi
@@ -129,7 +129,7 @@ case "$1" in
     restart)
         restart
         ;;
-    
+
     *)
         echo "Usage: $0 {start|stop|restart}"
         exit 1

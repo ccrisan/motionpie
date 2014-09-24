@@ -2,7 +2,7 @@
 
 
 function usage() {
-    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-l] [-n ssid:psk] [-o none|modest|medium|high|turbo] [-p port] [-s ip/cidr:gw:dns]" 1>&2
+    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-l] [-n ssid:psk] [-o none|modest|medium|high|turbo] [-p port] [-s ip/cidr:gw:dns] [-w]" 1>&2
     echo "    -d sdcard_dev - indicates the path to the sdcard block device (e.g. -d /dev/mmcblk0)"
     echo "    -i image_file - indicates the path to the image file (e.g. -i /home/user/Download/motionPie.img)"
     echo "    -l - disables the LED of the CSI camera module"
@@ -10,6 +10,7 @@ function usage() {
     echo "    -o none|modest|medium|high|turbo - overclocks the PI according to a preset (e.g. -o high)"
     echo "    -p port - listen on the given port rather than on 80 (e.g. -p 8080)"
     echo "    -s ip/cidr:gw:dns - sets a static IP configuration instead of DHCP (e.g. -s 192.168.3.107/24:192.168.3.1:8.8.8.8)"
+    echo "    -w - disables rebooting when the wireless connection is lost"
     exit 1
 }
 
@@ -23,7 +24,7 @@ function msg() {
     echo ":: $1"
 }
 
-while getopts "d:i:ln:o:p:s:" o; do
+while getopts "d:i:ln:o:p:s:w" o; do
     case "$o" in
         d)
             SDCARD_DEV=$OPTARG
@@ -50,6 +51,9 @@ while getopts "d:i:ln:o:p:s:" o; do
             IP=${S_IP[0]}
             GW=${S_IP[1]}
             DNS=${S_IP[2]}
+            ;;
+        w)
+            DISABLE_WR=true
             ;;
         *)
             usage
@@ -177,6 +181,14 @@ fi
 if [ -n "$PORT" ]; then
     msg "setting server port to $PORT"
     sed -i "s%PORT = 80%PORT = $PORT%" $ROOT/programs/motioneye/settings.py
+fi
+
+if [ -n "$DISABLE_WR" ]; then
+    msg "disabling no-wireless reboot"
+    sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi
+    sed -i 's%reboot%%' $ROOT/etc/init.d/S35wifi
+    sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S36ppp
+    sed -i 's%reboot%%' $ROOT/etc/init.d/S36ppp
 fi
 
 msg "unmounting sdcard"

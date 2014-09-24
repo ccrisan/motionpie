@@ -42,6 +42,7 @@ start() {
 
         if [ $count -gt $watch_timeout ]; then
             echo "failed"
+	    reboot
             return
         fi
 

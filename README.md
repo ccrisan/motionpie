@@ -99,6 +99,11 @@ Create the partitions on the SD card. Run the following as root.
 	> 2
 	> <enter>
 	> <enter>       # fill the remaining disk, adjust size to fit your needs
+	> t             # change partition type
+	> 1             # select first partition
+	> e             # use type 'e' (FAT16)
+	> a             # make partition bootable
+	> 1             # select first partition
 	> p             # double check everything looks right
 	> w             # write partition table to disk.
 

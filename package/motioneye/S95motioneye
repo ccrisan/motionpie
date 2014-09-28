@@ -71,7 +71,7 @@ start() {
 
 stop() {
     echo -n "Shutting down motioneye: "
-    killall python2.7
+    ps | grep motioneye | grep -v $$ | grep -v grep | tr -s ' ' | cut -d ' ' -f 2 | xargs -r kill
     echo "done"
 }
 

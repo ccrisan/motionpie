@@ -16,6 +16,7 @@ Check this [link](https://bitbucket.org/ccrisan/motioneye/wiki/Screenshots) for 
 * support for **IP cameras**
 * **motion detection** with email notifications and working schedule
 * **JPEG** files for still images, **AVI** files for videos
+* **timelapse** movies
 * connects to the network using **ethernet** or **wifi**
 * file storage on **SD card**, **USB drive** or **network SMB share**
 * files on SD card visible in the local network as a **SMB share**
@@ -43,7 +44,13 @@ All releases are available from [here](https://github.com/ccrisan/motionPie/rele
     
         ./writeimage.sh -d /dev/mmcblk0 -i /path/to/motionPie.img -n yournet:yourkey
         
-   Optionally you can give other arguments to `writeimage.sh` to configure various features of your PI. For more details run `writeimage.sh` without arguments.
+   Optionally you can give other arguments to `writeimage.sh` to configure various features of your PI:
+
+* `-l` disables the CSI camera led
+* `-o none|modest|medium|high|turbo` overclocks the PI according to the preset (e.g. `-o high`)
+* `-p port` listen on the given TCP port rather than on 80 (e.g. `-p 8080`)
+* `-s ip/cidr:gw:dns` sets a static IP configuration instead of DHCP (e.g. `-s 192.168.3.107/24:192.168.3.1:8.8.8.8`)
+* `-w` disables rebooting when the wireless connection is lost
 
     **If you don't know how to do it**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 
@@ -116,13 +123,17 @@ These pictures and movies recored by motionPie are visible on the local network 
 
 ## Troubleshooting ##
 
+### Raspberry PI Model A ###
+
+*Model A* has no wired ethernet connector and thus it's impossible to access it unless it is connected to a wireless network. To preconfigure the wireless network for a Model A you must use `writeimage.sh` with the `-n ssid:psk` argument.
+
 ### Stuck With Rainbow On Display ###
 
 MotionPie has no video driver compiled in and therefore it won't control your display in any way. The rainbow you see is what PI's GPU shows by default when powered on. Nevertheless things happen in the background and your motionPie should be up and running (i.e. listening on port 80) in less than 2 minutes.
 
 ### System Rebooting ###
 
-The system will reboot whenever something goes wrong (i.e. disconnected from network, software hangs or kernel crashes). This is accomplished using the hardware watchdog as well as software watch scripts. It is therefore possible that the system enter an indefinite reboot loop if, for example, the network is misconfigured.
+The system will reboot whenever something goes wrong (i.e. disconnected from network, software hangs or kernel crashes). This is accomplished using the hardware watchdog as well as software watch scripts. It is therefore possible that the system enter an indefinite reboot loop if, for example, the network is misconfigured. Invoking `writeimage.sh` with `-w` when writing the image disables rebooting when wireless connection issues are encountered.
 
 ### Date & Time ###
 

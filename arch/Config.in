@@ -56,6 +56,12 @@ config BR2_aarch64
 config BR2_avr32
 	bool "AVR32"
 	select BR2_SOFT_FLOAT
+	# This architecture is obsolete and complicated to maintain to
+	# do the lack of upstream support in the major toolchain
+	# components. If you're interested by AVR32, contact the
+	# Buildroot community. Otherwise, its support will be removed
+	# by the 2015.02 release.
+	depends on BR2_DEPRECATED_SINCE_2014_08
 	help
 	  The AVR32 is a 32-bit RISC microprocessor architecture designed by
 	  Atmel.
@@ -140,6 +146,25 @@ config BR2_powerpc
 	bool "PowerPC"
 	help
 	  PowerPC is a RISC architecture created by Apple-IBM-Motorola alliance.
+	  Big endian.
+	  http://www.power.org/
+	  http://en.wikipedia.org/wiki/Powerpc
+
+config BR2_powerpc64
+	bool "PowerPC64 (big endian)"
+	select BR2_ARCH_IS_64
+	help
+	  PowerPC is a RISC architecture created by Apple-IBM-Motorola alliance.
+	  Big endian.
+	  http://www.power.org/
+	  http://en.wikipedia.org/wiki/Powerpc
+
+config BR2_powerpc64le
+	bool "PowerPC64 (little endian)"
+	select BR2_ARCH_IS_64
+	help
+	  PowerPC is a RISC architecture created by Apple-IBM-Motorola alliance.
+	  Little endian.
 	  http://www.power.org/
 	  http://en.wikipedia.org/wiki/Powerpc
 
@@ -224,6 +249,10 @@ config BR2_GCC_TARGET_FLOAT_ABI
 # wrapper (external toolchain)
 config BR2_GCC_TARGET_MODE
 	string
+
+# If the architecture has atomic operations, select this:
+config BR2_ARCH_HAS_ATOMICS
+	bool
 
 # Set up target binary format
 choice
@@ -321,7 +350,7 @@ if BR2_nios2
 source "arch/Config.in.nios2"
 endif
 
-if BR2_powerpc
+if BR2_powerpc || BR2_powerpc64 || BR2_powerpc64le
 source "arch/Config.in.powerpc"
 endif
 

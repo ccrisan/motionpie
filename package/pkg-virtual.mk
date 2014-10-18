@@ -19,7 +19,7 @@
 # package against its provider.
 #
 #  argument 1 is the lowercase package name
-#  argument 2 is the uppercase package name, including an HOST_ prefix
+#  argument 2 is the uppercase package name, including a HOST_ prefix
 #             for host packages
 #  argument 3 is the uppercase package name, without the HOST_ prefix
 #             for host packages
@@ -35,8 +35,8 @@
 define inner-virtual-package
 
 # Ensure the virtual package has an implementation defined.
-ifeq ($(BR2_PACKAGE_HAS_$(2)),y)
-ifeq ($(call qstrip,$(BR2_PACKAGE_PROVIDES_$(2))),)
+ifeq ($$(BR2_PACKAGE_HAS_$(2)),y)
+ifeq ($$(call qstrip,$$(BR2_PACKAGE_PROVIDES_$(2))),)
 $$(error No implementation selected for virtual package $(1). Configuration error)
 endif
 endif
@@ -45,16 +45,17 @@ endif
 $(2)_SOURCE =
 
 # Fake a version string, so it looks nicer in the build log
-$(3)_VERSION = virtual
-HOST_$(3)_VERSION = virtual
+$(2)_VERSION = virtual
 
 # This must be repeated from inner-generic-package, otherwise we get an empty
 # _DEPENDENCIES
-$(2)_DEPENDENCIES ?= $(filter-out host-toolchain $(1),\
-	$(patsubst host-host-%,host-%,$(addprefix host-,$($(3)_DEPENDENCIES))))
+ifeq ($(4),host)
+$(2)_DEPENDENCIES ?= $$(filter-out host-toolchain $(1),\
+	$$(patsubst host-host-%,host-%,$$(addprefix host-,$$($(3)_DEPENDENCIES))))
+endif
 
 # Add dependency against the provider
-$(2)_DEPENDENCIES += $(call qstrip,$(BR2_PACKAGE_PROVIDES_$(2)))
+$(2)_DEPENDENCIES += $$(call qstrip,$$(BR2_PACKAGE_PROVIDES_$(2)))
 
 # Call the generic package infrastructure to generate the necessary
 # make targets

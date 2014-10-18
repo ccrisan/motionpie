@@ -43,13 +43,14 @@ endif
 
 ifeq ($(BR2_PACKAGE_MYSQL_SERVER),y)
 MYSQL_DEPENDENCIES += host-mysql host-bison
-HOST_MYSQL_DEPENDENCIES =
+HOST_MYSQL_DEPENDENCIES = host-zlib
 
 HOST_MYSQL_CONF_OPT = \
 	--with-embedded-server \
 	--disable-mysql-maintainer-mode
 
 MYSQL_CONF_OPT += \
+	--localstatedir=/var/mysql \
 	--disable-dependency-tracking \
 	--with-atomic-ops=up \
 	--with-embedded-server \
@@ -86,6 +87,21 @@ endef
 
 define HOST_MYSQL_INSTALL_CMDS
 	$(INSTALL) -m 0755  $(@D)/sql/gen_lex_hash  $(HOST_DIR)/usr/bin/
+endef
+
+define MYSQL_USERS
+	mysql -1 nogroup -1 * /var/mysql - - MySQL daemon
+endef
+
+define MYSQL_ADD_FOLDER
+	$(INSTALL) -d $(TARGET_DIR)/var/mysql
+endef
+
+MYSQL_POST_INSTALL_TARGET_HOOKS += MYSQL_ADD_FOLDER
+
+define MYSQL_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 0755 package/mysql/S97mysqld \
+		$(TARGET_DIR)/etc/init.d/S97mysqld
 endef
 
 else

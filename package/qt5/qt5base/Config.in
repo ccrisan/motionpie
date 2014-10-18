@@ -3,6 +3,7 @@ config BR2_PACKAGE_QT5BASE
 	select BR2_PACKAGE_ZLIB
 	select BR2_PACKAGE_PCRE
 	select BR2_PACKAGE_PCRE_16
+	select BR2_PACKAGE_PCRE_UTF
 	help
 	  Qt is a cross-platform application and UI framework for
 	  developers using C++.
@@ -57,6 +58,7 @@ config BR2_PACKAGE_QT5BASE_MYSQL
 	select BR2_PACKAGE_NCURSES
 	select BR2_PACKAGE_READLINE
 	depends on BR2_USE_MMU # mysql
+	depends on !BR2_avr32 # mysql
 	help
 	  Build MySQL plugin
 	  If unsure, say n.
@@ -115,6 +117,45 @@ config BR2_PACKAGE_QT5BASE_WIDGETS
 	help
 	  This option enables the Qt5Widgets library.
 
+comment "OpenGL support needs an OpenGL-capable backend"
+	depends on !BR2_PACKAGE_QT5_GL_AVAILABLE
+
+config BR2_PACKAGE_QT5BASE_OPENGL
+	bool "OpenGL support"
+	depends on BR2_PACKAGE_QT5_GL_AVAILABLE
+	help
+	  This option enables OpenGL support.
+
+if BR2_PACKAGE_QT5BASE_OPENGL
+
+choice
+	prompt "OpenGL API"
+	help
+	  Select OpenGL API.
+
+config BR2_PACKAGE_QT5BASE_OPENGL_DESKTOP
+	bool "Desktop OpenGL"
+	depends on BR2_PACKAGE_HAS_LIBGL
+	help
+	  Use desktop OpenGL.
+
+config BR2_PACKAGE_QT5BASE_OPENGL_ES2
+	bool "OpenGL ES 2.0+"
+	depends on BR2_PACKAGE_HAS_LIBGLES
+	help
+	  Use OpenGL ES 2.0 and later versions.
+
+endchoice
+
+config BR2_PACKAGE_QT5BASE_OPENGL_LIB
+	bool "opengl module"
+	select BR2_PACKAGE_QT5BASE_WIDGETS
+	help
+	  This option enables the Qt5OpenGL library. This library includes
+	  OpenGL support classes provided to ease porting from Qt 4.x.
+
+endif
+
 config BR2_PACKAGE_QT5BASE_LINUXFB
 	bool "linuxfb support"
 
@@ -125,7 +166,7 @@ config BR2_PACKAGE_QT5BASE_DIRECTFB
 config BR2_PACKAGE_QT5BASE_XCB
 	bool "X.org XCB support"
 	depends on BR2_PACKAGE_XORG7
-	select BR2_PACKAGE_LIBX11
+	select BR2_PACKAGE_XLIB_LIBX11
 	select BR2_PACKAGE_LIBXCB
 	select BR2_PACKAGE_XCB_UTIL_IMAGE
 	select BR2_PACKAGE_XCB_UTIL_KEYSYMS
@@ -137,11 +178,23 @@ comment "X.org XCB backend available if X.org is enabled"
 
 config BR2_PACKAGE_QT5BASE_EGLFS
 	bool "eglfs support"
+	select BR2_PACKAGE_QT5BASE_OPENGL
 	depends on BR2_PACKAGE_HAS_LIBEGL
-	depends on BR2_PACKAGE_HAS_LIBGLES
+	depends on BR2_PACKAGE_QT5_GL_AVAILABLE
 
-comment "eglfs backend available if OpenGLES and EGL are enabled"
-	depends on !BR2_PACKAGE_HAS_LIBEGL || !BR2_PACKAGE_HAS_LIBGLES
+comment "eglfs backend available if OpenGL and EGL are enabled"
+	depends on !BR2_PACKAGE_HAS_LIBEGL || !BR2_PACKAGE_QT5_GL_AVAILABLE
+
+config BR2_PACKAGE_QT5BASE_DEFAULT_QPA
+	string "Default graphical platform"
+	help
+	  Choose the default platform abstraction to use for graphical
+	  applications (e.g xcb, linuxfb, eglfs, ...). If this is empty, the
+	  default for your architecture will be used (usually this is eglfs).
+
+	  You can get a list of supported platforms by running a Qt application
+	  with the option "-platform help" on your target. You can choose a
+	  different platform at runtime with the -platform option.
 
 config BR2_PACKAGE_QT5BASE_PRINTSUPPORT
 	bool "print support module"
@@ -188,7 +241,7 @@ config BR2_PACKAGE_QT5BASE_DBUS
 config BR2_PACKAGE_QT5BASE_ICU
 	bool "Enable ICU support"
 	select BR2_PACKAGE_ICU
-	depends on !BR2_arc # icu -> atomic builtins
+	depends on BR2_ARCH_HAS_ATOMICS # icu
 	depends on !BR2_BINFMT_FLAT # icu
 	help
 	  This option enables ICU support in Qt5. This is for example

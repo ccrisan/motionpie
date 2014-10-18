@@ -4,22 +4,20 @@
 #
 ################################################################################
 
-TVHEADEND_VERSION = 6482d33ba90848018c530018e5c38992b8ac921c
+TVHEADEND_VERSION = f72733ff08be069620e7247e191d4f0899a2638a
 TVHEADEND_SITE = $(call github,tvheadend,tvheadend,$(TVHEADEND_VERSION))
 TVHEADEND_LICENSE = GPLv3+
-TVHEADEND_LICENSE_FILES = LICENSE
+TVHEADEND_LICENSE_FILES = LICENSE.md
 TVHEADEND_DEPENDENCIES = host-pkgconf host-python openssl
 
 ifeq ($(BR2_PACKAGE_AVAHI),y)
 TVHEADEND_DEPENDENCIES += avahi
 endif
 
-#----------------------------------------------------------------------------
-# tvheadend is a little smuggler and thief! ;-)
-# During the ./configure, it downloads some files from the dtv-scan-tables
-# package, so it has a list of pre-scanned tunner configurations.
-# For buildroot, we add a patch that avoids doing that, but uses the
-# scan files installed by the dtv-scan-tables package
+ifeq ($(BR2_PACKAGE_LIBICONV),y)
+TVHEADEND_DEPENDENCIES += libiconv
+endif
+
 TVHEADEND_DEPENDENCIES += dtv-scan-tables
 
 define TVHEADEND_CONFIGURE_CMDS
@@ -31,6 +29,7 @@ define TVHEADEND_CONFIGURE_CMDS
 	 --arch="$(ARCH)"			\
 	 --cpu="$(BR2_GCC_TARGET_CPU)"		\
 	 --python="$(HOST_DIR)/usr/bin/python"	\
+	 --disable-dvbscan			\
 	)
 endef
 

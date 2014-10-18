@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBPCAP_VERSION = 1.5.3
+LIBPCAP_VERSION = 1.6.1
 LIBPCAP_SITE = http://www.tcpdump.org/release
 LIBPCAP_LICENSE = BSD-3c
 LIBPCAP_LICENSE_FILES = LICENSE
@@ -19,6 +19,20 @@ LIBPCAP_CONF_ENV = ac_cv_linux_vers=2 \
 LIBPCAP_CFLAGS = $(TARGET_CFLAGS)
 LIBPCAP_CONF_OPT = --disable-yydebug --with-pcap=linux
 LIBPCAP_CONFIG_SCRIPTS = pcap-config
+
+# On purpose, not compatible with bluez5
+ifeq ($(BR2_PACKAGE_BLUEZ_UTILS),y)
+LIBPCAP_DEPENDENCIES += bluez_utils
+else
+LIBPCAP_CONF_OPT += --disable-bluetooth
+endif
+
+ifeq ($(BR2_PACKAGE_DBUS),y)
+LIBPCAP_CONF_OPT += --enable-dbus
+LIBPCAP_DEPENDENCIES += dbus
+else
+LIBPCAP_CONF_OPT += --disable-dbus
+endif
 
 ifeq ($(BR2_PACKAGE_LIBUSB),y)
 LIBPCAP_CONF_OPT += --enable-canusb

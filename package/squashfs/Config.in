@@ -18,6 +18,12 @@ config BR2_PACKAGE_SQUASHFS_GZIP
 	help
 	  Support GZIP compression algorithm
 
+config BR2_PACKAGE_SQUASHFS_LZ4
+	bool "lz4 support"
+	select BR2_PACKAGE_LZ4
+	help
+	  Support LZ4 compression algorithm
+
 config BR2_PACKAGE_SQUASHFS_LZMA
 	bool "lzma support"
 	select BR2_PACKAGE_XZ
@@ -40,3 +46,4 @@ endif
 
 comment "squashfs needs a toolchain w/ largefile, threads"
 	depends on !BR2_LARGEFILE || !BR2_TOOLCHAIN_HAS_THREADS
+	depends on BR2_USE_MMU

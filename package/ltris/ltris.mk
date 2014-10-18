@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LTRIS_SITE = http://downloads.sourceforge.net/lgames/ltris/
+LTRIS_SITE = http://downloads.sourceforge.net/lgames/ltris
 LTRIS_VERSION = 1.0.19
 LTRIS_LICENSE = GPLv2+
 LTRIS_LICENSE_FILES = COPYING
@@ -21,7 +21,7 @@ else
 LTRIS_CONF_OPT += --disable-audio
 endif
 
-ifeq ($(BR2_PACKAGE_GETTEXT),y)
+ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
 LTRIS_DEPENDENCIES += gettext
 LTRIS_CONF_ENV += LIBS=-lintl
 endif

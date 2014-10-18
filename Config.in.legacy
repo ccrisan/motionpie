@@ -99,6 +99,156 @@ comment "----------------------------------------------------"
 endif
 
 ###############################################################################
+comment "Legacy options removed in 2014.08"
+
+config BR2_KERNEL_HEADERS_3_8
+	bool "kernel headers version 3.8.x are no longer supported"
+	select BR2_KERNEL_HEADERS_3_9
+	select BR2_LEGACY
+	help
+	  Version 3.8.x of the Linux kernel headers have been deprecated
+	  for more than four buildroot releases and are now removed.
+	  As an alternative, version 3.9.x of the headers have been
+	  automatically selected in your configuration.
+
+config BR2_PACKAGE_GETTEXT_TOOLS
+	bool "support for gettext-tools on target has been removed"
+	select BR2_LEGACY
+	help
+	  The option to install the gettext utilities on the target
+	  has been removed. This is not necessary as Buildroot is not
+	  designed to provide a full development environment on the
+	  target. gettext tools should be used on the build machine
+	  instead.
+
+config BR2_PACKAGE_PROCPS
+	bool "procps has been replaced by procps-ng"
+	select BR2_PACKAGE_PROCPS_NG
+	select BR2_LEGACY
+	help
+	  The procps package has been replaced by the equivalent procps-ng.
+
+config BR2_BINUTILS_VERSION_2_20_1
+	bool "binutils 2.20.1 has been removed"
+	select BR2_LEGACY
+	help
+	  The 2.20.1 version of binutils has been removed. Use a newer
+	  version instead.
+
+config BR2_BINUTILS_VERSION_2_21
+	bool "binutils 2.21 has been removed"
+	select BR2_LEGACY
+	help
+	  The 2.21 version of binutils has been removed. Use a newer
+	  version instead.
+
+config BR2_BINUTILS_VERSION_2_23_1
+	bool "binutils 2.23.1 has been removed"
+	select BR2_LEGACY
+	help
+	  The 2.23.1 version of binutils has been removed. Use a newer
+	  version instead.
+
+config BR2_UCLIBC_VERSION_0_9_32
+	bool "uclibc 0.9.32 has been removed"
+	select BR2_LEGACY
+	help
+	  The 0.9.32 version of uClibc has been removed. Use a newer
+	  version instead.
+
+config BR2_GCC_VERSION_4_3_X
+	bool "gcc 4.3.x has been removed"
+	select BR2_LEGACY
+	help
+	  The 4.3.x version of gcc has been removed. Use a newer
+	  version instead.
+
+config BR2_GCC_VERSION_4_6_X
+	bool "gcc 4.6.x has been removed"
+	select BR2_LEGACY
+	help
+	  The 4.6.x version of gcc has been removed. Use a newer
+	  version instead.
+
+config BR2_GDB_VERSION_7_4
+	bool "gdb 7.4 has been removed"
+	select BR2_LEGACY
+	help
+	  The 7.4 version of gdb has been removed. Use a newer version
+	  instead.
+
+config BR2_GDB_VERSION_7_5
+	bool "gdb 7.5 has been removed"
+	select BR2_LEGACY
+	help
+	  The 7.5 version of gdb has been removed. Use a newer version
+	  instead.
+
+config BR2_BUSYBOX_VERSION_1_19_X
+	bool "busybox version selection has been removed"
+	select BR2_LEGACY
+	help
+	  The possibility of selecting the Busybox version has been
+	  removed. Use the latest version provided by the Busybox
+	  package instead.
+
+config BR2_BUSYBOX_VERSION_1_20_X
+	bool "busybox version selection has been removed"
+	select BR2_LEGACY
+	help
+	  The possibility of selecting the Busybox version has been
+	  removed. Use the latest version provided by the Busybox
+	  package instead.
+
+config BR2_BUSYBOX_VERSION_1_21_X
+	bool "busybox version selection has been removed"
+	select BR2_LEGACY
+	help
+	  The possibility of selecting the Busybox version has been
+	  removed. Use the latest version provided by the Busybox
+	  package instead.
+
+config BR2_PACKAGE_LIBV4L_DECODE_TM6000
+	bool "decode_tm6000"
+	select BR2_PACKAGE_LIBV4L_UTILS
+	select BR2_LEGACY
+	help
+	  This libv4l option has been deprecated and replaced by a single
+	  option to build all the libv4l utilities.
+
+config BR2_PACKAGE_LIBV4L_IR_KEYTABLE
+	bool "ir-keytable"
+	select BR2_PACKAGE_LIBV4L_UTILS
+	select BR2_LEGACY
+	help
+	  This libv4l option has been deprecated and replaced by a single
+	  option to build all the libv4l utilities.
+
+config BR2_PACKAGE_LIBV4L_V4L2_COMPLIANCE
+	bool "v4l2-compliance"
+	select BR2_PACKAGE_LIBV4L_UTILS
+	select BR2_LEGACY
+	help
+	  This libv4l option has been deprecated and replaced by a single
+	  option to build all the libv4l utilities.
+
+config BR2_PACKAGE_LIBV4L_V4L2_CTL
+	bool "v4l2-ctl"
+	select BR2_PACKAGE_LIBV4L_UTILS
+	select BR2_LEGACY
+	help
+	  This libv4l option has been deprecated and replaced by a single
+	  option to build all the libv4l utilities.
+
+config BR2_PACKAGE_LIBV4L_V4L2_DBG
+	bool "v4l2-dbg"
+	select BR2_PACKAGE_LIBV4L_UTILS
+	select BR2_LEGACY
+	help
+	  This libv4l option has been deprecated and replaced by a single
+	  option to build all the libv4l utilities.
+
+###############################################################################
 comment "Legacy options removed in 2014.05"
 
 config BR2_PACKAGE_EVTEST_CAPTURE
@@ -111,7 +261,7 @@ config BR2_PACKAGE_EVTEST_CAPTURE
 
 config BR2_KERNEL_HEADERS_3_6
 	bool "kernel headers version 3.6.x are no longer supported"
-	select BR2_KERNEL_HEADERS_3_8
+	select BR2_KERNEL_HEADERS_3_9
 	select BR2_LEGACY
 	help
 	  Version 3.6.x of the Linux kernel headers have been deprecated
@@ -121,7 +271,7 @@ config BR2_KERNEL_HEADERS_3_6
 
 config BR2_KERNEL_HEADERS_3_7
 	bool "kernel headers version 3.7.x are no longer supported"
-	select BR2_KERNEL_HEADERS_3_8
+	select BR2_KERNEL_HEADERS_3_9
 	select BR2_LEGACY
 	help
 	  Version 3.7.x of the Linux kernel headers have been deprecated
@@ -306,7 +456,7 @@ config BR2_KERNEL_HEADERS_3_3
 
 config BR2_KERNEL_HEADERS_3_5
 	bool "kernel headers version 3.5.x are no longer supported"
-	select BR2_KERNEL_HEADERS_3_8
+	select BR2_KERNEL_HEADERS_3_9
 	select BR2_LEGACY
 	help
 	  Version 3.5.x of the Linux kernel headers have been deprecated
@@ -316,7 +466,7 @@ config BR2_KERNEL_HEADERS_3_5
 
 config BR2_GDB_VERSION_7_2
 	bool "gdb 7.2.x is no longer supported"
-	select BR2_GDB_VERSION_7_5
+	select BR2_GDB_VERSION_7_6
 	select BR2_LEGACY
 	help
 	  Version 7.2.x of gdb has been deprecated for more than four
@@ -325,7 +475,7 @@ config BR2_GDB_VERSION_7_2
 
 config BR2_GDB_VERSION_7_3
 	bool "gdb 7.3.x is no longer supported"
-	select BR2_GDB_VERSION_7_5
+	select BR2_GDB_VERSION_7_6
 	select BR2_LEGACY
 	help
 	  Version 7.3.x of gdb has been deprecated for more than four

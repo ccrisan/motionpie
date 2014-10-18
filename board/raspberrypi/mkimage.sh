@@ -92,8 +92,8 @@ msg "copying boot filesystem contents"
 cp $BOOT_SRC/bootcode.bin $BOOT
 cp $BOOT_SRC/config.txt $BOOT
 cp $BOOT_SRC/cmdline.txt $BOOT
-cp $BOOT_SRC/start_x.elf $BOOT
-cp $BOOT_SRC/fixup_x.dat $BOOT
+cp $BOOT_SRC/start.elf $BOOT
+cp $BOOT_SRC/fixup.dat $BOOT
 cp $BOOT_SRC/kernel.img $BOOT
 cp $BOOT_SRC/fwupdater.gz $BOOT
 sync

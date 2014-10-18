@@ -4,11 +4,14 @@
 #
 ################################################################################
 
-KNOCK_VERSION = 7ce33cd553800f48f16b3bb70b9cd0f1310d2c18
-KNOCK_SITE = $(call github,jvinet,knock,$(KNOCK_VERSION))
+KNOCK_VERSION = 0.7
+KNOCK_SITE = http://www.zeroflux.org/proj/knock/files
 KNOCK_LICENSE = GPLv2+
 KNOCK_LICENSE_FILES = COPYING
-KNOCK_AUTORECONF = YES
 KNOCK_DEPENDENCIES = libpcap
+
+ifeq ($(BR2_PREFER_STATIC_LIB),y)
+KNOCK_CONF_OPT = LIBS="$(shell $(STAGING_DIR)/usr/bin/pcap-config --static --additional-libs)"
+endif
 
 $(eval $(autotools-package))

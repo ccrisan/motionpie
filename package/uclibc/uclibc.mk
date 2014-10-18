@@ -6,6 +6,8 @@
 
 UCLIBC_VERSION = $(call qstrip,$(BR2_UCLIBC_VERSION_STRING))
 UCLIBC_SOURCE ?= uClibc-$(UCLIBC_VERSION).tar.bz2
+UCLIBC_LICENSE = LGPLv2.1+
+UCLIBC_LICENSE_FILES = COPYING.LIB
 
 ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
 UCLIBC_SITE = http://www.uclibc.org/downloads/snapshots
@@ -35,6 +37,14 @@ ifndef UCLIBC_CONFIG_FILE
 UCLIBC_CONFIG_FILE = $(call qstrip,$(BR2_UCLIBC_CONFIG))
 endif
 
+UCLIBC_KCONFIG_FILE = $(UCLIBC_CONFIG_FILE)
+
+UCLIBC_KCONFIG_OPT = \
+		$(UCLIBC_MAKE_FLAGS) \
+		PREFIX=$(STAGING_DIR) \
+		DEVEL_PREFIX=/usr/ \
+		RUNTIME_PREFIX=$(STAGING_DIR)/ \
+
 UCLIBC_TARGET_ARCH = $(call qstrip,$(BR2_UCLIBC_TARGET_ARCH))
 
 ifeq ($(GENERATE_LOCALE),)
@@ -47,35 +57,13 @@ UCLIBC_LOCALES = $(foreach locale,$(GENERATE_LOCALE),\
 endif
 
 #
-# Utility functions to manipulation the uClibc configuration file
-#
-
-define UCLIBC_OPT_SET
-	$(SED) '/$(1)/d' $(3)/.config
-	echo '$(1)=$(2)' >> $(3)/.config
-endef
-
-define UCLIBC_OPT_UNSET
-	$(SED) '/$(1)/d' $(2)/.config
-	echo '# $(1) is not set' >> $(2)/.config
-endef
-
-#
 # ARM definitions
 #
 
 ifeq ($(UCLIBC_TARGET_ARCH),arm)
-UCLIBC_ARM_TYPE = CONFIG_$(call qstrip,$(BR2_UCLIBC_ARM_TYPE))
-
-define UCLIBC_ARM_TYPE_CONFIG
-	$(SED) 's/^\(CONFIG_[^_]*[_]*ARM[^=]*\)=.*/# \1 is not set/g' \
-		$(@D)/.config
-	$(call UCLIBC_OPT_SET,$(UCLIBC_ARM_TYPE),y,$(@D))
-endef
-
 define UCLIBC_ARM_ABI_CONFIG
 	$(SED) '/CONFIG_ARM_.ABI/d' $(@D)/.config
-	$(call UCLIBC_OPT_SET,CONFIG_ARM_EABI,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,CONFIG_ARM_EABI,$(@D)/.config)
 endef
 
 # Thumb build is broken with threads, build in ARM mode
@@ -85,11 +73,11 @@ endif
 
 ifeq ($(BR2_UCLIBC_ARM_BX),y)
 define UCLIBC_ARM_BX_CONFIG
-	$(call UCLIBC_OPT_SET,USE_BX,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,USE_BX,$(@D)/.config)
 endef
 else
 define UCLIBC_ARM_BX_CONFIG
-	$(call UCLIBC_OPT_UNSET,USE_BX,$(@D))
+	$(call KCONFIG_DISABLE_OPT,USE_BX,$(@D)/.config)
 endef
 endif
 
@@ -103,13 +91,13 @@ ifeq ($(UCLIBC_TARGET_ARCH),mips)
 UCLIBC_MIPS_ABI = CONFIG_MIPS_$(call qstrip,$(BR2_UCLIBC_MIPS_ABI))_ABI
 define UCLIBC_MIPS_ABI_CONFIG
 	$(SED) '/CONFIG_MIPS_[NO].._ABI/d' $(@D)/.config
-	$(call UCLIBC_OPT_SET,$(UCLIBC_MIPS_ABI),y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,$(UCLIBC_MIPS_ABI),$(@D)/.config)
 endef
 
 UCLIBC_MIPS_ISA = CONFIG_MIPS_ISA_$(call qstrip,$(BR2_UCLIBC_MIPS_ISA))
 define UCLIBC_MIPS_ISA_CONFIG
 	$(SED) '/CONFIG_MIPS_ISA_.*/d' $(@D)/.config
-	$(call UCLIBC_OPT_SET,$(UCLIBC_MIPS_ISA),y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,$(UCLIBC_MIPS_ISA),$(@D)/.config)
 endef
 endif # mips
 
@@ -121,7 +109,7 @@ ifeq ($(UCLIBC_TARGET_ARCH),sh)
 UCLIBC_SH_TYPE = CONFIG_$(call qstrip,$(BR2_UCLIBC_SH_TYPE))
 define UCLIBC_SH_TYPE_CONFIG
 	$(SED) '/CONFIG_SH[234A]*/d' $(@D)/.config
-	$(call UCLIBC_OPT_SET,$(UCLIBC_SH_TYPE),y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,$(UCLIBC_SH_TYPE),$(@D)/.config)
 endef
 endif # sh
 
@@ -134,7 +122,7 @@ UCLIBC_SPARC_TYPE = CONFIG_SPARC_$(call qstrip,$(BR2_UCLIBC_SPARC_TYPE))
 define UCLIBC_SPARC_TYPE_CONFIG
 	$(SED) 's/^\(CONFIG_[^_]*[_]*SPARC[^=]*\)=.*/# \1 is not set/g' \
 		 $(@D)/.config
-	$(call UCLIBC_OPT_SET,$(UCLIBC_SPARC_TYPE),y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,$(UCLIBC_SPARC_TYPE),$(@D)/.config)
 endef
 endif # sparc
 
@@ -145,9 +133,9 @@ endif # sparc
 ifeq ($(UCLIBC_TARGET_ARCH),powerpc)
 UCLIBC_POWERPC_TYPE = CONFIG_$(call qstrip,$(BR2_UCLIBC_POWERPC_TYPE))
 define UCLIBC_POWERPC_TYPE_CONFIG
-	$(call UCLIBC_OPT_UNSET,CONFIG_GENERIC,$(@D))
-	$(call UCLIBC_OPT_UNSET,CONFIG_E500,$(@D))
-	$(call UCLIBC_OPT_SET,$(UCLIBC_POWERPC_TYPE),y,$(@D))
+	$(call KCONFIG_DISABLE_OPT,CONFIG_GENERIC,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,CONFIG_E500,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,$(UCLIBC_POWERPC_TYPE),$(@D)/.config)
 endef
 endif # powerpc
 
@@ -158,34 +146,34 @@ endif # powerpc
 ifeq ($(UCLIBC_TARGET_ARCH),bfin)
 ifeq ($(BR2_BINFMT_FDPIC),y)
 define UCLIBC_BFIN_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FLAT,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_SHARED_FLAT,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_FORMAT_FDPIC_ELF,y,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FLAT,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_SHARED_FLAT,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_FORMAT_FDPIC_ELF,$(@D)/.config)
 endef
 endif
 ifeq ($(BR2_BINFMT_FLAT_ONE),y)
 define UCLIBC_BFIN_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_FORMAT_FLAT,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_SHARED_FLAT,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FDPIC_ELF,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_FORMAT_FLAT,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_SHARED_FLAT,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FDPIC_ELF,$(@D)/.config)
 endef
 endif
 ifeq ($(BR2_BINFMT_FLAT_SEP_DATA),y)
 define UCLIBC_BFIN_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FLAT,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_FORMAT_FLAT_SEP_DATA,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_SHARED_FLAT,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FDPIC_ELF,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FLAT,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_SHARED_FLAT,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FDPIC_ELF,$(@D)/.config)
 endef
 endif
 ifeq ($(BR2_BINFMT_FLAT_SHARED),y)
 define UCLIBC_BFIN_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FLAT,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_FORMAT_SHARED_FLAT,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_FORMAT_FDPIC_ELF,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FLAT,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FLAT_SEP_DATA,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_FORMAT_SHARED_FLAT,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_FORMAT_FDPIC_ELF,$(@D)/.config)
 endef
 endif
 endif # bfin
@@ -196,7 +184,7 @@ endif # bfin
 
 ifeq ($(UCLIBC_TARGET_ARCH),avr32)
 define UCLIBC_AVR32_CONFIG
-	$(call UCLIBC_OPT_SET,LINKRELAX,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,LINKRELAX,$(@D)/.config)
 endef
 endif # avr32
 
@@ -206,7 +194,7 @@ endif # avr32
 ifeq ($(UCLIBC_TARGET_ARCH),i386)
 UCLIBC_X86_TYPE = CONFIG_$(call qstrip,$(BR2_UCLIBC_X86_TYPE))
 define UCLIBC_X86_TYPE_CONFIG
-	$(call UCLIBC_OPT_SET,$(UCLIBC_X86_TYPE),y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,$(UCLIBC_X86_TYPE),$(@D)/.config)
 endef
 endif
 
@@ -216,17 +204,17 @@ endif
 
 ifeq ($(call qstrip,$(BR2_ENDIAN)),BIG)
 define UCLIBC_ENDIAN_CONFIG
-	$(call UCLIBC_OPT_SET,ARCH_BIG_ENDIAN,y,$(@D))
-	$(call UCLIBC_OPT_SET,ARCH_WANTS_BIG_ENDIAN,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,ARCH_LITTLE_ENDIAN,$(@D))
-	$(call UCLIBC_OPT_UNSET,ARCH_WANTS_LITTLE_ENDIAN,$(@D))
+	$(call KCONFIG_ENABLE_OPT,ARCH_BIG_ENDIAN,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,ARCH_WANTS_BIG_ENDIAN,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,ARCH_LITTLE_ENDIAN,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,ARCH_WANTS_LITTLE_ENDIAN,$(@D)/.config)
 endef
 else
 define UCLIBC_ENDIAN_CONFIG
-	$(call UCLIBC_OPT_SET,ARCH_LITTLE_ENDIAN,y,$(@D))
-	$(call UCLIBC_OPT_SET,ARCH_WANTS_LITTLE_ENDIAN,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,ARCH_BIG_ENDIAN,$(@D))
-	$(call UCLIBC_OPT_UNSET,ARCH_WANTS_BIG_ENDIAN,$(@D))
+	$(call KCONFIG_ENABLE_OPT,ARCH_LITTLE_ENDIAN,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,ARCH_WANTS_LITTLE_ENDIAN,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,ARCH_BIG_ENDIAN,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,ARCH_WANTS_BIG_ENDIAN,$(@D)/.config)
 endef
 endif
 
@@ -236,12 +224,12 @@ endif
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_LARGEFILE),y)
 define UCLIBC_LARGEFILE_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_LFS,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_LFS,$(@D)/.config)
 endef
 else
 define UCLIBC_LARGEFILE_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_LFS,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_FOPEN_LARGEFILE_MODE,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_LFS,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_FOPEN_LARGEFILE_MODE,$(@D)/.config)
 endef
 endif
 
@@ -251,11 +239,11 @@ endif
 
 ifeq ($(BR2_USE_MMU),y)
 define UCLIBC_MMU_CONFIG
-	$(call UCLIBC_OPT_SET,ARCH_USE_MMU,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,ARCH_USE_MMU,$(@D)/.config)
 endef
 else
 define UCLIBC_MMU_CONFIG
-	$(call UCLIBC_OPT_UNSET,ARCH_USE_MMU,$(@D))
+	$(call KCONFIG_DISABLE_OPT,ARCH_USE_MMU,$(@D)/.config)
 endef
 endif
 
@@ -264,9 +252,9 @@ endif
 #
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_INET_IPV6),y)
-UCLIBC_IPV6_CONFIG = $(call UCLIBC_OPT_SET,UCLIBC_HAS_IPV6,y,$(@D))
+UCLIBC_IPV6_CONFIG = $(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_IPV6,$(@D)/.config)
 else
-UCLIBC_IPV6_CONFIG = $(call UCLIBC_OPT_UNSET,UCLIBC_HAS_IPV6,$(@D))
+UCLIBC_IPV6_CONFIG = $(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_IPV6,$(@D)/.config)
 endif
 
 #
@@ -275,15 +263,15 @@ endif
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_INET_RPC),y)
 define UCLIBC_RPC_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_RPC,y,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_FULL_RPC,y,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_REENTRANT_RPC,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_RPC,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_FULL_RPC,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_REENTRANT_RPC,$(@D)/.config)
 endef
 else
 define UCLIBC_RPC_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_RPC,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_FULL_RPC,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_REENTRANT_RPC,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_RPC,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_FULL_RPC,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_REENTRANT_RPC,$(@D)/.config)
 endef
 endif
 
@@ -293,14 +281,14 @@ endif
 
 ifeq ($(BR2_SOFT_FLOAT),y)
 define UCLIBC_FLOAT_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_FPU,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_FLOATS,y,$(@D))
-	$(call UCLIBC_OPT_SET,DO_C99_MATH,y,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_FPU,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_FLOATS,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,DO_C99_MATH,$(@D)/.config)
 endef
 else
 define UCLIBC_FLOAT_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_FPU,y,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_FLOATS,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_FPU,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_FLOATS,$(@D)/.config)
 endef
 endif
 
@@ -309,13 +297,13 @@ endif
 #
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_USE_SSP),y)
 define UCLIBC_SSP_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_SSP,y,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_BUILD_SSP,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_SSP,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_BUILD_SSP,$(@D)/.config)
 endef
 else
 define UCLIBC_SSP_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_SSP,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_BUILD_SSP,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_SSP,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_BUILD_SSP,$(@D)/.config)
 endef
 endif
 
@@ -324,31 +312,31 @@ endif
 #
 ifeq ($(BR2_PTHREADS_NONE),y)
 define UCLIBC_THREAD_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_THREADS,$(@D))
-	$(call UCLIBC_OPT_UNSET,LINUXTHREADS,$(@D))
-	$(call UCLIBC_OPT_UNSET,LINUXTHREADS_OLD,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_THREADS_NATIVE,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_THREADS,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,LINUXTHREADS,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,LINUXTHREADS_OLD,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_THREADS_NATIVE,$(@D)/.config)
 endef
 else ifeq ($(BR2_PTHREADS),y)
 define UCLIBC_THREAD_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_THREADS,y,$(@D))
-	$(call UCLIBC_OPT_SET,LINUXTHREADS_NEW,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,LINUXTHREADS_OLD,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_THREADS_NATIVE,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_THREADS,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,LINUXTHREADS_NEW,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,LINUXTHREADS_OLD,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_THREADS_NATIVE,$(@D)/.config)
 endef
 else ifeq ($(BR2_PTHREADS_OLD),y)
 define UCLIBC_THREAD_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_THREADS,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,LINUXTHREADS_NEW,$(@D))
-	$(call UCLIBC_OPT_SET,LINUXTHREADS_OLD,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_THREADS_NATIVE,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_THREADS,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,LINUXTHREADS_NEW,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,LINUXTHREADS_OLD,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_THREADS_NATIVE,$(@D)/.config)
 endef
 else ifeq ($(BR2_PTHREADS_NATIVE),y)
 define UCLIBC_THREAD_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_THREADS,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,LINUXTHREADS_NEW,$(@D))
-	$(call UCLIBC_OPT_UNSET,LINUXTHREADS_OLD,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_THREADS_NATIVE,y,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_THREADS,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,LINUXTHREADS_NEW,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,LINUXTHREADS_OLD,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_THREADS_NATIVE,$(@D)/.config)
 endef
 endif
 
@@ -357,9 +345,9 @@ endif
 #
 
 ifeq ($(BR2_PTHREAD_DEBUG),y)
-UCLIBC_THREAD_DEBUG_CONFIG = $(call UCLIBC_OPT_SET,PTHREADS_DEBUG_SUPPORT,y,$(@D))
+UCLIBC_THREAD_DEBUG_CONFIG = $(call KCONFIG_ENABLE_OPT,PTHREADS_DEBUG_SUPPORT,$(@D)/.config)
 else
-UCLIBC_THREAD_DEBUG_CONFIG = $(call UCLIBC_OPT_UNSET,PTHREADS_DEBUG_SUPPORT,$(@D))
+UCLIBC_THREAD_DEBUG_CONFIG = $(call KCONFIG_DISABLE_OPT,PTHREADS_DEBUG_SUPPORT,$(@D)/.config)
 endif
 
 #
@@ -368,18 +356,18 @@ endif
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_LOCALE),y)
 define UCLIBC_LOCALE_CONFIG
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_LOCALE,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_BUILD_ALL_LOCALE,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_BUILD_MINIMAL_LOCALE,y,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_BUILD_MINIMAL_LOCALES,"$(UCLIBC_LOCALES)",$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_PREGENERATED_LOCALE_DATA,$(@D))
-	$(call UCLIBC_OPT_UNSET,DOWNLOAD_PREGENERATED_LOCALE_DATA,$(@D))
-	$(call UCLIBC_OPT_SET,UCLIBC_HAS_XLOCALE,y,$(@D))
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_GLIBC_DIGIT_GROUPING,$(@D))
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_LOCALE,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_BUILD_ALL_LOCALE,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_BUILD_MINIMAL_LOCALE,$(@D)/.config)
+	$(call KCONFIG_SET_OPT,UCLIBC_BUILD_MINIMAL_LOCALES,"$(UCLIBC_LOCALES)",$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_PREGENERATED_LOCALE_DATA,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,DOWNLOAD_PREGENERATED_LOCALE_DATA,$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_XLOCALE,$(@D)/.config)
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_GLIBC_DIGIT_GROUPING,$(@D)/.config)
 endef
 else
 define UCLIBC_LOCALE_CONFIG
-	$(call UCLIBC_OPT_UNSET,UCLIBC_HAS_LOCALE,$(@D))
+	$(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_LOCALE,$(@D)/.config)
 endef
 endif
 
@@ -388,9 +376,9 @@ endif
 #
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT_WCHAR),y)
-UCLIBC_WCHAR_CONFIG = $(call UCLIBC_OPT_SET,UCLIBC_HAS_WCHAR,y,$(@D))
+UCLIBC_WCHAR_CONFIG = $(call KCONFIG_ENABLE_OPT,UCLIBC_HAS_WCHAR,$(@D)/.config)
 else
-UCLIBC_WCHAR_CONFIG = $(call UCLIBC_OPT_UNSET,UCLIBC_HAS_WCHAR,$(@D))
+UCLIBC_WCHAR_CONFIG = $(call KCONFIG_DISABLE_OPT,UCLIBC_HAS_WCHAR,$(@D)/.config)
 endif
 
 #
@@ -398,9 +386,9 @@ endif
 #
 
 ifeq ($(BR2_STRIP_none),y)
-UCLIBC_STRIP_CONFIG = $(call UCLIBC_OPT_UNSET,DOSTRIP,$(@D))
+UCLIBC_STRIP_CONFIG = $(call KCONFIG_DISABLE_OPT,DOSTRIP,$(@D)/.config)
 else
-UCLIBC_STRIP_CONFIG = $(call UCLIBC_OPT_SET,DOSTRIP,y,$(@D))
+UCLIBC_STRIP_CONFIG = $(call KCONFIG_ENABLE_OPT,DOSTRIP,$(@D)/.config)
 endif
 
 #
@@ -413,17 +401,15 @@ UCLIBC_MAKE_FLAGS = \
 	UCLIBC_EXTRA_CFLAGS="$(UCLIBC_EXTRA_CFLAGS) $(TARGET_ABI)" \
 	HOSTCC="$(HOSTCC)"
 
-define UCLIBC_SETUP_DOT_CONFIG
-	$(INSTALL) -m 0644 $(UCLIBC_CONFIG_FILE) $(@D)/.config
-	$(call UCLIBC_OPT_SET,CROSS_COMPILER_PREFIX,"$(TARGET_CROSS)",$(@D))
-	$(call UCLIBC_OPT_SET,TARGET_$(UCLIBC_TARGET_ARCH),y,$(@D))
-	$(call UCLIBC_OPT_SET,TARGET_ARCH,"$(UCLIBC_TARGET_ARCH)",$(@D))
-	$(call UCLIBC_OPT_SET,KERNEL_HEADERS,"$(STAGING_DIR)/usr/include",$(@D))
-	$(call UCLIBC_OPT_SET,RUNTIME_PREFIX,"/",$(@D))
-	$(call UCLIBC_OPT_SET,DEVEL_PREFIX,"/usr",$(@D))
-	$(call UCLIBC_OPT_SET,SHARED_LIB_LOADER_PREFIX,"/lib",$(@D))
+define UCLIBC_KCONFIG_FIXUP_CMDS
+	$(call KCONFIG_SET_OPT,CROSS_COMPILER_PREFIX,"$(TARGET_CROSS)",$(@D)/.config)
+	$(call KCONFIG_ENABLE_OPT,TARGET_$(UCLIBC_TARGET_ARCH),$(@D)/.config)
+	$(call KCONFIG_SET_OPT,TARGET_ARCH,"$(UCLIBC_TARGET_ARCH)",$(@D)/.config)
+	$(call KCONFIG_SET_OPT,KERNEL_HEADERS,"$(LINUX_HEADERS_DIR)/usr/include",$(@D)/.config)
+	$(call KCONFIG_SET_OPT,RUNTIME_PREFIX,"/",$(@D)/.config)
+	$(call KCONFIG_SET_OPT,DEVEL_PREFIX,"/usr",$(@D)/.config)
+	$(call KCONFIG_SET_OPT,SHARED_LIB_LOADER_PREFIX,"/lib",$(@D)/.config)
 	$(UCLIBC_MMU_CONFIG)
-	$(UCLIBC_ARM_TYPE_CONFIG)
 	$(UCLIBC_ARM_ABI_CONFIG)
 	$(UCLIBC_ARM_BX_CONFIG)
 	$(UCLIBC_MIPS_ABI_CONFIG)
@@ -445,16 +431,9 @@ define UCLIBC_SETUP_DOT_CONFIG
 	$(UCLIBC_LOCALE_CONFIG)
 	$(UCLIBC_WCHAR_CONFIG)
 	$(UCLIBC_STRIP_CONFIG)
-	yes "" | $(MAKE1) -C $(@D) \
-		$(UCLIBC_MAKE_FLAGS) \
-		PREFIX=$(STAGING_DIR) \
-		DEVEL_PREFIX=/usr/ \
-		RUNTIME_PREFIX=$(STAGING_DIR) \
-		oldconfig
 endef
 
 define UCLIBC_CONFIGURE_CMDS
-	$(UCLIBC_SETUP_DOT_CONFIG)
 	$(MAKE1) -C $(UCLIBC_DIR) \
 		$(UCLIBC_MAKE_FLAGS) \
 		PREFIX=$(STAGING_DIR) \
@@ -479,17 +458,28 @@ define UCLIBC_BUILD_TEST_SUITE
 endef
 endif
 
+# In uClibc 0.9.31 parallel building is broken so we have to disable it
+# Fortunately uClibc 0.9.31 is only used by AVR32 and in its turn AVR32 is
+# about to be removed from buildroot.
+#
+# So as soon as AVR32 is removed please revert this patch so instead of
+# UCLIBC_MAKE normal "MAKE" is used in UCLIBC_BUILD_CMDS
+ifeq ($(BR2_UCLIBC_VERSION_0_9_31),y)
+	UCLIBC_MAKE = $(MAKE1)
+else
+	UCLIBC_MAKE = $(MAKE)
+endif
+
 define UCLIBC_BUILD_CMDS
-	$(MAKE1) -C $(@D) \
+	$(UCLIBC_MAKE) -C $(@D) \
 		$(UCLIBC_MAKE_FLAGS) \
 		PREFIX= \
 		DEVEL_PREFIX=/ \
 		RUNTIME_PREFIX=/ \
 		all
-	$(MAKE1) -C $(@D)/utils \
+	$(MAKE) -C $(@D)/utils \
 		PREFIX=$(HOST_DIR) \
 		HOSTCC="$(HOSTCC)" hostutils
-	$(UCLIBC_BUILD_TEST_SUITE)
 endef
 
 ifeq ($(BR2_UCLIBC_INSTALL_TEST_SUITE),y)
@@ -519,11 +509,12 @@ define UCLIBC_INSTALL_TARGET_CMDS
 		RUNTIME_PREFIX=/ \
 		install_runtime
 	$(UCLIBC_INSTALL_UTILS_TARGET)
+	$(UCLIBC_BUILD_TEST_SUITE)
 	$(UCLIBC_INSTALL_TEST_SUITE)
 endef
 
-# For FLAT binfmts (static) there are no host utils
-ifeq ($(BR2_BINFMT_FLAT),)
+# STATIC has no ld* tools, only getconf
+ifeq ($(BR2_PREFER_STATIC_LIB),)
 define UCLIBC_INSTALL_UTILS_STAGING
 	$(INSTALL) -D -m 0755 $(@D)/utils/ldd.host $(HOST_DIR)/usr/bin/ldd
 	ln -sf ldd $(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-ldd
@@ -542,19 +533,7 @@ define UCLIBC_INSTALL_STAGING_CMDS
 	$(UCLIBC_INSTALL_UTILS_STAGING)
 endef
 
-uclibc-menuconfig: uclibc-patch
-	$(MAKE1) -C $(UCLIBC_DIR) \
-		$(UCLIBC_MAKE_FLAGS) \
-		PREFIX=$(STAGING_DIR) \
-		DEVEL_PREFIX=/usr/ \
-		RUNTIME_PREFIX=$(STAGING_DIR)/ \
-		menuconfig
-	rm -f $(UCLIBC_DIR)/.stamp_{configured,built,target_installed,staging_installed}
-
-$(eval $(generic-package))
-
-uclibc-update-config: $(UCLIBC_DIR)/.stamp_configured
-	cp -f $(UCLIBC_DIR)/.config $(UCLIBC_CONFIG_FILE)
+$(eval $(kconfig-package))
 
 # Before uClibc is built, we must have the second stage cross-compiler
 $(UCLIBC_TARGET_BUILD): | host-gcc-intermediate

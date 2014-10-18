@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for wget, to be called from the download wrapper script
+# Expected arguments:
+#   $1: output file
+#   $2: URL
+# And this environment:
+#   WGET     : the wget command to call
+
+output="${1}"
+url="${2}"
+
+${WGET} -O "${output}" "${url}"

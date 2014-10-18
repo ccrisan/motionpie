@@ -23,6 +23,16 @@ config BR2_EXTERNAL
 config BR2_NEEDS_HOST_JAVA
 	bool
 
+# Hidden boolean selected by packages in need of javac in order to build
+# (example: classpath)
+config BR2_NEEDS_HOST_JAVAC
+	bool
+
+# Hidden boolean selected by packages in need of jar in order to build
+# (example: classpath)
+config BR2_NEEDS_HOST_JAR
+	bool
+
 # Hidden boolean selected by pre-built packages for x86, when they
 # need to run on x86-64 machines (example: pre-built external
 # toolchains, binary tools like SAM-BA, etc.).
@@ -224,7 +234,7 @@ endif
 
 config BR2_LUAROCKS_MIRROR
 	string "LuaRocks mirror"
-	default "http://luarocks.org/repositories/rocks"
+	default "http://rocks.moonscript.org"
 	help
 	  LuaRocks repository.
 
@@ -232,7 +242,7 @@ config BR2_LUAROCKS_MIRROR
 
 config BR2_CPAN_MIRROR
 	string "CPAN mirror (Perl packages)"
-	default "http://search.cpan.org/CPAN"
+	default "http://cpan.metacpan.org"
 	help
 	  CPAN (Comprehensive Perl Archive Network) is a repository
 	  of Perl packages. It has multiple software mirrors scattered
@@ -256,7 +266,7 @@ config BR2_CCACHE
 	help
 	  This option will enable the use of ccache, a compiler
 	  cache. It will cache the result of previous builds to speed
-	  up future builds. The cache is stored in
+	  up future builds. By default, the cache is stored in
 	  $HOME/.buildroot-ccache.
 
 	  Note that Buildroot does not try to invalidate the cache
@@ -266,12 +276,29 @@ config BR2_CCACHE
 	  ccache cache by removing the $HOME/.buildroot-ccache
 	  directory.
 
+if BR2_CCACHE
+
 config BR2_CCACHE_DIR
 	string "Compiler cache location"
-	depends on BR2_CCACHE
 	default "$(HOME)/.buildroot-ccache"
 	help
 	  Where ccache should store cached files.
+
+config BR2_CCACHE_INITIAL_SETUP
+	string "Compiler cache initial setup"
+	help
+	  Initial ccache settings to apply, such as --max-files or --max-size.
+
+	  For example, if your project is known to require more space than the
+	  default max cache size, then you might want to increase the cache size
+	  to a suitable amount using the -M (--max-size) option.
+
+	  The string you specify here is passed verbatim to ccache.  Refer to
+	  ccache documentation for more details.
+
+	  These initial settings are applied after ccache has been compiled.
+
+endif
 
 config BR2_DEPRECATED
 	bool "Show packages that are deprecated or obsolete"
@@ -279,10 +306,6 @@ config BR2_DEPRECATED
 	  This option hides outdated/obsolete versions of packages.
 
 if BR2_DEPRECATED
-
-config BR2_DEPRECATED_SINCE_2013_08
-	bool
-	default y
 
 config BR2_DEPRECATED_SINCE_2013_11
 	bool
@@ -293,6 +316,10 @@ config BR2_DEPRECATED_SINCE_2014_02
 	default y
 
 config BR2_DEPRECATED_SINCE_2014_05
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2014_08
 	bool
 	default y
 
@@ -456,6 +483,39 @@ config BR2_OPTIMIZE_S
 	  -ftree-vect-loop-version
 
 endchoice
+
+config BR2_GOOGLE_BREAKPAD_ENABLE
+	bool "Enable google-breakpad support"
+	select BR2_PACKAGE_GOOGLE_BREAKPAD
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_TOOLCHAIN_USES_GLIBC
+	depends on BR2_PACKAGE_GOOGLE_BREAKPAD_ARCH_SUPPORTS
+	help
+	  This option will enable the use of google breakpad, a
+	  library and tool suite that allows you to distribute an
+	  application to users with compiler-provided debugging
+	  information removed, record crashes in compact "minidump"
+	  files, send them back to your server and produce C and C++
+	  stack traces from these minidumps.  Breakpad can also write
+	  minidumps on request for programs that have not crashed.
+
+if BR2_GOOGLE_BREAKPAD_ENABLE
+
+config BR2_GOOGLE_BREAKPAD_INCLUDE_FILES
+	string "List of executables and libraries to extract symbols from"
+	default ""
+	help
+	  You may specify a space-separated list of binaries and
+	  libraries with full paths relative to $(TARGET_DIR) of which
+	  debug symbols will be dumped for further use with google
+	  breakpad.
+
+	  A directory structure that can be used by minidump-stackwalk
+	  will be created at:
+
+	  $(STAGING_DIR)/usr/share/google-breakpad-symbols
+
+endif
 
 config BR2_ENABLE_SSP
 	bool "build code with Stack Smashing Protection"

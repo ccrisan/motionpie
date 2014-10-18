@@ -4,12 +4,12 @@
 #
 ################################################################################
 
-FREERDP_VERSION = 1.0.1
-FREERDP_SITE = https://github.com/downloads/FreeRDP/FreeRDP
+FREERDP_VERSION = 1.0.2
+FREERDP_SITE = $(call github,FreeRDP,FreeRDP,$(FREERDP_VERSION))
 FREERDP_DEPENDENCIES = openssl zlib \
 	xlib_libX11 xlib_libXt xlib_libXext xlib_libXcursor
 FREERDP_LICENSE = Apache-2.0
-FREEDRP_LICENSE_FILES = LICENSE
+FREERDP_LICENSE_FILES = LICENSE
 
 ifeq ($(BR2_PACKAGE_CUPS),y)
 FREERDP_CONF_OPT += -DWITH_CUPS=ON

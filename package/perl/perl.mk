@@ -12,9 +12,10 @@ PERL_LICENSE = Artistic or GPLv1+
 PERL_LICENSE_FILES = Artistic Copying README
 PERL_INSTALL_STAGING = YES
 
-PERL_CROSS_VERSION = 0.8.3
-PERL_CROSS_BASE_VERSION = 5.$(PERL_VERSION_MAJOR).1
-PERL_CROSS_SITE    = http://download.berlios.de/perlcross
+PERL_CROSS_VERSION = 0.8.5
+PERL_CROSS_BASE_VERSION = 5.$(PERL_VERSION_MAJOR).2
+# DO NOT refactor with the github helper (the result is not the same)
+PERL_CROSS_SITE    = http://raw.github.com/arsv/perl-cross/releases
 PERL_CROSS_SOURCE  = perl-$(PERL_CROSS_BASE_VERSION)-cross-$(PERL_CROSS_VERSION).tar.gz
 PERL_CROSS_OLD_POD = perl$(subst .,,$(PERL_CROSS_BASE_VERSION))delta.pod
 PERL_CROSS_NEW_POD = perl$(subst .,,$(PERL_VERSION))delta.pod
@@ -68,6 +69,10 @@ ifeq ($(shell expr $(PERL_VERSION_MAJOR) % 2), 1)
     PERL_CONF_OPT += -Dusedevel
 endif
 
+ifeq ($(BR2_PREFER_STATIC_LIB),y)
+    PERL_CONF_OPT += --all-static --no-dynaloader
+endif
+
 ifneq ($(BR2_LARGEFILE),y)
     PERL_CONF_OPT += -Uuselargefiles
 endif
@@ -94,4 +99,37 @@ define PERL_INSTALL_TARGET_CMDS
 	$(MAKE1) -C $(@D) DESTDIR="$(TARGET_DIR)" install.perl
 endef
 
+# perl infra: fix for Perl XS packages configured by Makefile.PL
+#
+# ExtUtils::MakeMaker adds all the header files used by the perl as
+# dependencies to the generated Makefile. This means that the generated
+# Makefile will depend on the system's header files.
+#
+# Usually this is not a problem, because when building the target package,
+# these header files will indeed be found in $(STAGING_DIR). However, some
+# distro's add an extra header file to the system's perl. This header is
+# also included in the generated Makefile, which makes the build fail
+# because it doesn't exist in $(STAGING_DIR).
+#
+# As a work-around, explicitly create this header file in $(STAGING_DIR).
+# It doesn't hurt to create it even if the system perl doesn't need it.
+#
+define PERL_ADD_CORE_H
+	touch $(STAGING_DIR)/usr/lib/perl5/$(PERL_VERSION)/$(PERL_ARCHNAME)/CORE/patchlevel-debian.h
+	touch $(STAGING_DIR)/usr/lib/perl5/$(PERL_VERSION)/$(PERL_ARCHNAME)/CORE/cc_runtime.h
+endef
+
+PERL_POST_INSTALL_STAGING_HOOKS += PERL_ADD_CORE_H
+
 $(eval $(generic-package))
+
+define PERL_FINALIZE_TARGET
+	rm -rf $(TARGET_DIR)/usr/lib/perl5/$(PERL_VERSION)/pod
+	rm -rf $(TARGET_DIR)/usr/lib/perl5/$(PERL_VERSION)/$(PERL_ARCHNAME)/CORE
+	find $(TARGET_DIR)/usr/lib/perl5/ -name 'extralibs.ld' -print0 | xargs -0 rm -f
+	find $(TARGET_DIR)/usr/lib/perl5/ -name '*.bs' -print0 | xargs -0 rm -f
+	find $(TARGET_DIR)/usr/lib/perl5/ -name '.packlist' -print0 | xargs -0 rm -f
+endef
+
+TARGET_FINALIZE_HOOKS += PERL_FINALIZE_TARGET
+

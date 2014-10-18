@@ -9,7 +9,7 @@
 # infrastructure
 #
 # In terms of implementation, this Python infrastructure requires the
-# .mk file to only specify metadata informations about the package:
+# .mk file to only specify metadata information about the package:
 # name, version, download URL, etc.
 #
 # We still allow the package .mk file to override what the different
@@ -35,8 +35,11 @@ PKG_PYTHON_DISTUTILS_ENV = \
 PKG_PYTHON_DISTUTILS_BUILD_OPT = \
 	--executable=/usr/bin/python
 
-PKG_PYTHON_DISTUTILS_INSTALL_OPT = \
+PKG_PYTHON_DISTUTILS_INSTALL_TARGET_OPT = \
 	--prefix=$(TARGET_DIR)/usr
+
+PKG_PYTHON_DISTUTILS_INSTALL_STAGING_OPT = \
+	--prefix=$(STAGING_DIR)/usr
 
 # Host distutils-based packages
 HOST_PKG_PYTHON_DISTUTILS_ENV = \
@@ -53,8 +56,14 @@ PKG_PYTHON_SETUPTOOLS_ENV = \
 	_python_prefix=/usr \
 	_python_exec_prefix=/usr
 
-PKG_PYTHON_SETUPTOOLS_INSTALL_OPT = \
+PKG_PYTHON_SETUPTOOLS_INSTALL_TARGET_OPT = \
 	--prefix=$(TARGET_DIR)/usr \
+	--executable=/usr/bin/python \
+	--single-version-externally-managed \
+	--root=/
+
+PKG_PYTHON_SETUPTOOLS_INSTALL_STAGING_OPT = \
+	--prefix=$(STAGING_DIR)/usr \
 	--executable=/usr/bin/python \
 	--single-version-externally-managed \
 	--root=/
@@ -73,7 +82,7 @@ HOST_PKG_PYTHON_SETUPTOOLS_INSTALL_OPT = \
 # infrastructure to generate the necessary make targets
 #
 #  argument 1 is the lowercase package name
-#  argument 2 is the uppercase package name, including an HOST_ prefix
+#  argument 2 is the uppercase package name, including a HOST_ prefix
 #             for host packages
 #  argument 3 is the uppercase package name, without the HOST_ prefix
 #             for host packages
@@ -82,7 +91,7 @@ HOST_PKG_PYTHON_SETUPTOOLS_INSTALL_OPT = \
 
 define inner-python-package
 
-$(2)_SRCDIR	= $$($(2)_DIR)/$($(2)_SUBDIR)
+$(2)_SRCDIR	= $$($(2)_DIR)/$$($(2)_SUBDIR)
 $(2)_BUILDDIR	= $$($(2)_SRCDIR)
 
 $(2)_ENV         ?=
@@ -91,7 +100,7 @@ $(2)_INSTALL_OPT ?=
 
 ifndef $(2)_SETUP_TYPE
  ifdef $(3)_SETUP_TYPE
-  $(2)_SETUP_TYPE = $($(3)_SETUP_TYPE)
+  $(2)_SETUP_TYPE = $$($(3)_SETUP_TYPE)
  else
   $$(error "$(2)_SETUP_TYPE must be set")
  endif
@@ -103,7 +112,8 @@ ifeq ($(4),target)
 $(2)_BASE_ENV         = $$(PKG_PYTHON_DISTUTILS_ENV)
 $(2)_BASE_BUILD_TGT   = build
 $(2)_BASE_BUILD_OPT   = $$(PKG_PYTHON_DISTUTILS_BUILD_OPT)
-$(2)_BASE_INSTALL_OPT = $$(PKG_PYTHON_DISTUTILS_INSTALL_OPT)
+$(2)_BASE_INSTALL_TARGET_OPT  = $$(PKG_PYTHON_DISTUTILS_INSTALL_TARGET_OPT)
+$(2)_BASE_INSTALL_STAGING_OPT = $$(PKG_PYTHON_DISTUTILS_INSTALL_STAGING_OPT)
 else
 $(2)_BASE_ENV         = $$(HOST_PKG_PYTHON_DISTUTILS_ENV)
 $(2)_BASE_BUILD_TGT   = build
@@ -116,7 +126,8 @@ ifeq ($(4),target)
 $(2)_BASE_ENV         = $$(PKG_PYTHON_SETUPTOOLS_ENV)
 $(2)_BASE_BUILD_TGT   = build
 $(2)_BASE_BUILD_OPT   =
-$(2)_BASE_INSTALL_OPT = $$(PKG_PYTHON_SETUPTOOLS_INSTALL_OPT)
+$(2)_BASE_INSTALL_TARGET_OPT  = $$(PKG_PYTHON_SETUPTOOLS_INSTALL_TARGET_OPT)
+$(2)_BASE_INSTALL_STAGING_OPT = $$(PKG_PYTHON_SETUPTOOLS_INSTALL_STAGING_OPT)
 else
 $(2)_BASE_ENV         = $$(HOST_PKG_PYTHON_SETUPTOOLS_ENV)
 $(2)_BASE_BUILD_TGT   = build
@@ -138,7 +149,9 @@ endif
 # depending on the package characteristics, and shouldn't be derived
 # automatically from the dependencies of the corresponding target
 # package.
-$(2)_DEPENDENCIES ?= $(filter-out host-python host-python3 host-python-setuptools host-toolchain $(1),$(patsubst host-host-%,host-%,$(addprefix host-,$($(3)_DEPENDENCIES))))
+ifeq ($(4),host)
+$(2)_DEPENDENCIES ?= $$(filter-out host-python host-python3 host-python-setuptools host-toolchain $(1),$$(patsubst host-host-%,host-%,$$(addprefix host-,$$($(3)_DEPENDENCIES))))
+endif
 
 # Target packages need both the python interpreter on the target (for
 # runtime) and the python interpreter on the host (for
@@ -155,19 +168,19 @@ $(2)_DEPENDENCIES ?= $(filter-out host-python host-python3 host-python-setuptool
 #   - otherwise, we depend on the one requested by *_NEEDS_HOST_PYTHON.
 #
 ifeq ($(4),target)
-$(2)_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON3),host-python3 python3,host-python python)
+$(2)_DEPENDENCIES += $$(if $$(BR2_PACKAGE_PYTHON3),host-python3 python3,host-python python)
 else
-ifeq ($($(2)_NEEDS_HOST_PYTHON),)
-$(2)_DEPENDENCIES += $(if $(BR2_PACKAGE_PYTHON3),host-python3,host-python)
+ifeq ($$($(2)_NEEDS_HOST_PYTHON),)
+$(2)_DEPENDENCIES += $$(if $$(BR2_PACKAGE_PYTHON3),host-python3,host-python)
 else
-ifeq ($($(2)_NEEDS_HOST_PYTHON),python2)
+ifeq ($$($(2)_NEEDS_HOST_PYTHON),python2)
 $(2)_DEPENDENCIES += host-python
-else ifeq ($($(2)_NEEDS_HOST_PYTHON),python3)
+else ifeq ($$($(2)_NEEDS_HOST_PYTHON),python3)
 $(2)_DEPENDENCIES += host-python3
 else
-$$(error Incorrect value '$($(2)_NEEDS_HOST_PYTHON)' for $(2)_NEEDS_HOST_PYTHON)
+$$(error Incorrect value '$$($(2)_NEEDS_HOST_PYTHON)' for $(2)_NEEDS_HOST_PYTHON)
 endif
-endif # ($($(2)_NEEDS_HOST_PYTHON),)
+endif # ($$($(2)_NEEDS_HOST_PYTHON),)
 endif # ($(4),target)
 
 # Setuptools based packages will need host-python-setuptools (both
@@ -196,12 +209,12 @@ endif
 #   - otherwise, we use the one requested by *_NEEDS_HOST_PYTHON.
 #
 ifeq ($(4),target)
-$(2)_PYTHON_INTERPRETER = $(HOST_DIR)/usr/bin/python
+$(2)_PYTHON_INTERPRETER = $$(HOST_DIR)/usr/bin/python
 else
-ifeq ($($(2)_NEEDS_HOST_PYTHON),)
-$(2)_PYTHON_INTERPRETER = $(HOST_DIR)/usr/bin/python
+ifeq ($$($(2)_NEEDS_HOST_PYTHON),)
+$(2)_PYTHON_INTERPRETER = $$(HOST_DIR)/usr/bin/python
 else
-$(2)_PYTHON_INTERPRETER = $(HOST_DIR)/usr/bin/$($(2)_NEEDS_HOST_PYTHON)
+$(2)_PYTHON_INTERPRETER = $$(HOST_DIR)/usr/bin/$$($(2)_NEEDS_HOST_PYTHON)
 endif
 endif
 
@@ -241,7 +254,22 @@ define $(2)_INSTALL_TARGET_CMDS
 	(cd $$($$(PKG)_BUILDDIR)/; \
 		$$($$(PKG)_BASE_ENV) $$($$(PKG)_ENV) \
 		$$($(2)_PYTHON_INTERPRETER) setup.py install \
-		$$($$(PKG)_BASE_INSTALL_OPT) $$($$(PKG)_INSTALL_OPT))
+		$$($$(PKG)_BASE_INSTALL_TARGET_OPT) \
+		$$($$(PKG)_INSTALL_TARGET_OPT))
+endef
+endif
+
+#
+# Staging installation step. Only define it if not already defined by
+# the package .mk file.
+#
+ifndef $(2)_INSTALL_STAGING_CMDS
+define $(2)_INSTALL_STAGING_CMDS
+	(cd $$($$(PKG)_BUILDDIR)/; \
+		$$($$(PKG)_BASE_ENV) $$($$(PKG)_ENV) \
+		$$($(2)_PYTHON_INTERPRETER) setup.py install \
+		$$($$(PKG)_BASE_INSTALL_STAGING_OPT) \
+		$$($$(PKG)_INSTALL_STAGING_OPT))
 endef
 endif
 

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PHP_VERSION = 5.5.12
+PHP_VERSION = 5.5.16
 PHP_SITE = http://www.php.net/distributions
 PHP_INSTALL_STAGING = YES
 PHP_INSTALL_STAGING_OPT = INSTALL_ROOT=$(STAGING_DIR) install
@@ -47,6 +47,7 @@ endif
 
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CLI),,--disable-cli)
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CGI),,--disable-cgi)
+PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_FPM),--enable-fpm,--disable-fpm)
 
 ### Extensions
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
@@ -73,7 +74,8 @@ PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
 		$(if $(BR2_PACKAGE_PHP_EXT_FILTER),--enable-filter) \
 		$(if $(BR2_PACKAGE_PHP_EXT_CALENDAR),--enable-calendar) \
 		$(if $(BR2_PACKAGE_PHP_EXT_FILEINFO),--enable-fileinfo) \
-		$(if $(BR2_PACKAGE_PHP_EXT_BCMATH),--enable-bcmath)
+		$(if $(BR2_PACKAGE_PHP_EXT_BCMATH),--enable-bcmath) \
+		$(if $(BR2_PACKAGE_PHP_EXT_PHAR),--enable-phar)
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_OPENSSL),y)
 	PHP_CONF_OPT += --with-openssl=$(STAGING_DIR)/usr

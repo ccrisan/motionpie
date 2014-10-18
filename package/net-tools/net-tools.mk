@@ -50,7 +50,9 @@ endef
 # install renames conflicting binaries, update does not
 # ifconfig & route reside in /sbin for busybox
 define NET_TOOLS_INSTALL_TARGET_CMDS
-	cp -f $(@D)/ifconfig $(TARGET_DIR)/sbin/ifconfig
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) update
+	mv -f $(TARGET_DIR)/bin/ifconfig $(TARGET_DIR)/sbin/ifconfig
+	mv -f $(TARGET_DIR)/bin/route $(TARGET_DIR)/sbin/route
 endef
 
 $(eval $(generic-package))

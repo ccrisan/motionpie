@@ -4,13 +4,12 @@
 #
 ################################################################################
 
-XSERVER_XORG_SERVER_VERSION = 1.15.1
+XSERVER_XORG_SERVER_VERSION = 1.16.0
 XSERVER_XORG_SERVER_SOURCE = xorg-server-$(XSERVER_XORG_SERVER_VERSION).tar.bz2
 XSERVER_XORG_SERVER_SITE = http://xorg.freedesktop.org/releases/individual/xserver
 XSERVER_XORG_SERVER_LICENSE = MIT
 XSERVER_XORG_SERVER_LICENSE_FILES = COPYING
 XSERVER_XORG_SERVER_INSTALL_STAGING = YES
-XSERVER_XORG_SERVER_INSTALL_STAGING_OPT = DESTDIR=$(STAGING_DIR) install install-data
 XSERVER_XORG_SERVER_DEPENDENCIES = 	\
 	xutil_util-macros 		\
 	xlib_libXfont 			\
@@ -171,8 +170,12 @@ ifeq ($(BR2_PACKAGE_XPROTO_DRI2PROTO),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += xproto_dri2proto
 XSERVER_XORG_SERVER_CONF_OPT += --enable-dri2
 endif
+ifeq ($(BR2_PACKAGE_XPROTO_DRI3PROTO),y)
+XSERVER_XORG_SERVER_DEPENDENCIES += xlib_libxshmfence xproto_dri3proto
+XSERVER_XORG_SERVER_CONF_OPT += --enable-dri3
+endif
 else
-XSERVER_XORG_SERVER_CONF_OPT += --disable-dri2
+XSERVER_XORG_SERVER_CONF_OPT += --disable-dri2 --disable-dri3
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXSCRNSAVER),y)

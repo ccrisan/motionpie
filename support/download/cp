@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for cp, to be called from the download wrapper script
+# Expected arguments:
+#   $1: output file
+#   $2: source file
+# And this environment:
+#   LOCALFILES: the cp command to call
+
+output="${1}"
+source="${2}"
+
+${LOCALFILES} "${source}" "${output}"

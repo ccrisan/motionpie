@@ -288,6 +288,7 @@ check_uclibc = \
 # configuration of the external toolchain.
 #
 # $1: cross-gcc path
+# $2: cross-readelf path
 #
 check_arm_abi = \
 	__CROSS_CC=$(strip $1) ; \
@@ -297,7 +298,7 @@ check_arm_abi = \
 		echo "External toolchain uses the unsuported OABI" ; \
 		exit 1 ; \
 	fi ; \
-	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o /dev/null - 2>/dev/null; then \
+	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o /dev/null - ; then \
 		abistr_$(BR2_ARM_EABI)='EABI'; \
 		abistr_$(BR2_ARM_EABIHF)='EABIhf'; \
 		echo "Incorrect ABI setting: $${abistr_y} selected, but toolchain is incompatible"; \

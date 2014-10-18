@@ -217,11 +217,6 @@ endif
 
 ifeq ($(BR2_arm)$(BR2_armeb),y)
 QT_EMB_PLATFORM = arm
-ifeq ($(BR2_GCC_VERSION_4_6_X),y)
-# workaround for gcc issue
-# http://gcc.gnu.org/ml/gcc-patches/2010-11/msg02245.html
-QT_CXXFLAGS += -fno-strict-volatile-bitfields
-endif
 else ifeq ($(BR2_avr32),y)
 QT_EMB_PLATFORM = avr32
 else ifeq ($(BR2_i386),y)
@@ -675,12 +670,14 @@ define QT_INSTALL_TARGET_POWERVR
 endef
 endif
 
+ifeq ($(BR2_PACKAGE_QT_TRANSLATION_FILES),y)
 define QT_INSTALL_TARGET_TRANSLATIONS
 	if [ -d $(STAGING_DIR)/usr/share/qt/translations/ ] ; then \
 		mkdir -p $(TARGET_DIR)/usr/share/qt/translations ; \
 		cp -dpfr $(STAGING_DIR)/usr/share/qt/translations/* $(TARGET_DIR)/usr/share/qt/translations ; \
 	fi
 endef
+endif
 
 define QT_INSTALL_TARGET_CMDS
 	$(QT_INSTALL_TARGET_LIBS)

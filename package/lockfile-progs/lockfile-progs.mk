@@ -6,7 +6,7 @@
 
 LOCKFILE_PROGS_VERSION = 0.1.17
 LOCKFILE_PROGS_SOURCE = lockfile-progs_$(LOCKFILE_PROGS_VERSION).tar.gz
-LOCKFILE_PROGS_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/l/lockfile-progs/
+LOCKFILE_PROGS_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/l/lockfile-progs
 LOCKFILE_PROGS_DEPENDENCIES = liblockfile
 LOCKFILE_PROGS_LICENSE = GPLv2
 LOCKFILE_PROGS_LICENSE_FILES = COPYING
@@ -21,7 +21,7 @@ endef
 
 define LOCKFILE_PROGS_INSTALL_TARGET_CMDS
 	for i in $(LOCKFILE_BINS); do \
-		install -D -m 755 $(@D)/bin/$$i $(TARGET_DIR)/usr/bin/$$i; \
+		$(INSTALL) -D -m 755 $(@D)/bin/$$i $(TARGET_DIR)/usr/bin/$$i; \
 	done
 endef
 

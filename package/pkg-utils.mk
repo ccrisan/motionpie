@@ -29,23 +29,23 @@ $(eval $(call caseconvert-helper,LOWERCASE,$(join $(addsuffix :,$([TO])),$([FROM
 
 #
 # Manipulation of .config files based on the Kconfig
-# infrastructure. Used by the Busybox package, the Linux kernel
+# infrastructure. Used by the BusyBox package, the Linux kernel
 # package, and more.
 #
 
-define KCONFIG_ENABLE_OPT
+define KCONFIG_ENABLE_OPT # (option, file)
 	$(SED) "/\\<$(1)\\>/d" $(2)
-	echo "$(1)=y" >> $(2)
+	echo '$(1)=y' >> $(2)
 endef
 
-define KCONFIG_SET_OPT
+define KCONFIG_SET_OPT # (option, value, file)
 	$(SED) "/\\<$(1)\\>/d" $(3)
-	echo "$(1)=$(2)" >> $(3)
+	echo '$(1)=$(2)' >> $(3)
 endef
 
-define KCONFIG_DISABLE_OPT
+define KCONFIG_DISABLE_OPT # (option, file)
 	$(SED) "/\\<$(1)\\>/d" $(2)
-	echo "# $(1) is not set" >> $(2)
+	echo '# $(1) is not set' >> $(2)
 endef
 
 # Helper functions to determine the name of a package and its
@@ -101,12 +101,12 @@ define legal-warning-pkg # pkg, text
 	echo "WARNING: $(1): $(2)" >>$(LEGAL_WARNINGS)
 endef
 
-define legal-warning-pkg-savednothing # pkg, {local|override}
-	$(call legal-warning-pkg,$(1),sources and license files not saved ($(2) packages not handled))
+define legal-warning-nosource # pkg, {local|override}
+	$(call legal-warning-pkg,$(1),sources not saved ($(2) packages not handled))
 endef
 
-define legal-manifest # pkg, version, license, license-files, source, {HOST|TARGET}
-	echo '"$(1)","$(2)","$(3)","$(4)","$(5)"' >>$(LEGAL_MANIFEST_CSV_$(6))
+define legal-manifest # pkg, version, license, license-files, source, url, {HOST|TARGET}
+	echo '"$(1)","$(2)","$(3)","$(4)","$(5)","$(6)"' >>$(LEGAL_MANIFEST_CSV_$(7))
 endef
 
 define legal-license-header # pkg, license-file, {HOST|TARGET}

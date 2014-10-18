@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for hg, to be called from the download wrapper script
+# Expected arguments:
+#   $1: output file
+#   $2: hg repo
+#   $3: hg cset
+#   $4: package's basename (eg. foobar-1.2.3)
+# And this environment:
+#   HG       : the hg command to call
+
+output="${1}"
+repo="${2}"
+cset="${3}"
+basename="${4}"
+
+${HG} clone --noupdate --rev "${cset}" "${repo}" "${basename}"
+
+${HG} archive --repository "${basename}" --type tgz \
+              --prefix "${basename}" --rev "${cset}" \
+              "${output}"

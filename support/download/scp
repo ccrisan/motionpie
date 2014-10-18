@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# We want to catch any unexpected failure, and exit immediately
+set -e
+
+# Download helper for scp, to be called from the download wrapper script
+# Expected arguments:
+#   $1: output file
+#   $2: URL
+# And this environment:
+#   SCP       : the scp command to call
+
+output="${1}"
+url="${2}"
+
+${SCP} "${url}" "${output}"

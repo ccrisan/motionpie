@@ -12,7 +12,7 @@
 # infrastructure
 #
 # In terms of implementation, this LuaRocks infrastructure requires
-# the .mk file to only specify metadata informations about the
+# the .mk file to only specify metadata information about the
 # package: name, version, etc.
 #
 ################################################################################
@@ -24,7 +24,7 @@
 # generate the necessary make targets
 #
 #  argument 1 is the lowercase package name
-#  argument 2 is the uppercase package name, including an HOST_ prefix
+#  argument 2 is the uppercase package name, including a HOST_ prefix
 #             for host packages
 #  argument 3 is the uppercase package name, without the HOST_ prefix
 #             for host packages
@@ -34,10 +34,10 @@
 define inner-luarocks-package
 
 $(2)_BUILD_OPT		?=
-$(2)_SUBDIR		?= $(1)-$(shell echo "$($(3)_VERSION)" | sed -e "s/-[0-9]$$//")
-$(2)_ROCKSPEC		?= $(1)-$($(3)_VERSION).rockspec
-$(2)_SOURCE		?= $(1)-$($(3)_VERSION).src.rock
-$(2)_SITE		?= $(call qstrip,$(BR2_LUAROCKS_MIRROR))
+$(2)_SUBDIR		?= $(1)-$$(shell echo "$$($(3)_VERSION)" | sed -e "s/-[0-9]$$$$//")
+$(2)_ROCKSPEC		?= $(1)-$$($(3)_VERSION).rockspec
+$(2)_SOURCE		?= $(1)-$$($(3)_VERSION).src.rock
+$(2)_SITE		?= $$(call qstrip,$$(BR2_LUAROCKS_MIRROR))
 
 # Since we do not support host-luarocks-package, we know this is
 # a target package, and can just add the required dependencies
@@ -49,7 +49,7 @@ $(2)_DEPENDENCIES	+= host-luarocks luainterpreter
 ifndef $(2)_EXTRACT_CMDS
 define $(2)_EXTRACT_CMDS
 	cd $$($(2)_DIR)/.. && \
-	 $$(LUAROCKS_RUN) unpack --force $(DL_DIR)/$$($(2)_SOURCE)
+	 $$(LUAROCKS_RUN) unpack --force $$(DL_DIR)/$$($(2)_SOURCE)
 endef
 endif
 
@@ -59,7 +59,7 @@ endif
 ifndef $(2)_INSTALL_TARGET_CMDS
 define $(2)_INSTALL_TARGET_CMDS
 	cd $$($(2)_SRCDIR) && \
-	 $$(LUAROCKS_RUN) make --deps-mode=none --keep $$($(2)_ROCKSPEC) $$($(2)_BUILD_OPT)
+	 $$(LUAROCKS_RUN) make --keep $$($(2)_ROCKSPEC) $$($(2)_BUILD_OPT)
 endef
 endif
 

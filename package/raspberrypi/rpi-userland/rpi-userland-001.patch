@@ -1,0 +1,74 @@
+diff -uNr userland-master/CMakeLists.txt userland-master-patched/CMakeLists.txt
+--- userland-master/CMakeLists.txt	2014-10-17 17:50:52.000000000 +0300
++++ userland-master-patched/CMakeLists.txt	2014-10-19 11:31:56.298348594 +0300
+@@ -108,3 +108,4 @@
+ 
+ # Remove cache entry, if one added by command line
+ unset(KHRONOS_EGL_PLATFORM CACHE)
++
+diff -uNr userland-master/host_applications/linux/libs/bcm_host/bcm_host.pc.in userland-master-patched/host_applications/linux/libs/bcm_host/bcm_host.pc.in
+--- userland-master/host_applications/linux/libs/bcm_host/bcm_host.pc.in	1970-01-01 02:00:00.000000000 +0200
++++ userland-master-patched/host_applications/linux/libs/bcm_host/bcm_host.pc.in	2014-10-19 11:31:33.717826737 +0300
+@@ -0,0 +1,11 @@
++prefix=/usr
++exec_prefix=${prefix}
++libdir=${exec_prefix}/lib
++includedir=${prefix}/include
++
++Name: bcm_host
++Description: Broadcom VideoCore host API library
++Version: 1
++Libs: -L${libdir} -lbcm_host -lvcos -lvchiq_arm
++Cflags: -I${includedir} -I${includedir}/interface/vmcs_host/linux -I${includedir}/interface/vcos/pthreads -DUSE_VCHIQ_ARM
++
+diff -uNr userland-master/host_applications/linux/libs/bcm_host/CMakeLists.txt userland-master-patched/host_applications/linux/libs/bcm_host/CMakeLists.txt
+--- userland-master/host_applications/linux/libs/bcm_host/CMakeLists.txt	2014-10-17 17:50:52.000000000 +0300
++++ userland-master-patched/host_applications/linux/libs/bcm_host/CMakeLists.txt	2014-10-19 11:32:12.892066162 +0300
+@@ -20,3 +20,8 @@
+ 
+ install(TARGETS bcm_host DESTINATION lib)
+ 
++configure_file("${CMAKE_CURRENT_SOURCE_DIR}/bcm_host.pc.in"
++  "${CMAKE_CURRENT_BINARY_DIR}/bcm_host.pc" @ONLY)
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bcm_host.pc"
++  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
++
+diff -uNr userland-master/interface/khronos/egl/egl.pc.in userland-master-patched/interface/khronos/egl/egl.pc.in
+--- userland-master/interface/khronos/egl/egl.pc.in	1970-01-01 02:00:00.000000000 +0200
++++ userland-master-patched/interface/khronos/egl/egl.pc.in	2014-10-19 11:32:57.789785108 +0300
+@@ -0,0 +1,12 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=${prefix}
++libdir=${exec_prefix}/lib
++includedir=${prefix}/include
++
++Name: egl
++Description: RasberryPi implementation of EGL
++Version: 10
++Libs: -L${libdir} -lEGL -lGLESv2 -lbcm_host -lvchostif
++Cflags: -I${includedir}/ -I${includedir}/interface/vcos/pthreads/ \
++        -I${includedir}/interface/vmcs_host/linux/
++
+diff -uNr userland-master/interface/vmcs_host/vc_vchi_dispmanx.c userland-master-patched/interface/vmcs_host/vc_vchi_dispmanx.c
+--- userland-master/interface/vmcs_host/vc_vchi_dispmanx.c	2014-10-17 17:50:52.000000000 +0300
++++ userland-master-patched/interface/vmcs_host/vc_vchi_dispmanx.c	2014-10-19 11:35:21.373741806 +0300
+@@ -1302,6 +1302,7 @@
+       } else {
+          // This is a vsync notification
+          if (dispmanx_client.vsync_callback ) {
++            vcos_assert( dispmanx_client.pending_update_handle == (DISPMANX_UPDATE_HANDLE_T) dispmanx_client.notify_buffer[1]);
+             dispmanx_client.vsync_callback(handle, dispmanx_client.vsync_callback_param);
+          }
+       }
+diff -uNr userland-master/makefiles/cmake/vmcs.cmake userland-master-patched/makefiles/cmake/vmcs.cmake
+--- userland-master/makefiles/cmake/vmcs.cmake	2014-10-17 17:50:52.000000000 +0300
++++ userland-master-patched/makefiles/cmake/vmcs.cmake	2014-10-19 11:36:21.895339700 +0300
+@@ -9,7 +9,7 @@
+ # Where shall we install?
+ if (ANDROID)
+   SET(VMCS_INSTALL_PREFIX "/vendor/brcm/islands" CACHE PATH "Prefix prepended to install directories" FORCE)
+-else()
++elseif(NOT DEFINED VMCS_INSTALL_PREFIX)
+   SET(VMCS_INSTALL_PREFIX "/opt/vc" CACHE PATH "Prefix prepended to install directories" FORCE)
+ endif()
+ 

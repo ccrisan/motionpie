@@ -1,5 +1,5 @@
-start_file=start_x.elf
-fixup_file=fixup_x.elf
+start_file=start.elf
+fixup_file=fixup.elf
 arm_freq=900
 core_freq=500
 sdram_freq=500

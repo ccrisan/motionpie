@@ -1,7 +1,7 @@
 menu "Target packages"
 
-source "package/busybox/Config.in"
-source "package/motioneye/Config.in"
+	source "package/busybox/Config.in"
+	source "package/motioneye/Config.in"
 
 menu "Audio and video applications"
 	source "package/alsa-utils/Config.in"
@@ -37,7 +37,7 @@ menu "Audio and video applications"
 	source "package/wavpack/Config.in"
 	source "package/xbmc/Config.in"
 	source "package/yavta/Config.in"
-    endmenu
+endmenu
 
 menu "Compressors and decompressors"
 	source "package/bzip2/Config.in"

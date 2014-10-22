@@ -143,13 +143,39 @@ NTP is used to synchronize the system time, so an Internet connection is require
 
 You can log into your motionPie using SSH. It listens on the standard 22 port. The only enabled user is `root` and the password is the serial number of your PI unit. Don't worry, the serial number is part of motionPie's hostname and will appear as part of the welcome banner when you're asked for a password.
 
-The SD card has 3 partitions, as follows:
-* the boot partition, mounted at `/boot`, read-only
-* the root partition, mounted at `/`, read-only
-* the data partition, mounted at `/data`, writable
-
-If you want to make changes on any of the read-only partitions, you need to mount them read-write first. For example:
-
-    mount -o remount,rw /
-
 If you want to dig deeper you can log in on the serial port of your PI. Just connect it to your PC's serial port and use your favorite serial terminal program to log in or simply watch the output of the system. The serial port is configured as 115200 8N1.
+
+## Tweaks ##
+
+### Partition Layout ###
+
+motionPie uses three partitions:
+
+	1. a boot partition, FAT32, about 16M, mounted read-only at /boot
+	2. a root partition, EXT4, about 120M, mounted read-only at /
+	3. a data partition, EXT4, fills up the entire remaining card space, mounted read-wrtie at /data
+	
+The *boot* and *root* partitions are both overwritten when performing an update (except for the `/boot/config.txt` file which is preserved). Whenever you need to change something on either *root* or *boot* partitions, run the following command to make them writable:
+
+	mount -o remount,rw /
+	mount -o remount,rw /boot
+
+The *data* partition contains all the configuration files as well as media files (recorded movies and pictures taken). It is created and formatted at first boot. Wiping out the *data* partition is equivalent to a *factory reset*.
+
+### Manually Editing Network Configuration ###
+
+There's no `/etc/network/interfaces` file. Networking is configured by `/etc/init.d/S35wifi` and `/etc/init.d/S40network`.
+
+The wifi script looks for `/data/etc/wpa_supplicant.conf`; if found, it's used to establish the wifi connection. If this file is absent, it looks for `/etc/wpa_supplicant.conf` (normally created by `writeimage.sh`) and it copies it over to `/data/etc/`, using it thereafter. If none of the files are present, wifi connection is skipped.
+
+The network script looks for `/data/etc/static_ip.conf`; if found, it's used for configuring the IP of the *first* connected interface (`wlan0`, `eth0` in this order). If this file is absent, it looks for `/etc/static_ip.conf` (normally created by `writeimage.sh`) and it copies it over to `/data/etc`, using it thereafter.. If none of the files are present, all the connected interfaces are configured using *DHCP*.
+
+Here's an example of a `static_ip.conf` file:
+
+	static_ip="192.168.0.3/24"
+	static_gw="192.168.0.1"
+	static_dns="8.8.8.8"
+
+### Tweaking motionEye ###
+
+motionEye is installed at `/programs/motioneye`, on the *root* partition. After remounting the root partition read-write, you can edit `/programs/motioneye/settings.py` and its startup script, `/etc/init.d/S95motioneye`.

@@ -4,13 +4,17 @@
 
 mkdir -p /var/lib/ntp
 
+set_current_date() {
+    timestamp=$(python -c 'import calendar, httplib, email.utils; conn = httplib.HTTPConnection("google.com"); conn.request("HEAD", "/"); \
+            print calendar.timegm(email.utils.parsedate(conn.getresponse().getheader("date")))')
+    
+    date +%s -s @$timestamp > /dev/null
+}
+
 start() {
-    server=$(cat /etc/ntp.conf | grep server | head -n 1 | cut -d ' ' -f 2)
-    if [ -n "$server" ]; then
-        echo -n "Starting ntpdate: "
-        ntpdate $server > /dev/null
-        [ $? == 0 ] && echo "done" || echo "failed"
-    fi
+    echo -n "Setting current date: "
+    set_current_date
+    [ $? == 0 ] && date || echo "failed"
 
     echo -n "Starting ntpd: "
     ntpd -g -c /etc/ntp.conf

@@ -23,7 +23,7 @@ null::sysinit:/sbin/loadmodules
 ::sysinit:/etc/init.d/rcS
 
 # Put a getty on the serial port
-#tty1::respawn:/sbin/getty -L tty1 115200 vt100
+tty1::respawn:/sbin/getty -L tty1 115200 vt100
 ttyAMA0::respawn:/sbin/getty -L ttyAMA0 115200 vt100
 
 # Stuff to do for the 3-finger salute

@@ -108,7 +108,8 @@ start() {
 
 stop() {
     echo -n "Shutting down pppd: "
-    kill `pidof pppd`
+    kill `pidof pppd` 2>/dev/null
+    ps | grep ppp | grep -v $$ | grep -v grep | tr -s ' ' | cut -d ' ' -f 2 | xargs -r kill
     echo "done"
 }
 

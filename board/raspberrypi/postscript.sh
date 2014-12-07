@@ -104,8 +104,6 @@ rm -f $TARGET/usr/bin/slogin
 rm -f $TARGET/usr/bin/ssh-keyscan
 rm -f $TARGET/usr/bin/ssh-add
 rm -f $TARGET/usr/bin/ssh-agent
-rm -f $TARGET/usr/bin/sftp
-rm -f $TARGET/usr/bin/scp
 
 rm -f $TARGET/usr/libexec/ssh-keysign
 rm -f $TARGET/usr/libexec/ssh-pkcs11-helper

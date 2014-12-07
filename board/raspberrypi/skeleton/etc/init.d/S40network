@@ -4,6 +4,7 @@ mkdir -p /var/lib/dhcp
 dh_conf="/var/cache/dhclient.conf"
 sys_static_conf="/etc/static_ip.conf"
 static_conf="/data/etc/static_ip.conf"
+watch_timeout=20
 
 if [ -f $sys_static_conf ] && ! [ -f $static_conf ]; then
     mkdir -p $(dirname $static_conf)
@@ -68,6 +69,25 @@ start_eth0() {
         echo "eth0: starting dhclient"
         dhclient -cf "$dh_conf" eth0
     fi
+    
+    watch_eth0 &
+}
+
+watch_eth0() {
+    count=0
+    while true; do
+        sleep 5
+        if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
+            count=0
+        else
+            if [ $count -lt $watch_timeout ]; then
+                count=$(($count + 5))
+            else
+                logger -t ethernet -s "disconnected for $watch_timeout seconds, rebooting"
+                reboot
+            fi
+        fi
+    done
 }
 
 start() {

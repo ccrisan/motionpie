@@ -53,7 +53,7 @@ while getopts "d:i:ln:o:p:s:w" o; do
             DNS=${S_IP[2]}
             ;;
         w)
-            DISABLE_WR=true
+            DISABLE_NR=true
             ;;
         *)
             usage
@@ -183,12 +183,14 @@ if [ -n "$PORT" ]; then
     sed -i "s%PORT = 80%PORT = $PORT%" $ROOT/programs/motioneye/settings.py
 fi
 
-if [ -n "$DISABLE_WR" ]; then
-    msg "disabling no-wireless reboot"
+if [ -n "$DISABLE_NR" ]; then
+    msg "disabling reboot on network errors"
     sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi
     sed -i 's%reboot%%' $ROOT/etc/init.d/S35wifi
     sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S36ppp
     sed -i 's%reboot%%' $ROOT/etc/init.d/S36ppp
+    sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S40network
+    sed -i 's%reboot%%' $ROOT/etc/init.d/S40network
 fi
 
 msg "unmounting sdcard"

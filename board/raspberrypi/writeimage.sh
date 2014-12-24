@@ -10,7 +10,7 @@ function usage() {
     echo "    -o none|modest|medium|high|turbo - overclocks the PI according to a preset (e.g. -o high)"
     echo "    -p port - listen on the given port rather than on 80 (e.g. -p 8080)"
     echo "    -s ip/cidr:gw:dns - sets a static IP configuration instead of DHCP (e.g. -s 192.168.3.107/24:192.168.3.1:8.8.8.8)"
-    echo "    -w - disables rebooting when the wireless connection is lost"
+    echo "    -w - disables rebooting when the network connection is lost"
     exit 1
 }
 

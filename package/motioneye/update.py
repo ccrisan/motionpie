@@ -51,7 +51,7 @@ def get_all_versions():
         
         response = urllib2.urlopen(url, timeout=settings.REMOTE_REQUEST_TIMEOUT)
         versions = json.load(response)
-        versions = [v['name'] for v in versions if not v.get('prerelease')]
+        versions = [v['name'] for v in versions if not v.get('prerelease') or getattr(settings, 'PRERELEASES', False)]
         
         logging.debug('available versions: %(versions)s' % {
                 'versions': ', '.join(versions)})

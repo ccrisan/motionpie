@@ -7,7 +7,7 @@ set -e
 case "$1" in
     start)
         echo -n "Starting vsftpd: "
-        vsftpd /etc/vsftpd.conf
+        vsftpd /etc/vsftpd.conf >/dev/null 2>&1 &
         [ $? == 0 ] && echo "done" || echo "failed"
         ;;
 
@@ -28,4 +28,3 @@ case "$1" in
 esac
 
 exit 0
-

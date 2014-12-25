@@ -8,7 +8,11 @@ set_current_date() {
     timestamp=$(python -c 'import calendar, httplib, email.utils; conn = httplib.HTTPConnection("google.com"); conn.request("HEAD", "/"); \
             print calendar.timegm(email.utils.parsedate(conn.getresponse().getheader("date")))')
     
-    date +%s -s @$timestamp > /dev/null
+    if [ -n "$timestamp" ]; then
+        date +%s -s @$timestamp > /dev/null
+    else
+        return 1
+    fi
 }
 
 start() {

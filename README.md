@@ -50,7 +50,7 @@ All releases are available from [here](https://github.com/ccrisan/motionPie/rele
 * `-o none|modest|medium|high|turbo` overclocks the PI according to the preset (e.g. `-o high`)
 * `-p port` listen on the given TCP port rather than on 80 (e.g. `-p 8080`)
 * `-s ip/cidr:gw:dns` sets a static IP configuration instead of DHCP (e.g. `-s 192.168.3.107/24:192.168.3.1:8.8.8.8`)
-* `-w` disables rebooting when the wireless connection is lost
+* `-w` disables rebooting when the network connection is lost
 
     **If you don't know how to do it**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 

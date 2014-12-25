@@ -6,6 +6,13 @@ mkdir -p /var/log/samba
 mkdir -p /var/lib/samba/private
 
 start() {
+    echo -n "Setting SMB admin password: "
+    if [ -f /data/etc/motion.conf ]; then
+        password=$(cat /data/etc/motion.conf | grep admin_usernamee |  cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3)
+    fi
+    echo -e "$password\n$password\n" | /usr/bin/smbpasswd -a admin -s > /dev/null
+    [ $? == 0 ] && echo "done" || echo "failed"
+
     echo -n "Starting SMB services: "
     smbd -D
     [ $? == 0 ] && echo "done" || echo "failed"

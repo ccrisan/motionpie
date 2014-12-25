@@ -2,15 +2,39 @@
 
 
 function usage() {
-    echo "Usage: $0 <-d sdcard_dev> <-i image_file> [-l] [-n ssid:psk] [-o none|modest|medium|high|turbo] [-p port] [-s ip/cidr:gw:dns] [-w]" 1>&2
-    echo "    -d sdcard_dev - indicates the path to the sdcard block device (e.g. -d /dev/mmcblk0)"
-    echo "    -i image_file - indicates the path to the image file (e.g. -i /home/user/Download/motionPie.img)"
-    echo "    -l - disables the LED of the CSI camera module"
-    echo "    -n ssid:psk - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
-    echo "    -o none|modest|medium|high|turbo - overclocks the PI according to a preset (e.g. -o high)"
-    echo "    -p port - listen on the given port rather than on 80 (e.g. -p 8080)"
-    echo "    -s ip/cidr:gw:dns - sets a static IP configuration instead of DHCP (e.g. -s 192.168.3.107/24:192.168.3.1:8.8.8.8)"
-    echo "    -w - disables rebooting when the network connection is lost"
+    echo "Usage: $0 [options...]" 1>&2
+    echo ""
+    echo "Available options:"
+    echo "    <-i image_file> - indicates the path to the image file (e.g. -i /home/user/Download/motionPie.img)"
+    echo "    <-d sdcard_dev> - indicates the path to the sdcard block device (e.g. -d /dev/mmcblk0)"
+    echo "    [-a off|public|auth|writable] - configures the internal samba server (e.g. -a auth)"
+    echo "        default - shares are read-only, no authentication required"
+    echo "        off - samba server disabled"
+    echo "        public - shares are read-only, no authentication required"
+    echo "        auth - shares are read-only, authentication required"
+    echo "        writable - shares are writable, authentication required"
+    echo "    [-f off|public|auth|writable] - configures the internal ftp server (e.g. -f auth)"
+    echo "        default - read-only mode, anonymous logins"
+    echo "        off - ftp server disabled"
+    echo "        public - read-only mode, anonymous logins"
+    echo "        auth - read-only mode, authentication required"
+    echo "        writable - writable mode, authentication required"
+    echo "    [-h off|on] - configures the internal ssh server (e.g. -f on)"
+    echo "        default - on"
+    echo "        off - ssh server disabled"
+    echo "        on - ssh server enabled"
+    echo "    [-l] - disables the LED of the CSI camera module"
+    echo "    [-n ssid:psk] - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
+    echo "    [-o none|modest|medium|high|turbo] - overclocks the PI according to a preset (e.g. -o high)"
+    echo "        default - arm=900Mhz, core=500Mhz, sdram=500MHz, ov=6"
+    echo "        none - arm=700Mhz, core=250Mhz, sdram=400MHz, ov=0"
+    echo "        modest - arm=800Mhz, core=250Mhz, sdram=400MHz, ov=0"
+    echo "        medium - arm=900Mhz, core=250Mhz, sdram=450MHz, ov=2"
+    echo "        high - arm=950Mhz, core=250Mhz, sdram=450MHz, ov=6"
+    echo "        turbo - arm=1000Mhz, core=500Mhz, sdram=600MHz, ov=6"
+    echo "    [-p port] - listen on the given port rather than on 80 (e.g. -p 8080)"
+    echo "    [-s ip/cidr:gw:dns] - sets a static IP configuration instead of DHCP (e.g. -s 192.168.3.107/24:192.168.3.1:8.8.8.8)"
+    echo "    [-w] - disables rebooting when the network connection is lost"
     exit 1
 }
 
@@ -26,8 +50,17 @@ function msg() {
 
 while getopts "d:i:ln:o:p:s:w" o; do
     case "$o" in
+        a)
+            SMB_MODE=$OPTARG
+            ;;
         d)
             SDCARD_DEV=$OPTARG
+            ;;
+        f)
+            FTP_MODE=$OPTARG
+            ;;
+        h)
+            SSH_MODE=$OPTARG
             ;;
         i)
             DISK_IMG=$OPTARG
@@ -104,11 +137,55 @@ fi
 mount $BOOT_DEV $BOOT
 mount $ROOT_DEV $ROOT
 
+# samba
+if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
+    msg "settings smb mode to $SMB_MODE"
+    case $SMB_MODE in
+        off)
+            rm $ROOT/etc/init.d/S91smb
+            rm -r $ROOT/etc/samba/
+            ;;
+        auth)
+            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            ;;
+        writable)
+            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            sed -Ei "s/writable = no/public = yes/" $ROOT/etc/samba/smb.conf
+            ;;
+        *)
+            echo "invalid smb mode $SMB_MODE"
+            ;;
+    esac
+fi
+
+# samba
+if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
+    msg "settings smb mode to $SMB_MODE"
+    case $SMB_MODE in
+        off)
+            rm $ROOT/etc/init.d/S91smb
+            rm -r $ROOT/etc/samba/
+            ;;
+        auth)
+            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            ;;
+        writable)
+            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            sed -Ei "s/writable = no/public = yes/" $ROOT/etc/samba/smb.conf
+            ;;
+        *)
+            echo "invalid smb mode $SMB_MODE"
+            ;;
+    esac
+fi
+
+# camera led
 if [ -n "$DISABLE_LED" ]; then
     msg "disabling camera LED"
     echo "disable_camera_led=1" >> $BOOT/config.txt
 fi
 
+# overclocking
 if [ -n "$OC_PRESET" ]; then
     msg "setting overclocking to $OC_PRESET"
     case $OC_PRESET in
@@ -146,6 +223,9 @@ if [ -n "$OC_PRESET" ]; then
             SDRAM_FREQ="600"
             OVER_VOLTAGE="6"
             ;;
+        *)
+            echo "invalid overclocking preset $OC_PRESET"
+            ;;
     esac
 
     if [ -n "$ARM_FREQ" ]; then
@@ -156,6 +236,7 @@ if [ -n "$OC_PRESET" ]; then
     fi
 fi
 
+# wifi
 if [ -n "$SSID" ]; then
     msg "creating wireless configuration"
     conf=$ROOT/etc/wpa_supplicant.conf
@@ -170,6 +251,7 @@ if [ -n "$SSID" ]; then
     echo -e "}\n" >> $conf
 fi
 
+# static ip
 if [ -n "$IP" ] && [ -n "$GW" ] && [ -n "$DNS" ]; then
     msg "setting static IP configuration"
     conf=$ROOT/etc/static_ip.conf
@@ -178,11 +260,13 @@ if [ -n "$IP" ] && [ -n "$GW" ] && [ -n "$DNS" ]; then
     echo "static_dns=\"$DNS\"" >> $conf
 fi
 
+# port
 if [ -n "$PORT" ]; then
     msg "setting server port to $PORT"
     sed -i "s%PORT = 80%PORT = $PORT%" $ROOT/programs/motioneye/settings.py
 fi
 
+# rebooting upon network issues
 if [ -n "$DISABLE_NR" ]; then
     msg "disabling reboot on network errors"
     sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi

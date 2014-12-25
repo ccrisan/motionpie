@@ -55,7 +55,7 @@ start() {
         index=1
         for device in $(ls /dev/video* 2>/dev/null); do
             if [ "$count" -gt "1" ]; then
-                output_dir="/data/output/$index/"
+                output_dir="/data/output/camera$index/"
             else
                 output_dir="/data/output/"
             fi

@@ -127,10 +127,6 @@ These pictures and movies recored by motionPie are visible on the local network 
 
 *Model A* has no wired ethernet connector and thus it's impossible to access it unless it is connected to a wireless network. To preconfigure the wireless network for a Model A you must use `writeimage.sh` with the `-n ssid:psk` argument.
 
-### Stuck With Rainbow On Display ###
-
-MotionPie has no video driver compiled in and therefore it won't control your display in any way. The rainbow you see is what PI's GPU shows by default when powered on. Nevertheless things happen in the background and your motionPie should be up and running (i.e. listening on port 80) in less than 2 minutes.
-
 ### System Rebooting ###
 
 The system will reboot whenever something goes wrong (i.e. disconnected from network, software hangs or kernel crashes). This is accomplished using the hardware watchdog as well as software watch scripts. It is therefore possible that the system enter an indefinite reboot loop if, for example, the network is misconfigured. Invoking `writeimage.sh` with `-w` when writing the image disables rebooting when wireless connection issues are encountered.

@@ -48,7 +48,7 @@ function msg() {
     echo ":: $1"
 }
 
-while getopts "d:i:ln:o:p:s:w" o; do
+while getopts "a:d:f:h:i:ln:o:p:s:w" o; do
     case "$o" in
         a)
             SMB_MODE=$OPTARG
@@ -139,7 +139,7 @@ mount $ROOT_DEV $ROOT
 
 # samba
 if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
-    msg "settings smb mode to $SMB_MODE"
+    msg "setting smb mode to $SMB_MODE"
     case $SMB_MODE in
         off)
             rm $ROOT/etc/init.d/S91smb
@@ -150,7 +150,7 @@ if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
             ;;
         writable)
             sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
-            sed -Ei "s/writable = no/public = yes/" $ROOT/etc/samba/smb.conf
+            sed -Ei "s/writable = no/writable = yes/" $ROOT/etc/samba/smb.conf
             ;;
         *)
             echo "invalid smb mode $SMB_MODE"
@@ -158,23 +158,39 @@ if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
     esac
 fi
 
-# samba
-if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
-    msg "settings smb mode to $SMB_MODE"
-    case $SMB_MODE in
+# ftp
+if [ -n "$FTP_MODE" ] && [ "$FTP_MODE" != "public" ]; then
+    msg "setting ftp mode to $FTP_MODE"
+    case $FTP_MODE in
         off)
-            rm $ROOT/etc/init.d/S91smb
-            rm -r $ROOT/etc/samba/
+            rm $ROOT/etc/init.d/S70proftpd
+            rm -r $ROOT/etc/proftpd.conf
             ;;
         auth)
-            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            sed -Ei "s/RootLogin off/RootLogin on/" $ROOT/etc/proftpd.conf
+            sed -Ei "s/Anonymous ~ftp/Anonymous ~ftpdisabled/" $ROOT/etc/proftpd.conf
             ;;
         writable)
-            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
-            sed -Ei "s/writable = no/public = yes/" $ROOT/etc/samba/smb.conf
+            sed -Ei "s/RootLogin off/RootLogin on/" $ROOT/etc/proftpd.conf
+            sed -Ei "s/Anonymous ~ftp/Anonymous ~ftpdisabled/" $ROOT/etc/proftpd.conf
+            sed -Ei "s/DenyAll #rwmark/AllowAll/" $ROOT/etc/proftpd.conf
             ;;
         *)
-            echo "invalid smb mode $SMB_MODE"
+            echo "invalid ftp mode $FTP_MODE"
+            ;;
+    esac
+fi
+
+# samba
+if [ -n "$SSH_MODE" ] && [ "$SSH_MODE" != "on" ]; then
+    msg "setting ssh mode to $SSH_MODE"
+    case $SSH_MODE in
+        off)
+            rm $ROOT/etc/init.d/S50sshd
+            rm $ROOT/etc/sshd_config
+            ;;
+        *)
+            echo "invalid ssh mode $SSH_MODE"
             ;;
     esac
 fi

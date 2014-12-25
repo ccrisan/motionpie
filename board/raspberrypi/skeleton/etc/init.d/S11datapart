@@ -32,26 +32,52 @@ start() {
     if /usr/sbin/debugfs -R 'lcd /' $DATA_DEV 2>&1 | grep 'Bad magic'; then
         echo "Formatting data partition"
         mkfs.ext4 $DATA_DEV
+        mount /data
 
-        mount /data # also mount it
-
-        mkdir -p /data/etc
-
-        ln -s /usr/share/zoneinfo/UTC /data/etc/localtime
-
-        echo "Setting root password..."
-        echo 'root::::::::' > /data/etc/shadow
-        chmod go-rwx /data/etc/shadow
-        pwd=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
-        echo -en "$pwd\n$pwd\n" | passwd 2>/dev/null
-        # removes password expiration
-        sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /data/etc/shadow
     fi
 
     if df /dev/mmcblk0p3 >/dev/null 2>&1; then
+        # make sure required directories exist
+        mkdir -p /data/etc
         mkdir -p /data/log
         mkdir -p /data/output
         mkdir -p /data/media
+        chmod 775 /data/output
+        chmod 775 /data/media
+        
+        # make sure a localtime symlink exists
+        if ! [ -e /data/etc/localtime ]; then
+            ln -s /usr/share/zoneinfo/UTC /data/etc/localtime
+        fi
+
+        # make sure root and admin users exist
+        touch /data/etc/shadow
+        chmod go-rwx /data/etc/shadow
+        if ! grep root /data/etc/shadow &>/dev/null; then
+            echo 'root::::::::' >> /data/etc/shadow
+        fi
+        if ! grep admin /data/etc/shadow &>/dev/null; then
+            echo 'admin::::::::' >> /data/etc/shadow
+        fi
+
+        # set root and admin passwords
+        if [ -f /data/etc/motion.conf ]; then
+            password=$(cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3)
+            echo "Setting custom root/admin password"
+        fi
+        if [ -z "$password" ]; then
+            password=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
+            echo "Using default root/admin password: $password"
+        fi
+        
+        echo -en "$password\n$password\n" | passwd &>/dev/null
+        echo -en "$password\n$password\n" | passwd admin &>/dev/null
+        sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /data/etc/shadow # removes pwd expiration
+        sed -r -i 's/admin:([^:]+):[[:digit:]]+:/admin:\1::/' /data/etc/shadow # removes pwd expiration
+        
+        # mount binds
+        mount --bind /data/output /home/ftp/sdcard
+        mount --bind /data/media /home/ftp/storage
     fi
 }
 

@@ -59,11 +59,11 @@ start() {
             else
                 output_dir="/data/output/"
             fi
-            uri="/config/add/?username=admin"
+            uri="/config/add/?_username=admin"
             body="{\"uri\": \"$device\", \"proto\": \"v4l2\"}"
-            signature=$(echo -n "POST:/config/add/?username=admin:$body:" | sha1sum | cut -d ' ' -f 1)
+            signature=$(echo -n "POST:$uri:$body:" | sha1sum | cut -d ' ' -f 1)
 
-            curl -s -m 60 --data "$body" "http://127.0.0.1:$port$uri&signature=$signature" > /dev/null
+            curl -s -m 60 --data "$body" "http://127.0.0.1:$port$uri&_signature=$signature" > /dev/null
             index=$(($index + 1))
         done
     fi

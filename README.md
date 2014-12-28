@@ -19,7 +19,8 @@ Check this [link](https://bitbucket.org/ccrisan/motioneye/wiki/Screenshots) for 
 * **timelapse** movies
 * connects to the network using **ethernet** or **wifi**
 * file storage on **SD card**, **USB drive** or **network SMB share**
-* files on SD card visible in the local network as a **SMB share**
+* media files are visible in the local network as **SMB shares**
+* media files can also be accessed through the built-in **FTP server**  or **SFTP server**
 
 ## Hardware Requirements ##
 
@@ -40,19 +41,44 @@ All releases are available from [here](https://github.com/ccrisan/motionPie/rele
 2. extract the image file called `motionPie.img` from the archive
 3. write the image file to your SD card:
 
-    **If you run Linux**, there's a [writeimage.sh](https://raw.githubusercontent.com/ccrisan/motionPie/master/board/raspberrypi/writeimage.sh) script that will do everything for you, including the setup of a wireless network connection. Just run the script as follows (replacing the arguments with appropriate values):
+    **If you run Linux or OSX**, there's a [writeimage.sh](https://raw.githubusercontent.com/ccrisan/motionPie/master/board/raspberrypi/writeimage.sh) script that will do everything for you, including the setup of a wireless network connection. Just run the script as follows (replacing the arguments with appropriate values):
     
         ./writeimage.sh -d /dev/mmcblk0 -i /path/to/motionPie.img -n yournet:yourkey
         
-   Optionally you can give other arguments to `writeimage.sh` to configure various features of your PI:
+   Optionally you can give other arguments to `writeimage.sh` to configure various features of your system. Here's a full list of available arguments:
 
-* `-l` disables the CSI camera led
-* `-o none|modest|medium|high|turbo` overclocks the PI according to the preset (e.g. `-o high`)
-* `-p port` listen on the given TCP port rather than on 80 (e.g. `-p 8080`)
-* `-s ip/cidr:gw:dns` sets a static IP configuration instead of DHCP (e.g. `-s 192.168.3.107/24:192.168.3.1:8.8.8.8`)
-* `-w` disables rebooting when the network connection is lost
+* `<-i image_file>` - indicates the path to the image file (e.g. `-i /home/user/Download/motionPie.img`)
+* `<-d sdcard_dev>` - indicates the path to the sdcard block device (e.g. `-d /dev/mmcblk0`)
+* `[-a off|public|auth|writable]` - configures the internal samba server (e.g. `-a auth`)
+    * default - shares are read-only, no authentication required
+    * `off` - samba server disabled
+    * `public` - shares are read-only, no authentication required
+    * `auth` - shares are read-only, authentication required
+    * `writable` - shares are writable, authentication required
+* `[-f off|public|auth|writable]` - configures the internal ftp server (e.g. `-f auth`)
+    * default - read-only mode, anonymous logins
+    * `off` - ftp server disabled
+    * `public` - read-only mode, anonymous logins
+    * `auth` - read-only mode, authentication required
+    * `writable` - writable mode, authentication required
+* `[-h off|on]` - configures the internal ssh server (e.g. `-h on`)
+    * default - ssh server enabled
+    * `off` - ssh server disabled
+    * `on` - ssh server enabled
+* `[-l]` - disables the LED on the CSI camera module
+* `[-n ssid:psk]` - sets the wireless network name and key (e.g. `-n mynet:mykey1234`)
+* `[-o none|modest|medium|high|turbo]` - overclocks the PI according to a preset (e.g. `-o high`)
+    * default - arm=900Mhz, core=500Mhz, sdram=500MHz, ov=6
+    * `none` - arm=700Mhz, core=250Mhz, sdram=400MHz, ov=0
+    * `modest` - arm=800Mhz, core=250Mhz, sdram=400MHz, ov=0
+    * `medium` - arm=900Mhz, core=250Mhz, sdram=450MHz, ov=2
+    * `high` - arm=950Mhz, core=250Mhz, sdram=450MHz, ov=6
+    * `turbo` - arm=1000Mhz, core=500Mhz, sdram=600MHz, ov=6
+* `[-p port]` - listen on the given port rather than on 80 (e.g. `-p 8080`)
+* `[-s ip/cidr:gw:dns]` - sets a static IP configuration instead of DHCP (e.g. `-s 192.168.3.107/24:192.168.3.1:8.8.8.8`)
+* `[-w]` - disables rebooting when the network connection is lost
 
-    **If you don't know how to do it**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+    **If you don't know how to write an OS image to an SD card**, just follow [these instructions](http://www.raspberrypi.org/documentation/installation/installing-images/README.md). System customizations are not available when using these methods.
 
 ### Latest GIT Version ###
 
@@ -121,7 +147,13 @@ Movies and pictures taken by each camera can be browsed, previewed and downloade
 
 These pictures and movies recored by motionPie are visible on the local network as well. Just look for your motionPie in your network in a Windows Explorer window or use the `smb://your_motion_pie/` URL if on Linux. The two shares, `sdcard` and `storage` represent the local SD card data partition and any other attached storage, respectively.
 
+If you wish to access your files through FTP, you can do so. Unless you have tweaked your system otherwise, FTP anonymous logins are enabled and your media files can be downloaded using virtually any FTP client.
+
 ## Troubleshooting ##
+
+### No User Interface On Monitor ###
+
+motionPie will never display anything useful on your monitor. It is meant to only be used from a web browser. The ugly text that appears on the monitor is actually useful when debugging motionPie. Most users should ignore it.
 
 ### Raspberry PI Model A ###
 
@@ -133,13 +165,15 @@ The system will reboot whenever something goes wrong (i.e. disconnected from net
 
 ### Date & Time ###
 
-NTP is used to synchronize the system time, so an Internet connection is required. The local time is established by the time zone setting in the web UI.
+NTP is used to synchronize the system time, so an Internet connection is required. Initial date is set upon each boot and uses HTTP instead of NTP for faster boot. The local time is established by the time zone setting in the web UI.
 
-### Remote Shell ###
+### Shell Access ###
 
-You can log into your motionPie using SSH. It listens on the standard 22 port. The only enabled user is `root` and the password is the serial number of your PI unit. Don't worry, the serial number is part of motionPie's hostname and will appear as part of the welcome banner when you're asked for a password.
+If you connect a monitor and a keyboard to your PI, you'll be prompted to login in the text console. `root` is the username and the password is your administrator's password that you had configured in the UI. If you haven't configured it (i.e. you left it empty), the password is the serial number of your PI unit. Don't worry, the serial number is part of motionPie's hostname and will appear as part of the welcome banner when you're prompted for a password.
 
-If you want to dig deeper you can log in on the serial port of your PI. Just connect it to your PC's serial port and use your favorite serial terminal program to log in or simply watch the output of the system. The serial port is configured as 115200 8N1.
+You can also log into your motionPie using ssh or putty. It listens on the standard 22 port, unless you tweaked the system otherwise.
+
+As an alternative, you can log in on the serial port of your PI. Just connect it to your PC's serial port and use your favorite serial terminal program to log in. The serial port is configured as 115200 8N1.
 
 ## Tweaks ##
 
@@ -175,3 +209,4 @@ Here's an example of a `static_ip.conf` file:
 ### Tweaking motionEye ###
 
 motionEye is installed at `/programs/motioneye`, on the *root* partition. After remounting the root partition read-write, you can edit `/programs/motioneye/settings.py` and its startup script, `/etc/init.d/S95motioneye`.
+

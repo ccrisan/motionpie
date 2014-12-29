@@ -117,7 +117,7 @@ fi
 
 umount ${SDCARD_DEV}* 2>/dev/null || true
 msg "writing disk image to sdcard"
-dd if=$DISK_IMG of=$SDCARD_DEV bs=1M
+dd if=$DISK_IMG of=$SDCARD_DEV bs=1048576
 sync
 
 if which partprobe > /dev/null 2>&1; then
@@ -126,16 +126,33 @@ if which partprobe > /dev/null 2>&1; then
 fi
 
 msg "mounting sdcard"
-mkdir -p $BOOT
-mkdir -p $ROOT
-BOOT_DEV=${SDCARD_DEV}p1 # e.g. /dev/mmcblk0p1
-ROOT_DEV=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
-if ! [ -e ${SDCARD_DEV}p1 ]; then
-    BOOT_DEV=${SDCARD_DEV}1 # e.g. /dev/sdc1
-    ROOT_DEV=${SDCARD_DEV}2 # e.g. /dev/sdc2
+if [ `uname` == "Darwin" ]; then
+    if ! [ -x /sbin/mount_fuse-ext2 ]; then
+        echo "Missing mount_fuse-ext2 for EXT4 mounting! Further configuration stopped."
+        echo ""
+        echo "See http://osxdaily.com/2014/03/20/mount-ext-linux-file-system-mac/"
+        echo "how to install ext4 mount support, please include 'Enabling EXT Write Support'."
+        echo ""
+        exit 1
+    fi
+    mkdir -p $BOOT
+    mkdir -p $ROOT
+    BOOT_DEV=${SDCARD_DEV}s1 # e.g. /dev/disk4s1
+    ROOT_DEV=${SDCARD_DEV}s2 # e.g. /dev/disk4s2
+    mount_msdos $BOOT_DEV $BOOT
+    mount_fuse-ext2 $ROOT_DEV $ROOT    
+else
+    mkdir -p $BOOT
+    mkdir -p $ROOT
+    BOOT_DEV=${SDCARD_DEV}p1 # e.g. /dev/mmcblk0p1
+    ROOT_DEV=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
+    if ! [ -e ${SDCARD_DEV}p1 ]; then
+        BOOT_DEV=${SDCARD_DEV}1 # e.g. /dev/sdc1
+        ROOT_DEV=${SDCARD_DEV}2 # e.g. /dev/sdc2
+    fi
+    mount $BOOT_DEV $BOOT
+    mount $ROOT_DEV $ROOT
 fi
-mount $BOOT_DEV $BOOT
-mount $ROOT_DEV $ROOT
 
 # samba
 if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
@@ -146,11 +163,11 @@ if [ -n "$SMB_MODE" ] && [ "$SMB_MODE" != "public" ]; then
             rm -r $ROOT/etc/samba/
             ;;
         auth)
-            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            sed -Ei.bak "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
             ;;
         writable)
-            sed -Ei "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
-            sed -Ei "s/writable = no/writable = yes/" $ROOT/etc/samba/smb.conf
+            sed -Ei.bak "s/public = yes/public = no/" $ROOT/etc/samba/smb.conf
+            sed -Ei.bak "s/writable = no/writable = yes/" $ROOT/etc/samba/smb.conf
             ;;
         *)
             echo "invalid smb mode $SMB_MODE"
@@ -167,13 +184,13 @@ if [ -n "$FTP_MODE" ] && [ "$FTP_MODE" != "public" ]; then
             rm -r $ROOT/etc/proftpd.conf
             ;;
         auth)
-            sed -Ei "s/RootLogin off/RootLogin on/" $ROOT/etc/proftpd.conf
-            sed -Ei "s/Anonymous ~ftp/Anonymous ~ftpdisabled/" $ROOT/etc/proftpd.conf
+            sed -Ei.bak "s/RootLogin off/RootLogin on/" $ROOT/etc/proftpd.conf
+            sed -Ei.bak "s/Anonymous ~ftp/Anonymous ~ftpdisabled/" $ROOT/etc/proftpd.conf
             ;;
         writable)
-            sed -Ei "s/RootLogin off/RootLogin on/" $ROOT/etc/proftpd.conf
-            sed -Ei "s/Anonymous ~ftp/Anonymous ~ftpdisabled/" $ROOT/etc/proftpd.conf
-            sed -Ei "s/DenyAll #rwmark/AllowAll/" $ROOT/etc/proftpd.conf
+            sed -Ei.bak "s/RootLogin off/RootLogin on/" $ROOT/etc/proftpd.conf
+            sed -Ei.bak "s/Anonymous ~ftp/Anonymous ~ftpdisabled/" $ROOT/etc/proftpd.conf
+            sed -Ei.bak "s/DenyAll #rwmark/AllowAll/" $ROOT/etc/proftpd.conf
             ;;
         *)
             echo "invalid ftp mode $FTP_MODE"
@@ -181,7 +198,7 @@ if [ -n "$FTP_MODE" ] && [ "$FTP_MODE" != "public" ]; then
     esac
 fi
 
-# samba
+# ssh
 if [ -n "$SSH_MODE" ] && [ "$SSH_MODE" != "on" ]; then
     msg "setting ssh mode to $SSH_MODE"
     case $SSH_MODE in
@@ -245,10 +262,10 @@ if [ -n "$OC_PRESET" ]; then
     esac
 
     if [ -n "$ARM_FREQ" ]; then
-        sed -Ei "s/arm_freq=[[:digit:]]+/arm_freq=$ARM_FREQ/" $BOOT/config.txt
-        sed -Ei "s/core_freq=[[:digit:]]+/core_freq=$CORE_FREQ/" $BOOT/config.txt
-        sed -Ei "s/sdram_freq=[[:digit:]]+/sdram_freq=$SDRAM_FREQ/" $BOOT/config.txt
-        sed -Ei "s/over_voltage=[[:digit:]]+/over_voltage=$OVER_VOLTAGE/" $BOOT/config.txt
+        sed -Ei.bak "s/arm_freq=[[:digit:]]+/arm_freq=$ARM_FREQ/" $BOOT/config.txt
+        sed -Ei.bak "s/core_freq=[[:digit:]]+/core_freq=$CORE_FREQ/" $BOOT/config.txt
+        sed -Ei.bak "s/sdram_freq=[[:digit:]]+/sdram_freq=$SDRAM_FREQ/" $BOOT/config.txt
+        sed -Ei.bak "s/over_voltage=[[:digit:]]+/over_voltage=$OVER_VOLTAGE/" $BOOT/config.txt
     fi
 fi
 
@@ -279,19 +296,23 @@ fi
 # port
 if [ -n "$PORT" ]; then
     msg "setting server port to $PORT"
-    sed -i "s%PORT = 80%PORT = $PORT%" $ROOT/programs/motioneye/settings.py
+    sed -i.bak "s%PORT = 80%PORT = $PORT%" $ROOT/programs/motioneye/settings.py
 fi
 
 # rebooting upon network issues
 if [ -n "$DISABLE_NR" ]; then
     msg "disabling reboot on network errors"
-    sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi
-    sed -i 's%reboot%%' $ROOT/etc/init.d/S35wifi
-    sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S36ppp
-    sed -i 's%reboot%%' $ROOT/etc/init.d/S36ppp
-    sed -i 's%rebooting%ignoring%' $ROOT/etc/init.d/S40network
-    sed -i 's%reboot%%' $ROOT/etc/init.d/S40network
+    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi
+    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S35wifi
+    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S36ppp
+    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S36ppp
+    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S40network
+    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S40network
 fi
+
+msg "removing .bak files"
+find $BOOT/ -type f -name "*.bak" -exec rm -f {} \;
+find $ROOT/etc -type f -name "*.bak" -exec rm -f {} \;
 
 msg "unmounting sdcard"
 sync

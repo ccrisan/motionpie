@@ -34,6 +34,7 @@ SAMBA_CONF_ENV = \
 SAMBA_CONF_OPT = \
 	--localstatedir=/var \
 	--with-piddir=/var/run \
+        --with-nmbdsocketdir=/var/run/nmbd \
 	--with-lockdir=/var/lock \
 	--with-logfilebase=/var/log \
 	--with-configdir=/etc/samba \

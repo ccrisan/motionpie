@@ -63,11 +63,12 @@ start() {
         # set root and admin passwords
         if [ -f /data/etc/motion.conf ]; then
             password=$(cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3)
-            echo "Setting custom root/admin password"
         fi
         if [ -z "$password" ]; then
             password=$(/opt/vc/bin/vcgencmd otp_dump | grep 28: | tail -c +4)
             echo "Using default root/admin password: $password"
+        else
+            echo "Setting custom root/admin password"
         fi
         
         echo -en "$password\n$password\n" | passwd &>/dev/null

@@ -26,7 +26,8 @@ rm -f $TARGET/etc/init.d/S80dhcp-server
 
 
 # some cleanups
-rm -f $TARGET/etc/network
+rm -rf $TARGET/etc/network/
+rm -rf $TARGET/etc/dhcp/
 rm -f $TARGET/etc/default/ntp
 rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
 rm -f $TARGET/etc/motion-dist.conf

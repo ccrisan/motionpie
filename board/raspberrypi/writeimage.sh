@@ -126,6 +126,9 @@ if which partprobe > /dev/null 2>&1; then
 fi
 
 msg "mounting sdcard"
+mkdir -p $BOOT
+mkdir -p $ROOT
+
 if [ `uname` == "Darwin" ]; then
     if ! [ -x /sbin/mount_fuse-ext2 ]; then
         echo "Missing mount_fuse-ext2 for EXT4 mounting! Further configuration stopped."
@@ -135,15 +138,11 @@ if [ `uname` == "Darwin" ]; then
         echo ""
         exit 1
     fi
-    mkdir -p $BOOT
-    mkdir -p $ROOT
     BOOT_DEV=${SDCARD_DEV}s1 # e.g. /dev/disk4s1
     ROOT_DEV=${SDCARD_DEV}s2 # e.g. /dev/disk4s2
     mount_msdos $BOOT_DEV $BOOT
     mount_fuse-ext2 $ROOT_DEV $ROOT    
-else
-    mkdir -p $BOOT
-    mkdir -p $ROOT
+else # assuming Linux
     BOOT_DEV=${SDCARD_DEV}p1 # e.g. /dev/mmcblk0p1
     ROOT_DEV=${SDCARD_DEV}p2 # e.g. /dev/mmcblk0p2
     if ! [ -e ${SDCARD_DEV}p1 ]; then

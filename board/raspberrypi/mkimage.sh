@@ -2,46 +2,9 @@
 
 test "root" != "$USER" && exec sudo $0 "$@"
 
-function usage() {
-    echo "Usage: $0 [-c] [-d sdcard_dev] [-m modem:baud:vid:pid:pin:apn:user:pass] [-n ssid:psk]" 1>&2
-    exit 1
-}
-
 function msg() {
     echo ":: $1"
 }
-
-COMPRESSED=false
-
-while getopts "cd:m:n:" o; do
-    case "$o" in
-        c)
-            COMPRESSED=true
-            ;;
-        d)
-            SDCARD_DEV=$OPTARG
-            ;;
-        m)
-            IFS=":" NETWORK=($OPTARG)
-            MODEM=${NETWORK[0]}
-            MODEM_BAUD=${NETWORK[1]}
-            MODEM_VID=${NETWORK[2]}
-            MODEM_PID=${NETWORK[3]}
-            MODEM_PIN=${NETWORK[4]}
-            APN=${NETWORK[5]}
-            APN_USER=${NETWORK[6]}
-            APN_PASS=${NETWORK[7]}
-            ;;
-        n)
-            IFS=":" NETWORK=($OPTARG)
-            SSID=${NETWORK[0]}
-            PSK=${NETWORK[1]}
-            ;;
-        *)
-            usage
-            ;;
-    esac
-done
 
 function cleanup {
     set +e
@@ -121,56 +84,6 @@ mount -o loop $loop_dev $ROOT
 
 msg "copying root filesystem contents"
 tar -xpsf $ROOT_SRC -C $ROOT
-
-if [ -n "$SSID" ]; then
-    msg "creating default wireless configuration"
-    conf=$ROOT/etc/wpa_supplicant.conf
-    echo "update_config=1" > $conf
-    echo "ctrl_interface=/var/run/wpa_supplicant" >> $conf
-    echo "network={" >> $conf
-    echo "    ssid=\"$SSID\"" >> $conf
-    if [ -n "$PSK" ]; then
-        echo "    psk=\"$PSK\"" >> $conf
-    fi
-    echo -e "}\n" >> $conf
-fi
-
-if [ -n "$MODEM" ]; then
-    msg "creating default modem configuration"
-    conf=$ROOT/etc/ppp/default/
-    mkdir -p $conf
-
-    if [ -n "$APN" ]; then
-        echo "AT+CGDCONT=1,\"IP\",\"$APN\"" > $conf/apn
-    else
-        echo "AT" > $conf/apn
-    fi
-
-    echo -n > $conf/auth
-    if [ -n "$APN_USER" ]; then
-        echo "user \"$APN_USER\"" >> $conf/auth
-    fi
-    if [ -n "$APN_PASS" ]; then
-        echo "password \"$APN_PASS\"" >> $conf/auth
-    fi
-    
-    echo 'AT' > $conf/extra
-    
-    echo $MODEM > $conf/modem
-    echo $MODEM_BAUD >> $conf/modem
-    
-    if [ -n "$MODEM_PIN" ]; then
-        echo "AT+CPIN=\"$MODEM_PIN\"" > $conf/pin
-    else
-        echo "AT" > $conf/pin
-    fi
-    
-    if [ -n "$MODEM_VID" ] && [ -n "$MODEM_PID" ]; then
-        echo $MODEM_VID:$MODEM_PID > $conf/usb_modeswitch
-    fi
-fi
-
-sync
 
 msg "unmounting root filesystem"
 umount $ROOT
@@ -258,16 +171,5 @@ sync
 mv $DISK_IMG $(dirname $DISK_IMG)/motionPie.img
 DISK_IMG=$(dirname $DISK_IMG)/motionPie.img
 
-if [ -n "$SDCARD_DEV" ]; then
-    umount ${SDCARD_DEV}* 2>/dev/null || true
-    msg "writing disk image to sdcard"
-    dd if=$DISK_IMG of=$SDCARD_DEV bs=1M
-    sync
-fi
-
-if [ "$COMPRESSED" == "true" ]; then
-    gzip -f $DISK_IMG
-fi
-
-msg "done"
+msg "$(realpath "$DISK_IMG") is ready"
 

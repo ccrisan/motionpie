@@ -4,20 +4,20 @@
 #
 ################################################################################
 
-PHP_VERSION = 5.5.16
+PHP_VERSION = 5.5.19
 PHP_SITE = http://www.php.net/distributions
+PHP_SOURCE = php-$(PHP_VERSION).tar.xz
 PHP_INSTALL_STAGING = YES
-PHP_INSTALL_STAGING_OPT = INSTALL_ROOT=$(STAGING_DIR) install
-PHP_INSTALL_TARGET_OPT = INSTALL_ROOT=$(TARGET_DIR) install
+PHP_INSTALL_STAGING_OPTS = INSTALL_ROOT=$(STAGING_DIR) install
+PHP_INSTALL_TARGET_OPTS = INSTALL_ROOT=$(TARGET_DIR) install
 PHP_DEPENDENCIES = host-pkgconf
 PHP_LICENSE = PHP
 PHP_LICENSE_FILES = LICENSE
-PHP_CONF_OPT =  --mandir=/usr/share/man \
+PHP_CONF_OPTS = --mandir=/usr/share/man \
 		--infodir=/usr/share/info \
 		--disable-all \
 		--without-pear \
 		--with-config-file-path=/etc \
-		--localstatedir=/var \
 		--disable-rpath
 PHP_CONF_ENV = EXTRA_LIBS="$(PHP_EXTRA_LIBS)"
 
@@ -45,12 +45,12 @@ ifneq ($(BR2_INET_IPV6),y)
 endif
 endif
 
-PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CLI),,--disable-cli)
-PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CGI),,--disable-cgi)
-PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_FPM),--enable-fpm,--disable-fpm)
+PHP_CONF_OPTS += $(if $(BR2_PACKAGE_PHP_CLI),,--disable-cli)
+PHP_CONF_OPTS += $(if $(BR2_PACKAGE_PHP_CGI),,--disable-cgi)
+PHP_CONF_OPTS += $(if $(BR2_PACKAGE_PHP_FPM),--enable-fpm,--disable-fpm)
 
 ### Extensions
-PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
+PHP_CONF_OPTS += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
 		$(if $(BR2_PACKAGE_PHP_EXT_POSIX),--enable-posix) \
 		$(if $(BR2_PACKAGE_PHP_EXT_SESSION),--enable-session) \
 		$(if $(BR2_PACKAGE_PHP_EXT_HASH),--enable-hash) \
@@ -75,51 +75,57 @@ PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
 		$(if $(BR2_PACKAGE_PHP_EXT_CALENDAR),--enable-calendar) \
 		$(if $(BR2_PACKAGE_PHP_EXT_FILEINFO),--enable-fileinfo) \
 		$(if $(BR2_PACKAGE_PHP_EXT_BCMATH),--enable-bcmath) \
+		$(if $(BR2_PACKAGE_PHP_EXT_MBSTRING),--enable-mbstring) \
 		$(if $(BR2_PACKAGE_PHP_EXT_PHAR),--enable-phar)
 
+ifeq ($(BR2_PACKAGE_PHP_EXT_MCRYPT),y)
+	PHP_CONF_OPTS += --with-mcrypt=$(STAGING_DIR)/usr
+	PHP_DEPENDENCIES += libmcrypt
+endif
+
 ifeq ($(BR2_PACKAGE_PHP_EXT_OPENSSL),y)
-	PHP_CONF_OPT += --with-openssl=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-openssl=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += openssl
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_LIBXML2),y)
 	PHP_CONF_ENV += php_cv_libxml_build_works=yes
-	PHP_CONF_OPT += --enable-libxml --with-libxml-dir=${STAGING_DIR}/usr
+	PHP_CONF_OPTS += --enable-libxml --with-libxml-dir=${STAGING_DIR}/usr
 	PHP_DEPENDENCIES += libxml2
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_WDDX),y)
-	PHP_CONF_OPT += --enable-wddx --with-libexpat-dir=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --enable-wddx --with-libexpat-dir=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += expat
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_XMLRPC),y)
-	PHP_CONF_OPT += --with-xmlrpc \
+	PHP_CONF_OPTS += --with-xmlrpc \
 		$(if $(BR2_PACKAGE_LIBICONV),--with-iconv-dir=$(STAGING_DIR)/usr)
 	PHP_DEPENDENCIES += $(if $(BR2_PACKAGE_LIBICONV),libiconv)
 endif
 
 ifneq ($(BR2_PACKAGE_PHP_EXT_ZLIB)$(BR2_PACKAGE_PHP_EXT_ZIP),)
-	PHP_CONF_OPT += --with-zlib=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-zlib=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += zlib
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_GETTEXT),y)
-	PHP_CONF_OPT += --with-gettext=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-gettext=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += $(if $(BR2_NEEDS_GETTEXT),gettext)
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_ICONV),y)
 ifeq ($(BR2_PACKAGE_LIBICONV),y)
-	PHP_CONF_OPT += --with-iconv=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-iconv=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += libiconv
 else
-	PHP_CONF_OPT += --with-iconv
+	PHP_CONF_OPTS += --with-iconv
 endif
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_INTL),y)
-	PHP_CONF_OPT += --enable-intl --with-icu-dir=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --enable-intl --with-icu-dir=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += icu
 	# The intl module is implemented in C++, but PHP fails to use
 	# g++ as the compiler for the final link. As a workaround,
@@ -128,30 +134,30 @@ ifeq ($(BR2_PACKAGE_PHP_EXT_INTL),y)
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_GMP),y)
-	PHP_CONF_OPT += --with-gmp=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-gmp=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += gmp
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_READLINE),y)
-	PHP_CONF_OPT += --with-readline=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-readline=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += readline
 endif
 
 ### Native MySQL extensions
 ifeq ($(BR2_PACKAGE_PHP_EXT_MYSQL),y)
-	PHP_CONF_OPT += --with-mysql=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-mysql=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += mysql
 endif
 ifeq ($(BR2_PACKAGE_PHP_EXT_MYSQLI),y)
-	PHP_CONF_OPT += --with-mysqli=$(STAGING_DIR)/usr/bin/mysql_config
+	PHP_CONF_OPTS += --with-mysqli=$(STAGING_DIR)/usr/bin/mysql_config
 	PHP_DEPENDENCIES += mysql
 endif
 
 ### PDO
 ifeq ($(BR2_PACKAGE_PHP_EXT_PDO),y)
-	PHP_CONF_OPT += --enable-pdo
+	PHP_CONF_OPTS += --enable-pdo
 ifeq ($(BR2_PACKAGE_PHP_EXT_PDO_SQLITE),y)
-	PHP_CONF_OPT += --with-pdo-sqlite=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-pdo-sqlite=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += sqlite
 	PHP_CFLAGS += -DSQLITE_OMIT_LOAD_EXTENSION
 ifneq ($(BR2_LARGEFILE),y)
@@ -159,53 +165,65 @@ ifneq ($(BR2_LARGEFILE),y)
 endif
 endif
 ifeq ($(BR2_PACKAGE_PHP_EXT_PDO_MYSQL),y)
-	PHP_CONF_OPT += --with-pdo-mysql=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-pdo-mysql=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += mysql
+endif
+ifeq ($(BR2_PACKAGE_PHP_EXT_PDO_POSTGRESQL),y)
+	PHP_CONF_OPTS += --with-pdo-pgsql=$(STAGING_DIR)/usr
+	PHP_DEPENDENCIES += postgresql
 endif
 endif
 
 ### Use external PCRE if it's available
 ifeq ($(BR2_PACKAGE_PCRE),y)
-	PHP_CONF_OPT += --with-pcre-regex=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-pcre-regex=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += pcre
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_CURL),y)
-	PHP_CONF_OPT += --with-curl=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-curl=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += libcurl
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_XSL),y)
-	PHP_CONF_OPT += --with-xsl=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-xsl=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += libxslt
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_BZIP2),y)
-	PHP_CONF_OPT += --with-bz2=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-bz2=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += bzip2
 endif
 
 ### DBA
 ifeq ($(BR2_PACKAGE_PHP_EXT_DBA),y)
-	PHP_CONF_OPT += --enable-dba
+	PHP_CONF_OPTS += --enable-dba
 ifneq ($(BR2_PACKAGE_PHP_EXT_DBA_CDB),y)
-	PHP_CONF_OPT += --without-cdb
+	PHP_CONF_OPTS += --without-cdb
 endif
 ifneq ($(BR2_PACKAGE_PHP_EXT_DBA_FLAT),y)
-	PHP_CONF_OPT += --without-flatfile
+	PHP_CONF_OPTS += --without-flatfile
 endif
 ifneq ($(BR2_PACKAGE_PHP_EXT_DBA_INI),y)
-	PHP_CONF_OPT += --without-inifile
+	PHP_CONF_OPTS += --without-inifile
 endif
 ifeq ($(BR2_PACKAGE_PHP_EXT_DBA_DB4),y)
-	PHP_CONF_OPT += --with-db4=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-db4=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += berkeleydb
 endif
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_SNMP),y)
-	PHP_CONF_OPT += --with-snmp=$(STAGING_DIR)/usr
+	PHP_CONF_OPTS += --with-snmp=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += netsnmp
+endif
+
+ifeq ($(BR2_PACKAGE_PHP_EXT_GD),y)
+	PHP_CONF_OPTS += --with-gd --with-jpeg-dir=$(STAGING_DIR)/usr \
+		--with-png-dir=$(STAGING_DIR)/usr \
+		--with-zlib-dir=$(STAGING_DIR)/usr \
+		--with-freetype-dir=$(STAGING_DIR)/usr
+	PHP_DEPENDENCIES += jpeg libpng freetype
 endif
 
 define PHP_EXTENSIONS_FIXUP

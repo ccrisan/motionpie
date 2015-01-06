@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-EXIM_VERSION = 4.83
+EXIM_VERSION = 4.84
 EXIM_SOURCE = exim-$(EXIM_VERSION).tar.bz2
 EXIM_SITE = ftp://ftp.exim.org/pub/exim/exim4
 EXIM_LICENSE = GPLv2+
@@ -48,6 +48,20 @@ define EXIM_USE_DEFAULT_CONFIG_FILE
 	$(call exim-config-unset,EXIM_MONITOR)
 endef
 
+ifeq ($(BR2_PACKAGE_DOVECOT),y)
+EXIM_DEPENDENCIES += dovecot
+define EXIM_USE_DEFAULT_CONFIG_FILE_DOVECOT
+	$(call exim-config-change,AUTH_DOVECOT,yes)
+endef
+endif
+
+ifeq ($(BR2_PACKAGE_CLAMAV),y)
+EXIM_DEPENDENCIES += clamav
+define EXIM_USE_DEFAULT_CONFIG_FILE_CLAMAV
+	$(call exim-config-change,WITH_CONTENT_SCAN,yes)
+endef
+endif
+
 define EXIM_CONFIGURE_TOOLCHAIN
 	$(call exim-config-add,CC,$(TARGET_CC))
 	$(call exim-config-add,CFLAGS,$(TARGET_CFLAGS))
@@ -65,6 +79,8 @@ endef
 else # CUSTOM_CONFIG
 define EXIM_CONFIGURE_CMDS
 	$(EXIM_USE_DEFAULT_CONFIG_FILE)
+	$(EXIM_USE_DEFAULT_CONFIG_FILE_DOVECOT)
+	$(EXIM_USE_DEFAULT_CONFIG_FILE_CLAMAV)
 	$(EXIM_CONFIGURE_TOOLCHAIN)
 endef
 endif # CUSTOM_CONFIG
@@ -89,7 +105,7 @@ define EXIM_INSTALL_TARGET_CMDS
 endef
 
 define EXIM_USERS
-exim 88 mail 8 * - - - exim
+	exim 88 mail 8 * - - - exim
 endef
 
 define EXIM_INSTALL_INIT_SYSV

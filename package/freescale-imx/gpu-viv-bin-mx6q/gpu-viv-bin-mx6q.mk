@@ -9,8 +9,8 @@ GPU_VIV_BIN_MX6Q_VERSION = $(FREESCALE_IMX_VERSION)-hfp
 else
 GPU_VIV_BIN_MX6Q_VERSION = $(FREESCALE_IMX_VERSION)-sfp
 endif
-GPU_VIV_BIN_MX6Q_SITE    = $(FREESCALE_IMX_SITE)
-GPU_VIV_BIN_MX6Q_SOURCE  = gpu-viv-bin-mx6q-$(GPU_VIV_BIN_MX6Q_VERSION).bin
+GPU_VIV_BIN_MX6Q_SITE = $(FREESCALE_IMX_SITE)
+GPU_VIV_BIN_MX6Q_SOURCE = gpu-viv-bin-mx6q-$(GPU_VIV_BIN_MX6Q_VERSION).bin
 
 GPU_VIV_BIN_MX6Q_INSTALL_STAGING = YES
 
@@ -23,7 +23,7 @@ GPU_VIV_BIN_MX6Q_LICENSE = Freescale Semiconductor Software License Agreement
 # for which a separate license is needed...
 GPU_VIV_BIN_MX6Q_REDISTRIBUTE = NO
 
-GPU_VIV_BIN_MX6Q_PROVIDES = libegl libgles
+GPU_VIV_BIN_MX6Q_PROVIDES = libegl libgles libopenvg
 
 # DirectFB is not supported (wrong version)
 ifeq ($(BR2_PACKAGE_XORG7),y)

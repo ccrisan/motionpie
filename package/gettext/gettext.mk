@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-GETTEXT_VERSION = 0.19.2
+GETTEXT_VERSION = 0.19.3
 GETTEXT_SITE = $(BR2_GNU_MIRROR)/gettext
+GETTEXT_SOURCE = gettext-$(GETTEXT_VERSION).tar.xz
 GETTEXT_INSTALL_STAGING = YES
 GETTEXT_LICENSE = GPLv2+
 GETTEXT_LICENSE_FILES = COPYING
@@ -13,7 +14,7 @@ GETTEXT_LICENSE_FILES = COPYING
 GETTEXT_DEPENDENCIES = $(if $(BR2_PACKAGE_LIBICONV),libiconv)
 HOST_GETTEXT_DEPENDENCIES = # we don't want the libiconv dependency
 
-GETTEXT_CONF_OPT += \
+GETTEXT_CONF_OPTS += \
 	--disable-libasprintf \
 	--disable-acl \
 	--disable-openmp \
@@ -24,7 +25,7 @@ GETTEXT_CONF_OPT += \
 	--disable-relocatable \
 	--without-emacs
 
-HOST_GETTEXT_CONF_OPT = \
+HOST_GETTEXT_CONF_OPTS = \
 	--disable-libasprintf \
 	--disable-acl \
 	--disable-openmp \
@@ -69,7 +70,7 @@ HOST_GETTEXT_POST_INSTALL_HOOKS += GETTEXT_GETTEXTIZE_EYE_CANDY
 # instead select BR2_PACKAGE_GETTEXT. Those packages need to be
 # fixed before we can remove the following 3 lines... :-(
 ifeq ($(BR2_ENABLE_LOCALE),)
-GETTEXT_CONF_OPT += --enable-nls
+GETTEXT_CONF_OPTS += --enable-nls
 endif
 
 # Disable interactive confirmation in host gettextize for package fixups

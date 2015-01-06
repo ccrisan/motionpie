@@ -5,14 +5,24 @@
 #
 ################################################################################
 
-# UPPERCASE Macro -- transform its argument to uppercase and replace dots and
-# hyphens to underscores
+# Case conversion macros. This is inspired by the 'up' macro from gmsl
+# (http://gmsl.sf.net). It is optimised very heavily because these macros
+# are used a lot. It is about 5 times faster than forking a shell and tr.
+#
+# The caseconvert-helper creates a definition of the case conversion macro.
+# After expansion by the outer $(eval ), the UPPERCASE macro is defined as:
+# $(strip $(eval __tmp := $(1))  $(eval __tmp := $(subst a,A,$(__tmp))) ... )
+# In other words, every letter is substituted one by one.
+#
+# The caseconvert-helper allows us to create this definition out of the
+# [FROM] and [TO] lists, so we don't need to write down every substition
+# manually. The uses of $ and $$ quoting are chosen in order to do as
+# much expansion as possible up-front.
+#
+# Note that it would be possible to conceive a slightly more optimal
+# implementation that avoids the use of __tmp, but that would be even
+# more unreadable and is not worth the effort.
 
-# Heavily inspired by the up macro from gmsl (http://gmsl.sf.net)
-# This is approx 5 times faster than forking a shell and tr, and
-# as this macro is used a lot it matters
-# This works by creating translation character pairs (E.G. a:A b:B)
-# and then looping though all of them running $(subst from,to,text)
 [FROM] := a b c d e f g h i j k l m n o p q r s t u v w x y z - .
 [TO]   := A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _ _
 
@@ -52,8 +62,8 @@ endef
 # directory from its makefile directory, using the $(MAKEFILE_LIST)
 # variable provided by make. This is used by the *TARGETS macros to
 # automagically find where the package is located.
-pkgdir       = $(dir $(lastword $(MAKEFILE_LIST)))
-pkgname      = $(lastword $(subst /, ,$(pkgdir)))
+pkgdir = $(dir $(lastword $(MAKEFILE_LIST)))
+pkgname = $(lastword $(subst /, ,$(pkgdir)))
 
 # Define extractors for different archive suffixes
 INFLATE.bz2  = $(BZCAT)
@@ -67,15 +77,15 @@ INFLATE.tar  = cat
 suitable-extractor = $(INFLATE$(suffix $(1)))
 
 # MESSAGE Macro -- display a message in bold type
-MESSAGE     = echo "$(TERM_BOLD)>>> $($(PKG)_NAME) $($(PKG)_VERSION) $(1)$(TERM_RESET)"
-TERM_BOLD  := $(shell tput smso)
+MESSAGE = echo "$(TERM_BOLD)>>> $($(PKG)_NAME) $($(PKG)_VERSION) $(call qstrip,$(1))$(TERM_RESET)"
+TERM_BOLD := $(shell tput smso)
 TERM_RESET := $(shell tput rmso)
 
 # Utility functions for 'find'
 # findfileclauses(filelist) => -name 'X' -o -name 'Y'
 findfileclauses = $(call notfirstword,$(patsubst %,-o -name '%',$(1)))
 # finddirclauses(base, dirlist) => -path 'base/dirX' -o -path 'base/dirY'
-finddirclauses  = $(call notfirstword,$(patsubst %,-o -path '$(1)/%',$(2)))
+finddirclauses = $(call notfirstword,$(patsubst %,-o -path '$(1)/%',$(2)))
 
 # Miscellaneous utility functions
 # notfirstword(wordlist): returns all but the first word in wordlist
@@ -88,10 +98,19 @@ define sep
 
 endef
 
+# check-deprecated-variable -- throw an error on deprecated variables
+# example:
+#   $(eval $(call check-deprecated-variable,FOO_MAKE_OPT,FOO_MAKE_OPTS))
+define check-deprecated-variable # (deprecated var, new var)
+ifneq ($$(origin $(1)),undefined)
+$$(error Package error: use $(2) instead of $(1). Please fix your .mk file)
+endif
+endef
+
 #
 # legal-info helper functions
 #
-LEGAL_INFO_SEPARATOR="::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+LEGAL_INFO_SEPARATOR = "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
 
 define legal-warning # text
 	echo "WARNING: $(1)" >>$(LEGAL_WARNINGS)

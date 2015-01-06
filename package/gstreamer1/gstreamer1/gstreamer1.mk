@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GSTREAMER1_VERSION = 1.2.4
+GSTREAMER1_VERSION = 1.4.3
 GSTREAMER1_SOURCE = gstreamer-$(GSTREAMER1_VERSION).tar.xz
 GSTREAMER1_SITE = http://gstreamer.freedesktop.org/src/gstreamer
 GSTREAMER1_INSTALL_STAGING = YES
@@ -21,11 +21,10 @@ ifeq ($(BR2_aarch64),y)
 GSTREAMER1_CONF_ENV = as_cv_unaligned_access=yes
 endif
 
-GSTREAMER1_CONF_OPT = \
+GSTREAMER1_CONF_OPTS = \
 	--disable-examples \
 	--disable-tests \
 	--disable-failing-tests \
-	--disable-debug \
 	--disable-valgrind \
 	--disable-benchmarks \
 	--disable-check \

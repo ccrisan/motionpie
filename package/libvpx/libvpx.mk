@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBVPX_VERSION = v1.2.0
+LIBVPX_VERSION = v1.3.0
 LIBVPX_SITE = http://git.chromium.org/webm/libvpx.git
 LIBVPX_SITE_METHOD = git
 
@@ -18,7 +18,7 @@ LIBVPX_CONF_ENV = \
 	LD="$(TARGET_CC)" \
 	CROSS=$(GNU_TARGET_NAME)
 
-LIBVPX_CONF_OPT = \
+LIBVPX_CONF_OPTS = \
 	--disable-examples \
 	--disable-docs \
 	--disable-unit-tests
@@ -34,7 +34,7 @@ define LIBVPX_CONFIGURE_CMDS
 		--enable-pic \
 		--prefix=/usr \
 		$(SHARED_STATIC_LIBS_OPTS) \
-		$(LIBVPX_CONF_OPT) \
+		$(LIBVPX_CONF_OPTS) \
 	)
 endef
 

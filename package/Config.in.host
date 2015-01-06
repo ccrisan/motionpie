@@ -1,6 +1,8 @@
 menu "Host utilities"
 
+	source "package/cramfs/Config.in.host"
 	source "package/dfu-util/Config.in.host"
+	source "package/dos2unix/Config.in.host"
 	source "package/dosfstools/Config.in.host"
 	source "package/e2fsprogs/Config.in.host"
 	source "package/e2tools/Config.in.host"

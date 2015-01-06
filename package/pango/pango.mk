@@ -5,7 +5,7 @@
 ################################################################################
 
 PANGO_VERSION_MAJOR = 1.36
-PANGO_VERSION = $(PANGO_VERSION_MAJOR).3
+PANGO_VERSION = $(PANGO_VERSION_MAJOR).7
 PANGO_SOURCE = pango-$(PANGO_VERSION).tar.xz
 PANGO_SITE = http://ftp.gnome.org/pub/GNOME/sources/pango/$(PANGO_VERSION_MAJOR)
 PANGO_AUTORECONF = YES
@@ -40,9 +40,7 @@ PANGO_CONF_ENV = ac_cv_func_posix_getpwuid_r=yes glib_cv_stack_grows=no \
 		ac_use_included_regex=no gl_cv_c_restrict=no \
 		ac_cv_path_FREETYPE_CONFIG=$(STAGING_DIR)/usr/bin/freetype-config
 
-PANGO_CONF_OPT = --enable-explicit-deps=no \
-	--disable-debug \
-	--disable-gtk-doc-html
+PANGO_CONF_OPTS = --enable-explicit-deps=no --disable-gtk-doc-html
 
 PANGO_DEPENDENCIES = $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) \
 	host-pkgconf \
@@ -53,14 +51,14 @@ PANGO_DEPENDENCIES = $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext) \
 	freetype
 
 ifeq ($(BR2_PACKAGE_XORG7),y)
-	PANGO_CONF_OPT += --x-includes=$(STAGING_DIR)/usr/include/X11 \
+	PANGO_CONF_OPTS += --x-includes=$(STAGING_DIR)/usr/include/X11 \
 		--x-libraries=$(STAGING_DIR)/usr/lib
 	PANGO_DEPENDENCIES += xlib_libX11
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXFT)$(BR2_PACKAGE_XLIB_LIBXRENDER),yy)
 	PANGO_DEPENDENCIES += xlib_libXft xlib_libXrender
-	PANGO_CONF_OPT += --with-xft
+	PANGO_CONF_OPTS += --with-xft
 endif
 
 define PANGO_INSTALL_INITSCRIPT

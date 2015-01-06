@@ -4,18 +4,18 @@
 #
 ################################################################################
 
-RUBY_VERSION_MAJOR = 1.9
-RUBY_VERSION = $(RUBY_VERSION_MAJOR).3-p545
-# 1.9.1 directory used for extensions
-RUBY_VERSION_EXT = 1.9.1
-RUBY_SITE = ftp://ftp.ruby-lang.org/pub/ruby/$(RUBY_VERSION_MAJOR)
+RUBY_VERSION_MAJOR = 2.1
+RUBY_VERSION = $(RUBY_VERSION_MAJOR).5
+RUBY_VERSION_EXT = 2.1.0
+RUBY_SITE = http://cache.ruby-lang.org/pub/ruby/$(RUBY_VERSION_MAJOR)
 RUBY_DEPENDENCIES = host-pkgconf host-ruby
 HOST_RUBY_DEPENDENCIES = host-pkgconf
 RUBY_MAKE_ENV = $(TARGET_MAKE_ENV)
 RUBY_MAKE = $(MAKE1)
-RUBY_CONF_OPT = --disable-install-doc --disable-rpath
-HOST_RUBY_CONF_OPT = --disable-install-doc \
-	--with-out-ext=curses,openssl,readline
+RUBY_CONF_OPTS = --disable-install-doc --disable-rpath --disable-rubygems
+HOST_RUBY_CONF_OPTS = --disable-install-doc \
+	--with-out-ext=curses,openssl,readline \
+	--without-gmp
 RUBY_LICENSE = Ruby or BSD-2c, BSD-3c, others
 RUBY_LICENSE_FILES = LEGAL COPYING BSDL
 
@@ -30,6 +30,9 @@ RUBY_CONF_ENV = CFLAGS="$(RUBY_CFLAGS)"
 
 ifeq ($(BR2_bfin),y)
 RUBY_CONF_ENV = ac_cv_func_dl_iterate_phdr=no
+# Blackfin doesn't have FFI closure support, needed by the fiddle
+# extension.
+RUBY_CONF_OPTS += --with-out-ext=fiddle
 endif
 
 # Force optionals to build before we do
@@ -53,6 +56,12 @@ ifeq ($(BR2_PACKAGE_READLINE),y)
 endif
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 	RUBY_DEPENDENCIES += zlib
+endif
+ifeq ($(BR2_PACKAGE_GMP),y)
+	RUBY_DEPENDENCIES += gmp
+	RUBY_CONF_OPTS += --with-gmp
+else
+	RUBY_CONF_OPTS += --without-gmp
 endif
 
 # Remove rubygems and friends, as they need extensions that aren't

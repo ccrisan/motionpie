@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-ATK_VERSION_MAJOR = 2.12
+ATK_VERSION_MAJOR = 2.14
 ATK_VERSION = $(ATK_VERSION_MAJOR).0
 ATK_SOURCE = atk-$(ATK_VERSION).tar.xz
 ATK_SITE = http://ftp.gnome.org/pub/gnome/sources/atk/$(ATK_VERSION_MAJOR)
 ATK_LICENSE = LGPLv2+
 ATK_LICENSE_FILES = COPYING
 ATK_INSTALL_STAGING = YES
-ATK_INSTALL_STAGING_OPT = DESTDIR=$(STAGING_DIR) LDFLAGS=-L$(STAGING_DIR)/usr/lib install
+ATK_INSTALL_STAGING_OPTS = DESTDIR=$(STAGING_DIR) LDFLAGS=-L$(STAGING_DIR)/usr/lib install
 
 ATK_CONF_ENV = ac_cv_func_posix_getpwuid_r=yes \
 		glib_cv_stack_grows=no glib_cv_uscore=no \
@@ -41,8 +41,7 @@ ATK_CONF_ENV = ac_cv_func_posix_getpwuid_r=yes \
 		jm_cv_func_working_re_compile_pattern=yes ac_use_included_regex=no \
 		gl_cv_c_restrict=no ac_cv_prog_F77=no
 
-ATK_CONF_OPT =  --disable-glibtest --enable-explicit-deps=no \
-		--disable-debug
+ATK_CONF_OPTS =  --disable-glibtest --enable-explicit-deps=no
 
 ATK_DEPENDENCIES = libglib2 host-pkgconf
 

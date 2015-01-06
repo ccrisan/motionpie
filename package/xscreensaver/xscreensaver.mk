@@ -16,10 +16,10 @@ XSCREENSAVER_DEPENDENCIES = jpeg libglade libgtk2 xlib_libX11 xlib_libXt \
 
 # otherwise we end up with host include/library dirs passed to the
 # compiler/linker
-XSCREENSAVER_CONF_OPT = \
+XSCREENSAVER_CONF_OPTS = \
 	--includedir=$(STAGING_DIR)/usr/include \
 	--libdir=$(STAGING_DIR)/usr/lib
 
-XSCREENSAVER_INSTALL_TARGET_OPT = install_prefix="$(TARGET_DIR)" install
+XSCREENSAVER_INSTALL_TARGET_OPTS = install_prefix="$(TARGET_DIR)" install
 
 $(eval $(autotools-package))

@@ -4,17 +4,17 @@
 #
 ################################################################################
 
-KEXEC_VERSION = 2.0.7
+KEXEC_VERSION = 2.0.8
 KEXEC_SOURCE = kexec-tools-$(KEXEC_VERSION).tar.xz
 KEXEC_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/kexec
 KEXEC_LICENSE = GPLv2
 KEXEC_LICENSE_FILES = COPYING
 
 ifeq ($(BR2_PACKAGE_KEXEC_ZLIB),y)
-KEXEC_CONF_OPT += --with-zlib
+KEXEC_CONF_OPTS += --with-zlib
 KEXEC_DEPENDENCIES = zlib
 else
-KEXEC_CONF_OPT += --without-zlib
+KEXEC_CONF_OPTS += --without-zlib
 endif
 
 define KEXEC_REMOVE_LIB_TOOLS

@@ -22,7 +22,7 @@ package, with an example :
 09: LIBFOO_SITE = http://www.foosoftware.org/download
 10: LIBFOO_INSTALL_STAGING = YES
 11: LIBFOO_INSTALL_TARGET = NO
-12: LIBFOO_CONF_OPT = --disable-shared
+12: LIBFOO_CONF_OPTS = --disable-shared
 13: LIBFOO_DEPENDENCIES = libglib2 host-pkgconf
 14:
 15: $(eval $(autotools-package))
@@ -96,7 +96,7 @@ cases, typical packages will therefore only use a few of them.
 * +LIBFOO_CONF_ENV+, to specify additional environment
   variables to pass to the configure script. By default, empty.
 
-* +LIBFOO_CONF_OPT+, to specify additional configure
+* +LIBFOO_CONF_OPTS+, to specify additional configure
   options to pass to the configure script. By default, empty.
 
 * +LIBFOO_MAKE+, to specify an alternate +make+
@@ -111,7 +111,7 @@ cases, typical packages will therefore only use a few of them.
   variables to pass to make in the build step. These are passed before
   the +make+ command. By default, empty.
 
-* +LIBFOO_MAKE_OPT+, to specify additional variables to
+* +LIBFOO_MAKE_OPTS+, to specify additional variables to
   pass to make in the build step. These are passed after the
   +make+ command. By default, empty.
 
@@ -125,8 +125,8 @@ cases, typical packages will therefore only use a few of them.
   variables to pass to the 'autoreconf' program if
   +LIBFOO_AUTORECONF=YES+. These are passed in the environment of
   the 'autoreconf' command. By default, empty.
-  
-* +LIBFOO_AUTORECONF_OPT+ to specify additional options
+
+* +LIBFOO_AUTORECONF_OPTS+ to specify additional options
   passed to the 'autoreconf' program if
   +LIBFOO_AUTORECONF=YES+. By default, empty.
 
@@ -136,7 +136,7 @@ cases, typical packages will therefore only use a few of them.
   'gettextize'.) Only valid when +LIBFOO_AUTORECONF=YES+. Valid
   values are +YES+ and +NO+. The default is +NO+.
 
-* +LIBFOO_GETTEXTIZE_OPT+, to specify additional options passed to
+* +LIBFOO_GETTEXTIZE_OPTS+, to specify additional options passed to
   the 'gettextize' program, if +LIBFOO_GETTEXTIZE=YES+. You may
   use that if, for example, the +.po+ files are not located in the
   standard place (i.e. in +po/+ at the root of the package.) By
@@ -147,13 +147,13 @@ cases, typical packages will therefore only use a few of them.
   not. Valid values are +YES+ and +NO+. By
   default, the value is +YES+
 
-* +LIBFOO_INSTALL_STAGING_OPT+ contains the make options
+* +LIBFOO_INSTALL_STAGING_OPTS+ contains the make options
   used to install the package to the staging directory. By default, the
   value is +DESTDIR=$(STAGING_DIR) install+, which is
   correct for most autotools packages. It is still possible to override
   it.
 
-* +LIBFOO_INSTALL_TARGET_OPT+ contains the make options
+* +LIBFOO_INSTALL_TARGET_OPTS+ contains the make options
   used to install the package to the target directory. By default, the
   value is +DESTDIR=$(TARGET_DIR) install+. The default
   value is correct for most autotools packages, but it is still possible

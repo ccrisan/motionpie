@@ -1,5 +1,5 @@
 QT5_VERSION_MAJOR = 5.3
-QT5_VERSION = $(QT5_VERSION_MAJOR).1
+QT5_VERSION = $(QT5_VERSION_MAJOR).2
 QT5_SITE = http://download.qt-project.org/official_releases/qt/$(QT5_VERSION_MAJOR)/$(QT5_VERSION)/submodules
 include $(sort $(wildcard package/qt5/*/*.mk))
 
@@ -17,3 +17,6 @@ define QT5_LA_PRL_FILES_FIXUP
 		$(SED) "s%-L/usr/lib%%" $$i; \
 	done
 endef
+
+# Variable for other Qt applications to use
+QT5_QMAKE = $(HOST_DIR)/usr/bin/qmake -spec devices/linux-buildroot-g++

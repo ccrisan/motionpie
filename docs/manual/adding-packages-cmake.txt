@@ -22,7 +22,7 @@ with an example :
 09: LIBFOO_SITE = http://www.foosoftware.org/download
 10: LIBFOO_INSTALL_STAGING = YES
 11: LIBFOO_INSTALL_TARGET = NO
-12: LIBFOO_CONF_OPT = -DBUILD_DEMOS=ON
+12: LIBFOO_CONF_OPTS = -DBUILD_DEMOS=ON
 13: LIBFOO_DEPENDENCIES = libglib2 host-pkgconf
 14:
 15: $(eval $(cmake-package))
@@ -94,8 +94,18 @@ typical packages will therefore only use a few of them.
 * +LIBFOO_CONF_ENV+, to specify additional environment variables to
   pass to CMake. By default, empty.
 
-* +LIBFOO_CONF_OPT+, to specify additional configure options to pass
-  to CMake. By default, empty.
+* +LIBFOO_CONF_OPTS+, to specify additional configure options to pass
+  to CMake. By default, empty. A number of common CMake options are
+  set by the +cmake-package+ infrastructure; so it is normally not
+  necessary to set them in the package's +*.mk+ file unless you want
+  to override them:
+
+** +CMAKE_BUILD_TYPE+ is driven by +BR2_ENABLE_DEBUG+;
+** +CMAKE_INSTALL_PREFIX+;
+** +BUILD_SHARED_LIBS+ is driven by +BR2_PREFER_STATIC_LIBS+;
+** +BUILD_DOC+, +BUILD_DOCS+ are disabled;
+** +BUILD_EXAMPLE+, +BUILD_EXAMPLES+ are disabled;
+** +BUILD_TEST+, +BUILD_TESTS+, +BUILD_TESTING+ are disabled.
 
 * +LIBFOO_MAKE+, to specify an alternate +make+ command. This is
   typically useful when parallel make is enabled in the configuration
@@ -108,16 +118,16 @@ typical packages will therefore only use a few of them.
   pass to make in the build step. These are passed before the +make+
   command. By default, empty.
 
-* +LIBFOO_MAKE_OPT+, to specify additional variables to pass to make
+* +LIBFOO_MAKE_OPTS+, to specify additional variables to pass to make
   in the build step. These are passed after the +make+ command. By
   default, empty.
 
-* +LIBFOO_INSTALL_STAGING_OPT+ contains the make options used to
+* +LIBFOO_INSTALL_STAGING_OPTS+ contains the make options used to
   install the package to the staging directory. By default, the value
   is +DESTDIR=$(STAGING_DIR) install+, which is correct for most
   CMake packages. It is still possible to override it.
 
-* +LIBFOO_INSTALL_TARGET_OPT+ contains the make options used to
+* +LIBFOO_INSTALL_TARGET_OPTS+ contains the make options used to
   install the package to the target directory. By default, the value
   is +DESTDIR=$(TARGET_DIR) install+. The default value is correct
   for most CMake packages, but it is still possible to override it if

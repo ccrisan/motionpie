@@ -5,8 +5,8 @@
 ################################################################################
 
 LUAJIT_VERSION = 2.0.3
-LUAJIT_SOURCE  = LuaJIT-$(LUAJIT_VERSION).tar.gz
-LUAJIT_SITE    = http://luajit.org/download
+LUAJIT_SOURCE = LuaJIT-$(LUAJIT_VERSION).tar.gz
+LUAJIT_SITE = http://luajit.org/download
 LUAJIT_LICENSE = MIT
 LUAJIT_LICENSE_FILES = COPYRIGHT
 
@@ -32,9 +32,9 @@ endif
 # bitness is used. Of course, this assumes that the 32 bits multilib
 # libraries are installed.
 ifeq ($(BR2_ARCH_IS_64),y)
-LUAJIT_HOST_CC=$(HOSTCC)
+LUAJIT_HOST_CC = $(HOSTCC)
 else
-LUAJIT_HOST_CC=$(HOSTCC) -m32
+LUAJIT_HOST_CC = $(HOSTCC) -m32
 endif
 
 # We unfortunately can't use TARGET_CONFIGURE_OPTS, because the luajit
@@ -63,6 +63,11 @@ endef
 define LUAJIT_INSTALL_TARGET_CMDS
 	$(MAKE) PREFIX="/usr" DESTDIR="$(TARGET_DIR)" LDCONFIG=true -C $(@D) install
 endef
+
+define LUAJIT_INSTALL_SYMLINK
+	ln -fs luajit $(TARGET_DIR)/usr/bin/lua
+endef
+LUAJIT_POST_INSTALL_TARGET_HOOKS += LUAJIT_INSTALL_SYMLINK
 
 define HOST_LUAJIT_BUILD_CMDS
 	$(MAKE) PREFIX="/usr" BUILDMODE=static -C $(@D) amalg

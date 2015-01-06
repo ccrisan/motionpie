@@ -10,13 +10,22 @@ LAME_SITE = http://downloads.sourceforge.net/project/lame/lame/$(LAME_VERSION_MA
 LAME_DEPENDENCIES = host-pkgconf
 LAME_INSTALL_STAGING = YES
 LAME_CONF_ENV = GTK_CONFIG=/bin/false
-LAME_CONF_OPT = --enable-dynamic-frontends
+LAME_CONF_OPTS = --enable-dynamic-frontends
 LAME_LICENSE = LGPLv2+
 LAME_LICENSE_FILES = COPYING
 
+# Building lame with debug symbols needs the following macros to be
+# defined: _FPU_MASK_IM, _FPU_MASK_ZM, _FPU_MASK_OM.
+# So, if BR2_ENABLE_DEBUG is selected, then we have force lame to be
+# built without debug symbols for Aarch64 and MIPS because these
+# architectures don't have those macros defined.
+ifeq ($(BR2_ENABLE_DEBUG)$(BR2_aarch64)$(BR2_arm)$(BR2_armeb)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el),yy)
+LAME_CONF_OPTS += --disable-debug
+endif
+
 ifeq ($(BR2_PACKAGE_LIBSNDFILE),y)
 LAME_DEPENDENCIES += libsndfile
-LAME_CONF_OPT += --with-fileio=sndfile
+LAME_CONF_OPTS += --with-fileio=sndfile
 endif
 
 ifeq ($(BR2_PACKAGE_NCURSES),y)

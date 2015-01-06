@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-BOOST_VERSION = 1.55.0
+BOOST_VERSION = 1.56.0
 BOOST_SOURCE = boost_$(subst .,_,$(BOOST_VERSION)).tar.bz2
 BOOST_SITE = http://downloads.sourceforge.net/project/boost/boost/$(BOOST_VERSION)
 BOOST_INSTALL_STAGING = YES
@@ -77,11 +77,20 @@ BOOST_DEPENDENCIES += python
 endif
 endif
 
-HOST_BOOST_OPT += toolset=gcc threading=multi variant=release link=shared \
+HOST_BOOST_OPTS += toolset=gcc threading=multi variant=release link=shared \
 	runtime-link=shared
 
-BOOST_OPT += toolset=gcc \
+ifeq ($(BR2_MIPS_OABI32),y)
+BOOST_ABI = o32
+else ifeq ($(BR2_arm),y)
+BOOST_ABI = aapcs
+else
+BOOST_ABI = sysv
+endif
+
+BOOST_OPTS += toolset=gcc \
 	     threading=multi \
+	     abi=$(BOOST_ABI) \
 	     variant=$(if $(BR2_ENABLE_DEBUG),debug,release) \
 	     link=$(if $(BR2_PREFER_STATIC_LIB),static,shared) \
 	     runtime-link=$(if $(BR2_PREFER_STATIC_LIB),static,shared)
@@ -89,7 +98,7 @@ BOOST_OPT += toolset=gcc \
 ifeq ($(BR2_PACKAGE_BOOST_LOCALE),y)
 ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
 # posix backend needs monetary.h which isn't available on uClibc
-BOOST_OPT += boost.locale.posix=off
+BOOST_OPTS += boost.locale.posix=off
 endif
 
 BOOST_DEPENDENCIES += $(if $(BR2_ENABLE_LOCALE),,libiconv)
@@ -114,31 +123,35 @@ endef
 define BOOST_INSTALL_TARGET_CMDS
 	(cd $(@D) && ./b2 -j$(PARALLEL_JOBS) -q -d+1 \
 	--user-config=$(@D)/user-config.jam \
-	$(BOOST_OPT) \
+	$(BOOST_OPTS) \
 	--prefix=$(TARGET_DIR)/usr \
+	--ignore-site-config \
 	--layout=$(BOOST_LAYOUT) install )
 endef
 
 define HOST_BOOST_BUILD_CMDS
 	(cd $(@D) && ./b2 -j$(PARALLEL_JOBS) -q -d+1 \
 	--user-config=$(@D)/user-config.jam \
-	$(HOST_BOOST_OPT) \
+	$(HOST_BOOST_OPTS) \
+	--ignore-site-config \
 	--prefix=$(HOST_DIR)/usr )
 endef
 
 define HOST_BOOST_INSTALL_CMDS
 	(cd $(@D) && ./b2 -j$(PARALLEL_JOBS) -q -d+1 \
 	--user-config=$(@D)/user-config.jam \
-	$(HOST_BOOST_OPT) \
+	$(HOST_BOOST_OPTS) \
 	--prefix=$(HOST_DIR)/usr \
+	--ignore-site-config \
 	--layout=$(BOOST_LAYOUT) install )
 endef
 
 define BOOST_INSTALL_STAGING_CMDS
 	(cd $(@D) && ./bjam -j$(PARALLEL_JOBS) -d+1 \
 	--user-config=$(@D)/user-config.jam \
-	$(BOOST_OPT) \
+	$(BOOST_OPTS) \
 	--prefix=$(STAGING_DIR)/usr \
+	--ignore-site-config \
 	--layout=$(BOOST_LAYOUT) install)
 endef
 

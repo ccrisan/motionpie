@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-PCIUTILS_VERSION = 3.2.1
-PCIUTILS_SITE = ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci
+PCIUTILS_VERSION = 3.3.0
+PCIUTILS_SITE = $(BR2_KERNEL_MIRROR)/software/utils/pciutils
+PCIUTILS_SOURCE = pciutils-$(PCIUTILS_VERSION).tar.xz
 PCIUTILS_INSTALL_STAGING = YES
 PCIUTILS_LICENSE = GPLv2+
 PCIUTILS_LICENSE_FILES = COPYING
@@ -17,7 +18,7 @@ else
 	PCIUTILS_ZLIB=no
 endif
 
-PCIUTILS_DNS=no
+PCIUTILS_DNS = no
 
 ifeq ($(BR2_PACKAGE_KMOD),y)
 	PCIUTILS_DEPENDENCIES += kmod
@@ -64,12 +65,14 @@ endef
 
 define PCIUTILS_INSTALL_TARGET_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) $(PCIUTILS_MAKE_OPTS) \
-		PREFIX=$(TARGET_DIR)/usr install install-lib install-pcilib
+		PREFIX=$(TARGET_DIR)/usr SBINDIR=$(TARGET_DIR)/usr/bin \
+		install install-lib install-pcilib
 endef
 
 define PCIUTILS_INSTALL_STAGING_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE1) -C $(@D) $(PCIUTILS_MAKE_OPTS) \
-		PREFIX=$(STAGING_DIR)/usr install install-lib install-pcilib
+		PREFIX=$(STAGING_DIR)/usr SBINDIR=$(STAGING_DIR)/usr/bin \
+		install install-lib install-pcilib
 endef
 
 $(eval $(generic-package))

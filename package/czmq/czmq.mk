@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-CZMQ_VERSION = v2.2.0
+CZMQ_VERSION = v3.0.0
 CZMQ_SITE = $(call github,zeromq,czmq,$(CZMQ_VERSION))
 
 # Autoreconf required as we use the git tree
@@ -17,6 +17,10 @@ CZMQ_LICENSE_FILES = LICENSE
 # asciidoc is a python script that imports unicodedata, which is not in
 # host-python, so disable asciidoc entirely.
 CZMQ_CONF_ENV = ac_cv_prog_czmq_have_asciidoc=no
+
+ifeq ($(BR2_PREFER_STATIC_LIB),y)
+CZMQ_CONF_OPTS += LIBS="-lstdc++ -lm"
+endif
 
 define CZMQ_CREATE_CONFIG_DIR
 	mkdir -p $(@D)/config

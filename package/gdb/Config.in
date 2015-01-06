@@ -8,7 +8,7 @@ config BR2_PACKAGE_GDB
 	# target, we don't allow building a separate gdbserver. The
 	# one from the external toolchain should be used.
 	select BR2_PACKAGE_GDB_SERVER if \
-	       (!BR2_PACKAGE_GDB_DEBUGGER && !BR2_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY)
+		(!BR2_PACKAGE_GDB_DEBUGGER && !BR2_TOOLCHAIN_EXTERNAL_GDB_SERVER_COPY)
 	depends on BR2_TOOLCHAIN_HAS_THREADS && BR2_TOOLCHAIN_HAS_THREADS_DEBUG
 	depends on !BR2_nios2
 	help
@@ -45,5 +45,28 @@ config BR2_PACKAGE_GDB_DEBUGGER
 comment "full gdb on target needs a toolchain w/ wchar"
 	depends on !BR2_sh && !BR2_sh64 && !BR2_avr32 && !BR2_microblaze && !BR2_bfin
 	depends on !BR2_USE_WCHAR
+
+if BR2_PACKAGE_GDB_DEBUGGER
+
+config BR2_PACKAGE_GDB_TUI
+	bool "TUI support"
+	help
+	  This option enables terminal user interface (TUI) for gdb
+
+	  "The GDB Text User Interface (TUI) is a terminal interface
+	  which uses the curses library to show the source file, the
+	  assembly output, the program registers and GDB commands in
+	  separate text windows."
+
+	  https://sourceware.org/gdb/current/onlinedocs/gdb/TUI.html
+
+config BR2_PACKAGE_GDB_PYTHON
+	bool "Python support"
+	# Only Python 2.x is supported by gdb for now
+	depends on BR2_PACKAGE_PYTHON
+	help
+	  This option enables Python support in the target gdb.
+
+endif
 
 endif

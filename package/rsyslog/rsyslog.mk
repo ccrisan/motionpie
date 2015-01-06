@@ -4,15 +4,15 @@
 #
 ################################################################################
 
-RSYSLOG_VERSION = 7.6.0
+RSYSLOG_VERSION = 7.6.7
 RSYSLOG_SITE = http://rsyslog.com/files/download/rsyslog
 RSYSLOG_LICENSE = GPLv3 LGPLv3 Apache-2.0
 RSYSLOG_LICENSE_FILES = COPYING COPYING.LESSER COPYING.ASL20
-RSYSLOG_DEPENDENCIES = zlib libestr liblogging json-c util-linux host-pkgconf
-RSYSLOG_AUTORECONF = YES
+RSYSLOG_DEPENDENCIES = zlib libestr liblogging json-c host-pkgconf
 
-RSYSLOG_CONF_OPT = --disable-testbench \
-		   --enable-cached-man-pages
+RSYSLOG_CONF_OPTS = --disable-testbench \
+		   --enable-cached-man-pages \
+		   --disable-generate-man-pages
 
 # Build after BusyBox
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
@@ -26,9 +26,16 @@ endif
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
 	RSYSLOG_DEPENDENCIES += libgcrypt
 	RSYSLOG_CONF_ENV += LIBGCRYPT_CONFIG=$(STAGING_DIR)/usr/bin/libgcrypt-config
-	RSYSLOG_CONF_OPT += --enable-libgcrypt=yes
+	RSYSLOG_CONF_OPTS += --enable-libgcrypt=yes
 else
-	RSYSLOG_CONF_OPT += --enable-libgcrypt=no
+	RSYSLOG_CONF_OPTS += --enable-libgcrypt=no
+endif
+
+ifeq ($(BR2_PACKAGE_UTIL_LINUX_LIBUUID),y)
+	RSYSLOG_DEPENDENCIES += util-linux
+	RSYSLOG_CONF_OPTS += --enable-uuid
+else
+	RSYSLOG_CONF_OPTS += --disable-uuid
 endif
 
 define RSYSLOG_INSTALL_INIT_SYSV

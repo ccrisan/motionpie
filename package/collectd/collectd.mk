@@ -14,7 +14,7 @@ COLLECTD_LICENSE_FILES = COPYING
 # These require unmet dependencies, are fringe, pointless or deprecated
 COLLECTD_PLUGINS_DISABLE = amqp apple_sensors aquaero ascent dbi email \
 		gmond hddtemp ipmi ipvs java libvirt lpar lvm madwifi mbmon \
-		memcachec modbus multimeter netapp netlink nginx \
+		modbus multimeter netapp netlink nginx \
 		notify_desktop notify_email numa nut onewire oracle perl pf \
 		pinba postgresql powerdns python redis routeros rrdcached \
 		sigrok tape target_v5upgrade teamspeak2 ted \
@@ -23,8 +23,8 @@ COLLECTD_PLUGINS_DISABLE = amqp apple_sensors aquaero ascent dbi email \
 
 COLLECTD_CONF_ENV += LIBS="-lm"
 
-COLLECTD_CONF_OPT += --with-nan-emulation --with-fp-layout=nothing \
-	--localstatedir=/var --with-perl-bindings=no \
+COLLECTD_CONF_OPTS += --with-nan-emulation --with-fp-layout=nothing \
+	--with-perl-bindings=no \
 	$(foreach p, $(COLLECTD_PLUGINS_DISABLE), --disable-$(p)) \
 	$(if $(BR2_PACKAGE_COLLECTD_AGGREGATION),--enable-aggregation,--disable-aggregation) \
 	$(if $(BR2_PACKAGE_COLLECTD_APACHE),--enable-apache,--disable-apache) \
@@ -118,22 +118,22 @@ COLLECTD_DEPENDENCIES = host-pkgconf \
 
 # include/library fixups
 ifeq ($(BR2_PACKAGE_LIBCURL),y)
-	COLLECTD_CONF_OPT += --with-libcurl=$(STAGING_DIR)/usr
+	COLLECTD_CONF_OPTS += --with-libcurl=$(STAGING_DIR)/usr
 endif
 ifeq ($(BR2_PACKAGE_MYSQL),y)
-	COLLECTD_CONF_OPT += --with-libmysql=$(STAGING_DIR)/usr
+	COLLECTD_CONF_OPTS += --with-libmysql=$(STAGING_DIR)/usr
 endif
 ifeq ($(BR2_PACKAGE_NETSNMP),y)
-	COLLECTD_CONF_OPT += --with-libnetsnmp=$(STAGING_DIR)/usr/bin/net-snmp-config
+	COLLECTD_CONF_OPTS += --with-libnetsnmp=$(STAGING_DIR)/usr/bin/net-snmp-config
 endif
 ifeq ($(BR2_PACKAGE_YAJL),y)
-	COLLECTD_CONF_OPT += --with-yajl=$(STAGING_DIR)/usr
+	COLLECTD_CONF_OPTS += --with-yajl=$(STAGING_DIR)/usr
 endif
 
 # network can use libgcrypt
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
 	COLLECTD_DEPENDENCIES += libgcrypt
-	COLLECTD_CONF_OPT += --with-libgcrypt=$(STAGING_DIR)/usr
+	COLLECTD_CONF_OPTS += --with-libgcrypt=$(STAGING_DIR)/usr
 endif
 
 # released software should not break on minor warnings

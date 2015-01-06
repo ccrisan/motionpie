@@ -6,7 +6,7 @@
 
 ALSA_UTILS_VERSION = 1.0.28
 ALSA_UTILS_SOURCE = alsa-utils-$(ALSA_UTILS_VERSION).tar.bz2
-ALSA_UTILS_SITE = http://alsa.cybermirror.org/utils
+ALSA_UTILS_SITE = ftp://ftp.alsa-project.org/pub/utils
 ALSA_UTILS_LICENSE = GPLv2
 ALSA_UTILS_LICENSE_FILES = COPYING
 ALSA_UTILS_INSTALL_STAGING = YES
@@ -14,14 +14,19 @@ ALSA_UTILS_DEPENDENCIES = host-gettext host-pkgconf alsa-lib \
 	$(if $(BR2_PACKAGE_NCURSES),ncurses)
 
 ALSA_UTILS_CONF_ENV = \
-	ac_cv_prog_ncurses5_config=$(STAGING_DIR)/bin/ncurses5-config
+	ac_cv_prog_ncurses5_config=$(STAGING_DIR)/usr/bin/$(NCURSES_CONFIG_SCRIPTS)
 
-ALSA_UTILS_CONF_OPT = \
+ALSA_UTILS_CONF_OPTS = \
 	--disable-xmlto \
-	--with-curses=ncurses
+	--with-curses=$(if $(BR2_PACKAGE_NCURSES_WCHAR),ncursesw,ncurses)
+
+ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
+ALSA_UTILS_DEPENDENCIES += gettext
+ALSA_UTILS_CONF_ENV += LIBS=-lintl
+endif
 
 ifneq ($(BR2_PACKAGE_ALSA_UTILS_ALSAMIXER),y)
-ALSA_UTILS_CONF_OPT += --disable-alsamixer --disable-alsatest
+ALSA_UTILS_CONF_OPTS += --disable-alsamixer --disable-alsatest
 endif
 
 ALSA_UTILS_TARGETS_$(BR2_PACKAGE_ALSA_UTILS_ALSACONF) += usr/sbin/alsaconf

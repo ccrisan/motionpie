@@ -19,26 +19,26 @@ SAMBA_DEPENDENCIES = popt \
 
 SAMBA_CONF_ENV = \
 	ac_cv_file__proc_sys_kernel_core_pattern=yes \
-	samba_cv_HAVE_GETTIMEOFDAY_TZ=yes \
+	libreplace_cv_HAVE_GETTIMEOFDAY_TZ=yes \
 	samba_cv_USE_SETREUID=yes \
 	samba_cv_HAVE_KERNEL_OPLOCKS_LINUX=yes \
-	samba_cv_HAVE_IFACE_IFCONF=yes \
-	samba_cv_HAVE_MMAP=yes \
+	libreplace_cv_HAVE_IFACE_GETIFADDRS=yes \
+	libreplace_cv_HAVE_IFACE_IFCONF=yes \
+	libreplace_cv_HAVE_MMAP=yes \
 	samba_cv_HAVE_FCNTL_LOCK=yes \
-	samba_cv_HAVE_SECURE_MKSTEMP=yes \
+	libreplace_cv_HAVE_SECURE_MKSTEMP=yes \
 	samba_cv_CC_NEGATIVE_ENUM_VALUES=yes \
 	samba_cv_fpie=no \
 	libreplace_cv_HAVE_IPV6=$(if $(BR2_INET_IPV6),yes,no) \
 	$(if $(BR2_PACKAGE_SAMBA_AVAHI),AVAHI_LIBS=-pthread)
 
-SAMBA_CONF_OPT = \
-	--localstatedir=/var \
+SAMBA_CONF_OPTS = \
 	--with-piddir=/var/run \
-        --with-nmbdsocketdir=/var/run/nmbd \
 	--with-lockdir=/var/lock \
 	--with-logfilebase=/var/log \
 	--with-configdir=/etc/samba \
 	--with-privatedir=/etc/samba \
+	--with-nmbdsocketdir=/var/run/nmbd \
 	\
 	--disable-cups \
 	--enable-shared-libs \
@@ -61,7 +61,7 @@ SAMBA_CONF_OPT = \
 	$(if $(BR2_PACKAGE_SAMBA_SMBCLIENT),--with-readline=$(STAGING_DIR)) \
 	$(if $(BR2_PACKAGE_SAMBA_WINBINDD),--with-winbind,--without-winbind)
 
-SAMBA_INSTALL_TARGET_OPT = \
+SAMBA_INSTALL_TARGET_OPTS = \
 	DESTDIR=$(TARGET_DIR) -C $(SAMBA_DIR)/$(SAMBA_SUBDIR) \
 	installlibs installservers installbin installscripts \
 	$(if $(BR2_PACKAGE_SAMBA_SWAT),installswat)
@@ -149,13 +149,13 @@ endef
 # --with-libiconv="" is to avoid detecting host libiconv and build failure
 ifeq ($(BR2_PACKAGE_SAMBA_LIBICONV),y)
 SAMBA_DEPENDENCIES += libiconv
-SAMBA_CONF_OPT += --with-libiconv=$(STAGING_DIR)
+SAMBA_CONF_OPTS += --with-libiconv=$(STAGING_DIR)
 else
-SAMBA_CONF_OPT += --with-libiconv=""
+SAMBA_CONF_OPTS += --with-libiconv=""
 endif
 
 # Compiled debug messages by level
-SAMBA_CONF_OPT += CFLAGS="$(TARGET_CFLAGS) -DMAX_DEBUG_LEVEL=$(BR2_PACKAGE_SAMBA_MAX_DEBUGLEVEL)"
+SAMBA_CONF_OPTS += CFLAGS="$(TARGET_CFLAGS) -DMAX_DEBUG_LEVEL=$(BR2_PACKAGE_SAMBA_MAX_DEBUGLEVEL)"
 
 ifeq ($(BR2_PACKAGE_SAMBA_SWAT),y)
 SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_REMOVE_SWAT_DOCUMENTATION

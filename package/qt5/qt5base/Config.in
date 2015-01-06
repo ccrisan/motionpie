@@ -37,9 +37,7 @@ config BR2_PACKAGE_QT5BASE_EXAMPLES
 	  If unsure, say N.
 
 config BR2_PACKAGE_QT5BASE_NETWORK
-	bool "network module"
-	help
-	  This options enables the Qt5Network library.
+       def_bool y
 
 config BR2_PACKAGE_QT5BASE_CONCURRENT
 	bool "concurrent module"
@@ -47,9 +45,7 @@ config BR2_PACKAGE_QT5BASE_CONCURRENT
 	  This options enables the Qt5Concurrent library.
 
 config BR2_PACKAGE_QT5BASE_SQL
-	bool "sql module"
-	help
-	  This options enables the Qt5Sql library.
+       def_bool y
 
 if BR2_PACKAGE_QT5BASE_SQL
 config BR2_PACKAGE_QT5BASE_MYSQL
@@ -62,6 +58,18 @@ config BR2_PACKAGE_QT5BASE_MYSQL
 	help
 	  Build MySQL plugin
 	  If unsure, say n.
+
+config BR2_PACKAGE_QT5BASE_PSQL
+	bool "PostgreSQL Plugin"
+	select BR2_PACKAGE_POSTGRESQL
+	depends on BR2_TOOLCHAIN_USES_GLIBC
+	help
+	  Build PostgreSQL plugin
+	  If unsure, say n.
+
+comment "PostgreSQL needs an (e)glibc toolchain"
+	depends on !BR2_TOOLCHAIN_USES_GLIBC
+
 choice
 	prompt "SQLite 3 support"
 	default BR2_PACKAGE_QT5BASE_SQLITE_NONE
@@ -89,14 +97,10 @@ endchoice
 endif
 
 config BR2_PACKAGE_QT5BASE_TEST
-	bool "test module"
-	help
-	  This options enables the Qt5Test library.
+	def_bool y
 
 config BR2_PACKAGE_QT5BASE_XML
-	bool "XML module"
-	help
-	  This options enables the Qt5Xml library.
+	def_bool y
 
 config BR2_PACKAGE_QT5BASE_GUI
 	bool "gui module"
@@ -197,10 +201,8 @@ config BR2_PACKAGE_QT5BASE_DEFAULT_QPA
 	  different platform at runtime with the -platform option.
 
 config BR2_PACKAGE_QT5BASE_PRINTSUPPORT
-	bool "print support module"
-	select BR2_PACKAGE_QT5BASE_WIDGETS
-	help
-	  This option enables the Qt5PrintSupport
+	depends on BR2_PACKAGE_QT5BASE_WIDGETS
+	def_bool y
 
 config BR2_PACKAGE_QT5BASE_FONTCONFIG
 	bool "fontconfig support"

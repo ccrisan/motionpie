@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MINIDLNA_VERSION = 1.1.3
+MINIDLNA_VERSION = 1.1.4
 MINIDLNA_SITE = http://downloads.sourceforge.net/project/minidlna/minidlna/$(MINIDLNA_VERSION)
 MINIDLNA_LICENSE = GPLv2 BSD-3c
 MINIDLNA_LICENSE_FILES = COPYING LICENCE.miniupnpd
@@ -20,7 +20,7 @@ ifeq ($(BR2_PREFER_STATIC_LIB),y)
 MINIDLNA_CONF_ENV = \
 	LIBS='-lavformat -lavcodec -lavutil -logg -lz -lpthread -lm'
 else
-MINIDLNA_CONF_OPT = \
+MINIDLNA_CONF_OPTS = \
 	--disable-static
 endif
 

@@ -5,10 +5,10 @@
 ################################################################################
 
 GDB_VERSION = $(call qstrip,$(BR2_GDB_VERSION))
-GDB_SITE    = $(BR2_GNU_MIRROR)/gdb
+GDB_SITE = $(BR2_GNU_MIRROR)/gdb
 
 ifeq ($(BR2_arc),y)
-GDB_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,gdb,$(GDB_VERSION))
+GDB_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,binutils-gdb,$(GDB_VERSION))
 GDB_SOURCE = gdb-$(GDB_VERSION).tar.gz
 GDB_FROM_GIT = y
 endif
@@ -21,6 +21,10 @@ endif
 
 ifeq ($(GDB_VERSION),6.7.1-avr32-2.1.5)
 GDB_SITE = ftp://www.at91.com/pub/buildroot
+endif
+
+ifeq ($(GDB_VERSION),7.8)
+GDB_SOURCE = gdb-$(GDB_VERSION).tar.xz
 endif
 
 GDB_SOURCE ?= gdb-$(GDB_VERSION).tar.bz2
@@ -36,8 +40,9 @@ GDB_DEPENDENCIES = ncurses
 endif
 
 # For the host variant, we really want to build with XML support,
-# which is needed to read XML descriptions of target architectures.
-HOST_GDB_DEPENDENCIES = host-expat
+# which is needed to read XML descriptions of target architectures. We
+# also need ncurses.
+HOST_GDB_DEPENDENCIES = host-expat host-ncurses
 
 # Apply the Xtensa specific patches
 XTENSA_CORE_NAME = $(call qstrip, $(BR2_XTENSA_CORE_NAME))
@@ -53,7 +58,7 @@ endif
 # When gdb sources are fetched from the binutils-gdb repository, they
 # also contain the binutils sources, but binutils shouldn't be built,
 # so we disable it.
-GDB_DISABLE_BINUTILS_CONF_OPT = \
+GDB_DISABLE_BINUTILS_CONF_OPTS = \
 	--disable-binutils \
 	--disable-ld \
 	--disable-gas
@@ -69,17 +74,29 @@ GDB_CONF_ENV = \
 	bash_cv_have_mbstate_t=yes \
 	gdb_cv_func_sigsetjmp=yes
 
-GDB_CONF_OPT = \
+GDB_CONF_OPTS = \
 	--without-uiout \
-	--disable-tui \
 	--disable-gdbtk \
 	--without-x \
 	--disable-sim \
-	$(GDB_DISABLE_BINUTILS_CONF_OPT) \
+	$(GDB_DISABLE_BINUTILS_CONF_OPTS) \
 	$(if $(BR2_PACKAGE_GDB_SERVER),--enable-gdbserver) \
 	--with-curses \
 	--without-included-gettext \
 	--disable-werror
+
+ifeq ($(BR2_PACKAGE_GDB_TUI),y)
+	GDB_CONF_OPTS += --enable-tui
+else
+	GDB_CONF_OPTS += --disable-tui
+endif
+
+ifeq ($(BR2_PACKAGE_GDB_PYTHON),y)
+	GDB_CONF_OPTS += --with-python=$(TOPDIR)/package/gdb/gdb-python-config
+	GDB_DEPENDENCIES += python
+else
+	GDB_CONF_OPTS += --without-python
+endif
 
 # This removes some unneeded Python scripts and XML target description
 # files that are not useful for a normal usage of the debugger.
@@ -110,18 +127,30 @@ endif
 #  * --disable-shared, otherwise the old 6.7 version specific to AVR32
 #    doesn't build because it wants to link a shared libbfd.so against
 #    non-PIC liberty.a.
-HOST_GDB_CONF_OPT = \
+HOST_GDB_CONF_OPTS = \
 	--target=$(GNU_TARGET_NAME) \
 	--enable-static --disable-shared \
 	--without-uiout \
-	--disable-tui \
 	--disable-gdbtk \
 	--without-x \
 	--enable-threads \
 	--disable-werror \
 	--without-included-gettext \
-	$(GDB_DISABLE_BINUTILS_CONF_OPT) \
+	$(GDB_DISABLE_BINUTILS_CONF_OPTS) \
 	--disable-sim
+
+ifeq ($(BR2_PACKAGE_HOST_GDB_TUI),y)
+	HOST_GDB_CONF_OPTS += --enable-tui
+else
+	HOST_GDB_CONF_OPTS += --disable-tui
+endif
+
+ifeq ($(BR2_PACKAGE_HOST_GDB_PYTHON),y)
+	HOST_GDB_CONF_OPTS += --with-python=$(HOST_DIR)/usr/bin/python2
+	HOST_GDB_DEPENDENCIES += host-python
+else
+	HOST_GDB_CONF_OPTS += --without-python
+endif
 
 ifeq ($(GDB_FROM_GIT),y)
 HOST_GDB_DEPENDENCIES += host-texinfo

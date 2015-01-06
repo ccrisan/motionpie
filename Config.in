@@ -220,16 +220,6 @@ config BR2_GNU_MIRROR
 	     http://ftp.gnu.org/pub/gnu
 	     http://mirror.aarnet.edu.au/pub/gnu
 
-config BR2_DEBIAN_MIRROR
-	string "Debian Software mirror"
-	default "http://ftp.debian.org"
-	help
-	  Debian has multiple software mirrors scattered around the world.
-	  The following allows you to select your preferred mirror.
-
-	  Usually, just add your country code like XX here:
-	  http://ftp.XX.debian.org
-
 endif
 
 config BR2_LUAROCKS_MIRROR
@@ -301,9 +291,10 @@ config BR2_CCACHE_INITIAL_SETUP
 endif
 
 config BR2_DEPRECATED
-	bool "Show packages that are deprecated or obsolete"
+	bool "Show options and packages that are deprecated or obsolete"
 	help
-	  This option hides outdated/obsolete versions of packages.
+	  This option shows outdated/obsolete versions of packages and
+	  options that are otherwise hidden.
 
 if BR2_DEPRECATED
 
@@ -535,15 +526,19 @@ comment "enabling Stack Smashing Protection requires support in the toolchain"
 	depends on !BR2_TOOLCHAIN_HAS_SSP
 
 config BR2_PREFER_STATIC_LIB
-	bool "prefer static libraries"
+	bool "build statically linked applications, no dynamic libraries"
 	help
-	  Where possible, build and use static libraries for the target.
-	  This potentially increases your code size and should only be
+	  Build all applications for the target statically linked.
+	  This potentially increases your filesystem size and should only be
 	  used if you know what you do.
-	  The default is to build dynamic libraries and use those on
-	  the target filesystem.
 
-	  WARNING: This is highly experimental at the moment.
+	  Note that some applications cannot be build statically and so are
+	  intentionally disabled.
+
+	  The default (if this option is disabled) is to build dynamic
+	  libraries and dynamically link applications to use those on the
+	  target filesystem.
+
 
 config BR2_PACKAGE_OVERRIDE_FILE
 	string "location of a package override file"

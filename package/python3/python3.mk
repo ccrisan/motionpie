@@ -17,7 +17,7 @@ PYTHON3_LICENSE_FILES = LICENSE
 # installed in $(HOST_DIR), as it is needed when cross-compiling
 # third-party Python modules.
 
-HOST_PYTHON3_CONF_OPT += 	\
+HOST_PYTHON3_CONF_OPTS += 	\
 	--without-ensurepip	\
 	--without-cxx-main 	\
 	--disable-sqlite3	\
@@ -37,7 +37,7 @@ HOST_PYTHON3_CONF_OPT += 	\
 HOST_PYTHON3_CONF_ENV += \
 	LDFLAGS="$(HOST_LDFLAGS) -Wl,--enable-new-dtags"
 
-PYTHON3_DEPENDENCIES  = host-python3 libffi
+PYTHON3_DEPENDENCIES = host-python3 libffi
 
 HOST_PYTHON3_DEPENDENCIES = host-expat host-zlib
 
@@ -50,35 +50,35 @@ endif
 ifeq ($(BR2_PACKAGE_PYTHON3_CURSES),y)
 PYTHON3_DEPENDENCIES += ncurses
 else
-PYTHON3_CONF_OPT += --disable-curses
+PYTHON3_CONF_OPTS += --disable-curses
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_DECIMAL),y)
 PYTHON3_DEPENDENCIES += mpdecimal
-PYTHON3_CONF_OPT += --with-libmpdec=system
+PYTHON3_CONF_OPTS += --with-libmpdec=system
 else
-PYTHON3_CONF_OPT += --with-libmpdec=none
+PYTHON3_CONF_OPTS += --with-libmpdec=none
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_PYEXPAT),y)
 PYTHON3_DEPENDENCIES += expat
-PYTHON3_CONF_OPT += --with-expat=system
+PYTHON3_CONF_OPTS += --with-expat=system
 else
-PYTHON3_CONF_OPT += --with-expat=none
+PYTHON3_CONF_OPTS += --with-expat=none
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_PYC_ONLY),y)
-PYTHON3_CONF_OPT += --enable-old-stdlib-cache
+PYTHON3_CONF_OPTS += --enable-old-stdlib-cache
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_PY_ONLY),y)
-PYTHON3_CONF_OPT += --disable-pyc-build
+PYTHON3_CONF_OPTS += --disable-pyc-build
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_SQLITE),y)
 PYTHON3_DEPENDENCIES += sqlite
 else
-PYTHON3_CONF_OPT += --disable-sqlite3
+PYTHON3_CONF_OPTS += --disable-sqlite3
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_SSL),y)
@@ -86,11 +86,11 @@ PYTHON3_DEPENDENCIES += openssl
 endif
 
 ifneq ($(BR2_PACKAGE_PYTHON3_CODECSCJK),y)
-PYTHON3_CONF_OPT += --disable-codecs-cjk
+PYTHON3_CONF_OPTS += --disable-codecs-cjk
 endif
 
 ifneq ($(BR2_PACKAGE_PYTHON3_UNICODEDATA),y)
-PYTHON3_CONF_OPT += --disable-unicodedata
+PYTHON3_CONF_OPTS += --disable-unicodedata
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_BZIP2),y)
@@ -107,7 +107,13 @@ PYTHON3_CONF_ENV += \
 	ac_cv_file__dev_ptc=yes \
 	ac_cv_working_tzset=yes
 
-PYTHON3_CONF_OPT += \
+# uClibc is known to have a broken wcsftime() implementation, so tell
+# Python 3 to fall back to strftime() instead.
+ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
+PYTHON3_CONF_ENV += ac_cv_func_wcsftime=no
+endif
+
+PYTHON3_CONF_OPTS += \
 	--without-ensurepip	\
 	--without-cxx-main 	\
 	--with-system-ffi	\
@@ -142,6 +148,10 @@ define PYTHON3_REMOVE_USELESS_FILES
 		-type f -not -name pyconfig.h -a -not -name Makefile` ; do \
 		rm -f $$i ; \
 	done
+	rm -rf $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/__pycache__/
+	rm -rf $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/lib-dynload/sysconfigdata/__pycache__
+	rm -rf $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/collections/__pycache__
+	rm -rf $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/importlib/__pycache__
 endef
 
 PYTHON3_POST_INSTALL_TARGET_HOOKS += PYTHON3_REMOVE_USELESS_FILES
@@ -183,3 +193,17 @@ PYTHON3_PATH = $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR)/sysconfigdat
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+ifeq ($(BR2_PACKAGE_PYTHON3_PYC_ONLY),y)
+define PYTHON3_FINALIZE_TARGET
+	find $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR) -name '*.py' -print0 | xargs -0 rm -f
+endef
+endif
+
+ifeq ($(BR2_PACKAGE_PYTHON3_PY_ONLY),y)
+define PYTHON3_FINALIZE_TARGET
+	find $(TARGET_DIR)/usr/lib/python$(PYTHON3_VERSION_MAJOR) -name '*.pyc' -print0 | xargs -0 rm -f
+endef
+endif
+
+TARGET_FINALIZE_HOOKS += PYTHON3_FINALIZE_TARGET

@@ -6,8 +6,8 @@
 
 GRUB_VERSION = 0.97
 GRUB_SOURCE = grub_$(GRUB_VERSION).orig.tar.gz
-GRUB_PATCH  = grub_$(GRUB_VERSION)-67.diff.gz
-GRUB_SITE   = http://snapshot.debian.org/archive/debian/20130129T225227Z/pool/main/g/grub
+GRUB_PATCH = grub_$(GRUB_VERSION)-68.diff.gz
+GRUB_SITE = http://snapshot.debian.org/archive/debian/20141023T043132Z/pool/main/g/grub
 
 GRUB_LICENSE = GPLv2+
 GRUB_LICENSE_FILES = COPYING
@@ -75,7 +75,7 @@ GRUB_CONF_ENV = \
 	$(HOST_CONFIGURE_OPTS) \
 	CFLAGS="$(HOST_CFLAGS) $(GRUB_CFLAGS) -m32"
 
-GRUB_CONF_OPT = \
+GRUB_CONF_OPTS = \
 	--disable-auto-linux-mem-opt \
 	$(GRUB_CONFIG-y)
 

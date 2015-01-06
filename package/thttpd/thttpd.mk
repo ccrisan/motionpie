@@ -7,21 +7,21 @@
 THTTPD_VERSION = 2.25b
 THTTPD_SOURCE = thttpd_$(THTTPD_VERSION).orig.tar.gz
 THTTPD_PATCH = thttpd_$(THTTPD_VERSION)-11.diff.gz
-THTTPD_SITE = $(BR2_DEBIAN_MIRROR)/debian/pool/main/t/thttpd
+THTTPD_SITE = http://snapshot.debian.org/archive/debian/20141023T043132Z/pool/main/t/thttpd
 THTTPD_LICENSE = BSD-2c
 THTTPD_LICENSE_FILES = thttpd.c
 
 ifneq ($(THTTPD_PATCH),)
 define THTTPD_DEBIAN_PATCHES
 	if [ -d $(@D)/debian/patches ]; then \
-		support/scripts/apply-patches.sh $(@D) $(@D)/debian/patches \*.patch; \
+		$(APPLY_PATCHES) $(@D) $(@D)/debian/patches \*.patch; \
 	fi
 endef
 endif
 
 THTTPD_POST_PATCH_HOOKS = THTTPD_DEBIAN_PATCHES
 
-THTTPD_MAKE=$(MAKE1)
+THTTPD_MAKE = $(MAKE1)
 
 define THTTPD_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/thttpd $(TARGET_DIR)/usr/sbin/thttpd

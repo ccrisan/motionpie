@@ -1,96 +1,71 @@
-// -*- mode:doc -*- ;
+// -*- mode:doc; -*-
+// vim: set syntax=asciidoc:
 
-[[packages-custom]]
-=== Customizing packages
+[[customize-packages]]
+=== Adding project-specific packages
 
-It is sometimes useful to apply 'extra' patches to packages - over and
-above those provided in Buildroot. This might be used to support custom
-features in a project, for example, or when working on a new architecture.
+In general, any new package should be added directly in the +package+
+directory and submitted to the Buildroot upstream project. How to add
+packages to Buildroot in general is explained in full detail in
+xref:adding-packages[] and will not be repeated here.  However, your
+project may need some proprietary packages that cannot be upstreamed.
+This section will explain how you can keep such project-specific
+packages in a project-specific directory.
 
-The +BR2_GLOBAL_PATCH_DIR+ configuration option can be used to specify
-a space separated list of one or more directories containing package
-patches. By specifying multiple global patch directories, a user could
-implement a layered approach to patches. This could be useful when a
-user has multiple boards that share a common processor architecture.
-It is often the case that a subset of patches for a package need to be
-shared between the different boards a user has. However, each board
-may require specific patches for the package that build on top of the
-common subset of patches.
+As shown in xref:customize-dir-structure[], the recommended location for
+project-specific packages is +package/<company>/+. If you are using the
++BR2_EXTERNAL+ feature (see xref:outside-br-custom[]) the recommended
+location is +$(BR2_EXTERNAL)/package/+.
 
-For a specific version +<packageversion>+ of a specific package
-+<packagename>+, patches are applied from +BR2_GLOBAL_PATCH_DIR+ as
-follows:
+However, Buildroot will not be aware of the packages in this location,
+unless we perform some additional steps. As explained in
+xref:adding-packages[], a package in Buildroot basically consists of two
+files: a +.mk+ file (describing how to build the package) and a
++Config.in+ file (describing the configuration options for this
+package).
 
-. For every directory - +<global-patch-dir>+ - that exists in
-  +BR2_GLOBAL_PATCH_DIR+, a +<package-patch-dir>+ will be determined as
-  follows:
-+
-* +<global-patch-dir>/<packagename>/<packageversion>/+ if the
-  directory exists.
-+
-* Otherwise, +<global-patch-dir>/<packagename>+ if the directory
-  exists.
-
-. Patches will then be applied from a +<package-patch-dir>+ as
-  follows:
-+
-* If a +series+ file exists in the package directory, then patches are
-  applied according to the +series+ file;
-+
-* Otherwise, patch files matching +<packagename>-*.patch+
-  are applied in alphabetical order.
-  So, to ensure they are applied in the right order, it is highly
-  recommended to name the patch files like this:
-  +<packagename>-<number>-<description>.patch+, where +<number>+
-  refers to the 'apply order'.
-
-For information about how patches are applied for a package, see
-xref:patch-apply-order[]
-
-The +BR2_GLOBAL_PATCH_DIR+ option is the preferred method for
-specifying a custom patch directory for packages. It can be used to
-specify a patch directory for any package in buildroot. It should also
-be used in place of the custom patch directory options that are
-available for packages such as U-Boot and Barebox. By doing this, it
-will allow a user to manage their patches from one top-level
-directory.
-
-The exception to +BR2_GLOBAL_PATCH_DIR+ being the preferred method for
-specifying custom patches is +BR2_LINUX_KERNEL_PATCH+.
-+BR2_LINUX_KERNEL_PATCH+ should be used to specify kernel patches that
-are available at an URL. *Note:* +BR2_LINUX_KERNEL_PATCH+ specifies kernel
-patches that are applied after patches available in +BR2_GLOBAL_PATCH_DIR+,
-as it is done from a post-patch hook of the Linux package.
-
-An example directory structure for where a user has multiple
-directories specified for +BR2_GLOBAL_PATCH_DIR+ may look like this:
+Buildroot will automatically include the +.mk+ files in first-level
+subdirectories of the +package+ directory (using the pattern
++package/\*/*.mk+). If we want Buildroot to include +.mk+ files from
+deeper subdirectories (like +package/<company>/package1/+) then we
+simply have to add a +.mk+ file in a first-level subdirectory that
+includes these additional +.mk+ files. Therefore, create a file
++package/<company>/<company>.mk+ with following contents (assuming you
+have only one extra directory level below +package/<company>/+):
 
 -----
-board/
-+-- common-fooarch
-|   +-- patches
-|       +-- linux
-|       |   +-- linux-patch1.patch
-|       |   +-- linux-patch2.patch
-|       +-- uboot
-|       +-- foopkg
-+-- fooarch-board
-    +-- patches
-        +-- linux
-        |   +-- linux-patch3.patch
-        +-- uboot
-        +-- foopkg
+include $(sort $(wildcard package/<company>/*/*.mk))
 -----
 
-If the user has the +BR2_GLOBAL_PATCH_DIR+ configuration option set as
-follows:
+If you are using +BR2_EXTERNAL+, create a file
++$(BR2_EXTERNAL)/external.mk+ with following contents (again assuming only
+one extra level):
 
 -----
-BR2_GLOBAL_PATCH_DIR="board/common-fooarch/patches board/fooarch-board/patches"
+include $(sort $(wildcard $(BR2_EXTERNAL)/package/*/*.mk))
 -----
 
-Then the patches would applied as follows for the Linux kernel:
+For the +Config.in+ files, create a file +package/<company>/Config.in+
+that includes the +Config.in+ files of all your packages. An exhaustive
+list has to be provided since wildcards are not supported in the source command of kconfig.
+For example:
 
-. board/common-fooarch/patches/linux/linux-patch1.patch
-. board/common-fooarch/patches/linux/linux-patch2.patch
-. board/fooarch-board/patches/linux/linux-patch3.patch
+-----
+source "package/<company>/package1/Config.in"
+source "package/<company>/package2/Config.in"
+-----
+
+Include this new file +package/<company>/Config.in+ from
++package/Config.in+, preferably in a company-specific menu to make
+merges with future Buildroot versions easier.
+
+If you are using +BR2_EXTERNAL+, create a file
++$(BR2_EXTERNAL)/Config.in+ with similar contents:
+
+-----
+source "$BR2_EXTERNAL/package/package1/Config.in"
+source "$BR2_EXTERNAL/package/package2/Config.in"
+-----
+
+You do not have to add an include for this +$(BR2_EXTERNAL)/Config.in+
+file as it is included automatically.

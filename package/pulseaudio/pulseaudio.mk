@@ -10,8 +10,7 @@ PULSEAUDIO_SITE = http://freedesktop.org/software/pulseaudio/releases
 PULSEAUDIO_INSTALL_STAGING = YES
 PULSEAUDIO_LICENSE = LGPLv2.1+ (specific license for modules, see LICENSE file)
 PULSEAUDIO_LICENSE_FILES = LICENSE GPL LGPL
-PULSEAUDIO_CONF_OPT = \
-	--localstatedir=/var \
+PULSEAUDIO_CONF_OPTS = \
 	--disable-default-build-tests \
 	--disable-legacy-runtime-dir \
 	--disable-legacy-database-entry-format \
@@ -36,16 +35,24 @@ PULSEAUDIO_DEPENDENCIES = \
 ifeq ($(BR2_PACKAGE_ORC),y)
 PULSEAUDIO_DEPENDENCIES += orc
 PULSEAUDIO_CONF_ENV += ORCC=$(HOST_DIR)/usr/bin/orcc
-PULSEAUDIO_CONF_OPT += --enable-orc
+PULSEAUDIO_CONF_OPTS += --enable-orc
 else
-PULSEAUDIO_CONF_OPT += --disable-orc
+PULSEAUDIO_CONF_OPTS += --disable-orc
 endif
 
 ifeq ($(BR2_PACKAGE_LIBCAP),y)
 PULSEAUDIO_DEPENDENCIES += libcap
-PULSEAUDIO_CONF_OPT += --with-caps
+PULSEAUDIO_CONF_OPTS += --with-caps
 else
-PULSEAUDIO_CONF_OPT += --without-caps
+PULSEAUDIO_CONF_OPTS += --without-caps
+endif
+
+# gtk3 support needs X11 backend
+ifeq ($(BR2_PACKAGE_LIBGTK3_X11),y)
+PULSEAUDIO_DEPENDENCIES += libgtk3
+PULSEAUDIO_CONF_OPTS += --enable-gtk3
+else
+PULSEAUDIO_CONF_OPTS += --disable-gtk3
 endif
 
 ifneq ($(BR2_INSTALL_LIBSTDCPP),y)
@@ -71,14 +78,14 @@ endif
 endif
 
 ifeq ($(PULSEAUDIO_USE_NEON),y)
-PULSEAUDIO_CONF_OPT += --enable-neon-opt=yes
+PULSEAUDIO_CONF_OPTS += --enable-neon-opt=yes
 else
-PULSEAUDIO_CONF_OPT += --enable-neon-opt=no
+PULSEAUDIO_CONF_OPTS += --enable-neon-opt=no
 endif
 
 # pulseaudio alsa backend needs pcm/mixer apis
 ifneq ($(BR2_PACKAGE_ALSA_LIB_PCM)$(BR2_PACKAGE_ALSA_LIB_MIXER),yy)
-PULSEAUDIO_CONF_OPT += --disable-alsa
+PULSEAUDIO_CONF_OPTS += --disable-alsa
 endif
 
 ifeq ($(BR2_PACKAGE_LIBXCB)$(BR2_PACKAGE_XLIB_LIBSM)$(BR2_PACKAGE_XLIB_LIBXTST),yyy)
@@ -89,15 +96,15 @@ PULSEAUDIO_DEPENDENCIES += libxcb xlib_libSM xlib_libXtst
 ifneq ($(BR2_ENABLE_LOCALE),y)
 define PULSEAUDIO_FIXUP_DESKTOP_FILES
 	cp $(@D)/src/daemon/pulseaudio.desktop.in \
-	   $(@D)/src/daemon/pulseaudio.desktop
+		$(@D)/src/daemon/pulseaudio.desktop
 	cp $(@D)/src/daemon/pulseaudio-kde.desktop.in \
-	   $(@D)/src/daemon/pulseaudio-kde.desktop
+		$(@D)/src/daemon/pulseaudio-kde.desktop
 endef
 PULSEAUDIO_POST_PATCH_HOOKS += PULSEAUDIO_FIXUP_DESKTOP_FILES
 endif
 
 else
-PULSEAUDIO_CONF_OPT += --disable-x11
+PULSEAUDIO_CONF_OPTS += --disable-x11
 endif
 
 define PULSEAUDIO_REMOVE_VALA

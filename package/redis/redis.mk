@@ -13,15 +13,15 @@ REDIS_LICENSE_FILES = COPYING
 # https://github.com/antirez/redis/pull/609).  We set PREFIX
 # instead.
 REDIS_BUILDOPTS = $(TARGET_CONFIGURE_OPTS) \
-    PREFIX=$(TARGET_DIR)/usr MALLOC=libc \
+	PREFIX=$(TARGET_DIR)/usr MALLOC=libc \
 
 define REDIS_BUILD_CMDS
-        $(TARGET_MAKE_ENV) $(MAKE) $(REDIS_BUILDOPTS) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE) $(REDIS_BUILDOPTS) -C $(@D)
 endef
 
 define REDIS_INSTALL_TARGET_CMDS
-        $(TARGET_MAKE_ENV) $(MAKE) $(REDIS_BUILDOPTS) -C $(@D) \
-	    LDCONFIG=true install
+	$(TARGET_MAKE_ENV) $(MAKE) $(REDIS_BUILDOPTS) -C $(@D) \
+		LDCONFIG=true install
 endef
 
 $(eval $(generic-package))

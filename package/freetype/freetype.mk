@@ -8,19 +8,19 @@ FREETYPE_VERSION = 2.5.3
 FREETYPE_SOURCE = freetype-$(FREETYPE_VERSION).tar.bz2
 FREETYPE_SITE = http://downloads.sourceforge.net/project/freetype/freetype2/$(FREETYPE_VERSION)
 FREETYPE_INSTALL_STAGING = YES
-FREETYPE_MAKE_OPT = CCexe="$(HOSTCC)"
+FREETYPE_MAKE_OPTS = CCexe="$(HOSTCC)"
 FREETYPE_LICENSE = Dual FTL/GPLv2+
 FREETYPE_LICENSE_FILES = docs/FTL.TXT docs/GPLv2.TXT
 FREETYPE_DEPENDENCIES = host-pkgconf
 FREETYPE_CONFIG_SCRIPTS = freetype-config
 
 HOST_FREETYPE_DEPENDENCIES = host-pkgconf
-HOST_FREETYPE_CONF_OPT = --without-zlib --without-bzip2 --without-png
+HOST_FREETYPE_CONF_OPTS = --without-zlib --without-bzip2 --without-png
 
 # Regen required because the tarball ships with an experimental ltmain.sh
 # that can't be patched by our infra.
 # autogen.sh is because autotools stuff lives in other directories and
-# even AUTORECONF with _OPT doesn't do it properly.
+# even AUTORECONF with _OPTS doesn't do it properly.
 # POST_PATCH is because we still need to patch libtool after the regen.
 define FREETYPE_RUN_AUTOGEN
 	cd $(@D) && PATH=$(BR_PATH) ./autogen.sh
@@ -32,25 +32,25 @@ HOST_FREETYPE_DEPENDENCIES += host-automake host-autoconf host-libtool
 
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 FREETYPE_DEPENDENCIES += zlib
-FREETYPE_CONF_OPT += --with-zlib
+FREETYPE_CONF_OPTS += --with-zlib
 else
-FREETYPE_CONF_OPT += --without-zlib
+FREETYPE_CONF_OPTS += --without-zlib
 endif
 
 ifeq ($(BR2_PACKAGE_BZIP2),y)
 FREETYPE_DEPENDENCIES += bzip2
-FREETYPE_CONF_OPT += --with-bzip2
+FREETYPE_CONF_OPTS += --with-bzip2
 else
-FREETYPE_CONF_OPT += --without-bzip2
+FREETYPE_CONF_OPTS += --without-bzip2
 endif
 
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
 FREETYPE_DEPENDENCIES += libpng
-FREETYPE_CONF_OPT += LIBPNG_CFLAGS="`$(STAGING_DIR)/usr/bin/libpng-config --cflags`" \
+FREETYPE_CONF_OPTS += LIBPNG_CFLAGS="`$(STAGING_DIR)/usr/bin/libpng-config --cflags`" \
 	LIBPNG_LDFLAGS="`$(STAGING_DIR)/usr/bin/libpng-config --ldflags`"
 FREETYPE_LIBPNG_LIBS = "`$(STAGING_DIR)/usr/bin/libpng-config --libs`"
 else
-FREETYPE_CONF_OPT += --without-png
+FREETYPE_CONF_OPTS += --without-png
 endif
 
 # Extra fixing since includedir and libdir are expanded from configure values

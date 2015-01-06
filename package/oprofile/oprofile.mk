@@ -8,8 +8,7 @@ OPROFILE_VERSION = 0.9.9
 OPROFILE_SITE = http://downloads.sourceforge.net/project/oprofile/oprofile/oprofile-$(OPROFILE_VERSION)
 OPROFILE_LICENSE = GPLv2+
 OPROFILE_LICENSE_FILES = COPYING
-OPROFILE_CONF_OPT = \
-	--localstatedir=/var \
+OPROFILE_CONF_OPTS = \
 	--disable-account-check \
 	--enable-gui=no \
 	--with-kernel=$(STAGING_DIR)/usr

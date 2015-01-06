@@ -4,11 +4,11 @@
 #
 ################################################################################
 
-BOOT_WRAPPER_AARCH64_VERSION        = 4266507a84f8c06452109d38e0350d4759740694
-BOOT_WRAPPER_AARCH64_SITE           = git://git.kernel.org/pub/scm/linux/kernel/git/cmarinas/boot-wrapper-aarch64.git
-BOOT_WRAPPER_AARCH64_LICENSE        = BSD3c
-BOOT_WRAPPER_AARCH64_LICENSE_FILES  = LICENSE.txt
-BOOT_WRAPPER_AARCH64_DEPENDENCIES   = linux
+BOOT_WRAPPER_AARCH64_VERSION = 4266507a84f8c06452109d38e0350d4759740694
+BOOT_WRAPPER_AARCH64_SITE = git://git.kernel.org/pub/scm/linux/kernel/git/cmarinas/boot-wrapper-aarch64.git
+BOOT_WRAPPER_AARCH64_LICENSE = BSD3c
+BOOT_WRAPPER_AARCH64_LICENSE_FILES = LICENSE.txt
+BOOT_WRAPPER_AARCH64_DEPENDENCIES = linux
 BOOT_WRAPPER_AARCH64_INSTALL_IMAGES = YES
 
 # The Git repository does not have the generated configure script and
@@ -26,7 +26,7 @@ endef
 
 BOOT_WRAPPER_AARCH64_PRE_PATCH_HOOKS += BOOT_WRAPPER_AARCH64_FIX_DTB_NAME
 
-BOOT_WRAPPER_AARCH64_CONF_OPT = \
+BOOT_WRAPPER_AARCH64_CONF_OPTS = \
 	--with-kernel-dir=$(LINUX_DIR) \
 	--with-cmdline=$(BR2_TARGET_BOOT_WRAPPER_AARCH64_BOOTARGS)
 

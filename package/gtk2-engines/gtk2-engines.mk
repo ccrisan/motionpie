@@ -65,13 +65,12 @@ GTK2_ENGINES_CONF_ENV = \
 		gl_cv_c_restrict=no \
 		ac_cv_path_CUPS_CONFIG=no
 
-GTK2_ENGINES_CONF_OPT = \
+GTK2_ENGINES_CONF_OPTS = \
 		--with-x \
 		--x-includes=$(STAGING_DIR)/usr/include/X11 \
 		--x-libraries=$(STAGING_DIR)/usr/lib \
 		--disable-glibtest \
 		--enable-explicit-deps=no \
-		--disable-debug \
 		--enable-clearlooks \
 		--disable-crux \
 		--disable-hc \

@@ -15,7 +15,7 @@ MATCHBOX_KEYBOARD_DEPENDENCIES = host-pkgconf matchbox-lib matchbox-fakekey expa
 MATCHBOX_KEYBOARD_CONF_ENV = expat=yes
 
 define MATCHBOX_KEYBOARD_POST_INSTALL_FIXES
- cp -dpf ./package/matchbox/matchbox-keyboard/mb-applet-kbd-wrapper.sh $(TARGET_DIR)/usr/bin/
+	cp -dpf ./package/matchbox/matchbox-keyboard/mb-applet-kbd-wrapper.sh $(TARGET_DIR)/usr/bin/
 endef
 
 MATCHBOX_KEYBOARD_POST_INSTALL_TARGET_HOOKS += MATCHBOX_KEYBOARD_POST_INSTALL_FIXES
@@ -23,10 +23,10 @@ MATCHBOX_KEYBOARD_POST_INSTALL_TARGET_HOOKS += MATCHBOX_KEYBOARD_POST_INSTALL_FI
 ################################################################################
 
 ifeq ($(BR2_PACKAGE_CAIRO),y)
-  MATCHBOX_KEYBOARD_CONF_OPT += --enable-cairo
-  MATCHBOX_KEYBOARD_DEPENDENCIES += cairo
+MATCHBOX_KEYBOARD_CONF_OPTS += --enable-cairo
+MATCHBOX_KEYBOARD_DEPENDENCIES += cairo
 else
-  MATCHBOX_KEYBOARD_DEPENDENCIES += xlib_libXft
+MATCHBOX_KEYBOARD_DEPENDENCIES += xlib_libXft
 endif
 
 ################################################################################

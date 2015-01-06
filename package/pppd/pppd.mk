@@ -19,11 +19,11 @@ PPPD_RADIUS_CONF = dictionary dictionary.ascend dictionary.compat \
 
 ifeq ($(BR2_PACKAGE_PPPD_FILTER),y)
 	PPPD_DEPENDENCIES += libpcap
-	PPPD_MAKE_OPT += FILTER=y
+	PPPD_MAKE_OPTS += FILTER=y
 endif
 
 ifeq ($(BR2_INET_IPV6),y)
-	PPPD_MAKE_OPT += HAVE_INET6=y
+	PPPD_MAKE_OPTS += HAVE_INET6=y
 endif
 
 # pppd bundles some but not all of the needed kernel headers. The embedded
@@ -35,6 +35,15 @@ endef
 
 PPPD_POST_EXTRACT_HOOKS += PPPD_DROP_INTERNAL_IF_PPOL2TP_H
 
+# pppd defaults to /etc/ppp/resolv.conf, which not be writable and is
+# definitely not useful since the C library only uses
+# /etc/resolv.conf. Therefore, we change pppd to use /etc/resolv.conf
+# instead.
+define PPPD_SET_RESOLV_CONF
+	$(SED) 's,ppp/resolv.conf,resolv.conf,' $(@D)/pppd/pathnames.h
+endef
+PPPD_POST_EXTRACT_HOOKS += PPPD_SET_RESOLV_CONF
+
 define PPPD_CONFIGURE_CMDS
 	$(SED) 's/FILTER=y/#FILTER=y/' $(PPPD_DIR)/pppd/Makefile.linux
 	$(SED) 's/ifneq ($$(wildcard \/usr\/include\/pcap-bpf.h),)/ifdef FILTER/' $(PPPD_DIR)/*/Makefile.linux
@@ -43,7 +52,7 @@ endef
 
 define PPPD_BUILD_CMDS
 	$(MAKE) CC="$(TARGET_CC)" COPTS="$(TARGET_CFLAGS)" \
-		-C $(@D) $(PPPD_MAKE_OPT)
+		-C $(@D) $(PPPD_MAKE_OPTS)
 endef
 
 ifeq ($(BR2_PACKAGE_PPPD_RADIUS),y)
@@ -94,7 +103,7 @@ define PPPD_INSTALL_TARGET_CMDS
 endef
 
 define PPPD_INSTALL_STAGING_CMDS
-	$(MAKE) INSTROOT=$(STAGING_DIR)/ -C $(@D) $(PPPD_MAKE_OPT) install-devel
+	$(MAKE) INSTROOT=$(STAGING_DIR)/ -C $(@D) $(PPPD_MAKE_OPTS) install-devel
 endef
 
 $(eval $(generic-package))

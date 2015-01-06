@@ -1,8 +1,8 @@
-###############################################################################
+################################################################################
 #
 # espeak
 #
-###############################################################################
+################################################################################
 
 ESPEAK_VERSION_MAJOR = 1.48
 ESPEAK_VERSION = $(ESPEAK_VERSION_MAJOR).04
@@ -21,7 +21,7 @@ ESPEAK_DEPENDENCIES = pulseaudio
 endif
 
 define ESPEAK_EXTRACT_CMDS
-	unzip -d $(@D) $(DL_DIR)/$(ESPEAK_SOURCE)
+	$(UNZIP) -d $(@D) $(DL_DIR)/$(ESPEAK_SOURCE)
 	mv $(@D)/espeak-$(ESPEAK_VERSION)-source/* $(@D)
 	$(RM) -r $(@D)/espeak-$(ESPEAK_VERSION)-source
 endef

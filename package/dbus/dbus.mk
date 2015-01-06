@@ -4,20 +4,25 @@
 #
 ################################################################################
 
-DBUS_VERSION = 1.8.6
+DBUS_VERSION = 1.8.10
 DBUS_SITE = http://dbus.freedesktop.org/releases/dbus
 DBUS_LICENSE = AFLv2.1 GPLv2+
 DBUS_LICENSE_FILES = COPYING
 DBUS_INSTALL_STAGING = YES
 
 define DBUS_PERMISSIONS
-/usr/libexec/dbus-daemon-launch-helper f 4755 0 0 - - - - -
+	/usr/libexec/dbus-daemon-launch-helper f 4755 0 0 - - - - -
 endef
+
+define DBUS_USERS
+	dbus -1 dbus -1 * /var/run/dbus - dbus DBus messagebus user
+endef
+
 
 DBUS_DEPENDENCIES = host-pkgconf expat
 
 DBUS_CONF_ENV = ac_cv_have_abstract_sockets=yes
-DBUS_CONF_OPT = --with-dbus-user=dbus \
+DBUS_CONF_OPTS = --with-dbus-user=dbus \
 		--disable-tests \
 		--disable-asserts \
 		--enable-abstract-sockets \
@@ -25,38 +30,33 @@ DBUS_CONF_OPT = --with-dbus-user=dbus \
 		--disable-xml-docs \
 		--disable-doxygen-docs \
 		--disable-dnotify \
-		--localstatedir=/var \
 		--with-xml=expat \
 		--with-system-socket=/var/run/dbus/system_bus_socket \
 		--with-system-pid-file=/var/run/messagebus.pid
 
-define DBUS_USERS
-	dbus -1 dbus -1 * /var/run/dbus - dbus DBus messagebus user
-endef
-
 ifeq ($(BR2_PREFER_STATIC_LIB),y)
-DBUS_CONF_OPT += LIBS='-pthread'
+DBUS_CONF_OPTS += LIBS='-pthread'
 endif
 
 ifeq ($(BR2_microblaze),y)
 # microblaze toolchain doesn't provide inotify_rm_* but does have sys/inotify.h
-DBUS_CONF_OPT += --disable-inotify
+DBUS_CONF_OPTS += --disable-inotify
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
-DBUS_CONF_OPT += --with-x
+DBUS_CONF_OPTS += --with-x
 DBUS_DEPENDENCIES += xlib_libX11
 else
-DBUS_CONF_OPT += --without-x
+DBUS_CONF_OPTS += --without-x
 endif
 
 ifeq ($(BR2_INIT_SYSTEMD),y)
-DBUS_CONF_OPT += \
+DBUS_CONF_OPTS += \
 	--enable-systemd \
 	--with-systemdsystemunitdir=/lib/systemd/system
 DBUS_DEPENDENCIES += systemd
 else
-DBUS_CONF_OPT += --disable-systemd
+DBUS_CONF_OPTS += --disable-systemd
 endif
 
 # fix rebuild (dbus makefile errors out if /var/lib/dbus is a symlink)
@@ -86,7 +86,7 @@ define DBUS_INSTALL_INIT_SYSV
 endef
 
 HOST_DBUS_DEPENDENCIES = host-pkgconf host-expat
-HOST_DBUS_CONF_OPT = \
+HOST_DBUS_CONF_OPTS = \
 		--with-dbus-user=dbus \
 		--disable-tests \
 		--disable-asserts \
@@ -99,7 +99,7 @@ HOST_DBUS_CONF_OPT = \
 		--with-xml=expat
 
 # dbus for the host
-DBUS_HOST_INTROSPECT=$(HOST_DBUS_DIR)/introspect.xml
+DBUS_HOST_INTROSPECT = $(HOST_DBUS_DIR)/introspect.xml
 
 HOST_DBUS_GEN_INTROSPECT = \
 	$(HOST_DIR)/usr/bin/dbus-daemon --introspect > $(DBUS_HOST_INTROSPECT)

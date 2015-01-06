@@ -13,10 +13,9 @@ LESSTIF_DEPENDENCIES = \
 	freetype
 LESSTIF_LICENSE = LGPLv2+
 LESSTIF_LICENSE_FILES = COPYING.LIB
-LESSTIF_CONF_OPT = \
+LESSTIF_CONF_OPTS = \
 	--with-gnu-ld \
 	--with-freetype-config=$(STAGING_DIR)/usr/bin/freetype-config \
-	--enable-debug=no \
 	--enable-production=yes	\
 	--enable-build-tests=no \
 	--no-recursion

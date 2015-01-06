@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-E2FSPROGS_VERSION = 1.42.11
-E2FSPROGS_SITE = http://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v$(E2FSPROGS_VERSION)
+E2FSPROGS_VERSION = 1.42.12
+E2FSPROGS_SITE = $(BR2_KERNEL_MIRROR)/linux/kernel/people/tytso/e2fsprogs/v$(E2FSPROGS_VERSION)
 E2FSPROGS_LICENSE = GPLv2, libuuid BSD-3c, libss and libet MIT-like with advertising clause
 E2FSPROGS_LICENSE_FILES = COPYING lib/uuid/COPYING lib/ss/mit-sipb-copyright.h lib/et/internal.h
 E2FSPROGS_INSTALL_STAGING = YES
-E2FSPROGS_INSTALL_STAGING_OPT = DESTDIR=$(STAGING_DIR) install-libs
+E2FSPROGS_INSTALL_STAGING_OPTS = DESTDIR=$(STAGING_DIR) install-libs
 
-E2FSPROGS_CONF_OPT = \
+E2FSPROGS_CONF_OPTS = \
 	$(if $(BR2_PREFER_STATIC_LIB),,--enable-elf-shlibs) \
 	$(if $(BR2_PACKAGE_E2FSPROGS_DEBUGFS),,--disable-debugfs) \
 	$(if $(BR2_PACKAGE_E2FSPROGS_E2IMAGE),,--disable-imager) \
@@ -29,13 +29,19 @@ ifeq ($(BR2_nios2),y)
 E2FSPROGS_CONF_ENV += ac_cv_func_fallocate=no
 endif
 
+ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
+# util-linux libuuid pulls in libintl if needed, so ensure we also
+# link against it, otherwise static linking fails
+E2FSPROGS_CONF_ENV += LIBS=-lintl
+endif
+
 E2FSPROGS_DEPENDENCIES = host-pkgconf util-linux
 
-E2FSPROGS_MAKE_OPT = \
+E2FSPROGS_MAKE_OPTS = \
 	LDCONFIG=true
 
 define HOST_E2FSPROGS_INSTALL_CMDS
- $(HOST_MAKE_ENV) $(MAKE) -C $(@D) install install-libs
+	$(HOST_MAKE_ENV) $(MAKE) -C $(@D) install install-libs
 endef
 # we don't have a host-util-linux
 HOST_E2FSPROGS_DEPENDENCIES = host-pkgconf

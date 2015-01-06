@@ -99,7 +99,110 @@ comment "----------------------------------------------------"
 endif
 
 ###############################################################################
+comment "Legacy options removed in 2014.11"
+
+config BR2_x86_generic
+	bool "x86 generic variant has been removed"
+	select BR2_LEGACY
+	help
+	  The generic x86 CPU variant has been removed. Use another
+	  CPU variant instead.
+
+config BR2_GCC_VERSION_4_4_X
+	bool "gcc 4.4.x has been removed"
+	select BR2_LEGACY
+	help
+	  The 4.4.x version of gcc has been removed. Use a newer
+	  version instead.
+
+config BR2_sparc_sparchfleon
+	bool "sparchfleon CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparchfleon CPU was only supported in a patched gcc 4.4
+	  version. Its support has been removed in favor of the leon3
+	  CPU starting from gcc 4.8.x.
+
+config BR2_sparc_sparchfleonv8
+	bool "sparchfleonv8 CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparchfleonv8 CPU was only supported in a patched gcc
+	  4.4 version. Its support has been removed in favor of the
+	  leon3 CPU starting from gcc 4.8.x.
+
+config BR2_sparc_sparcsfleon
+	bool "sparcsfleon CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparcsfleon CPU was only supported in a patched gcc 4.4
+	  version. Its support has been removed in favor of the leon3
+	  CPU starting from gcc 4.8.x.
+
+config BR2_sparc_sparcsfleonv8
+	bool "sparcsfleonv8 CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparcsfleonv8 CPU was only supported in a patched gcc
+	  4.4 version. Its support has been removed in favor of the
+	  leon3 CPU starting from gcc 4.8.x.
+
+config BR2_PACKAGE_XLIB_LIBPCIACCESS
+	bool "xlib-libpciaccess option has been renamed"
+	depends on BR2_PACKAGE_XORG7
+	select BR2_LEGACY
+	select BR2_PACKAGE_LIBPCIACCESS
+	help
+	  libpciaccess neither depends on X11 nor Xlib. Thus the
+	  package has been renamed BR2_PACKAGE_LIBPCIACCESS
+
+config BR2_PACKAGE_LINUX_FIRMWARE_XC5000
+	bool "Xceive xc5000 option has been renamed"
+	select BR2_PACKAGE_LINUX_FIRMWARE_XCx000
+	help
+	  The Xceive xc5000 option now also handles older firmwares from
+	  Xceive (the xc4000 series), as well as new firmwares (the xc5000c)
+	  from Cresta, who bought Xceive.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_CXGB4
+	bool "Chelsio T4 option has been renamed"
+	select BR2_PACKAGE_LINUX_FIRMWARE_CXGB4_T4
+	help
+	  The Chelsio T4 option BR2_PACKAGE_LINUX_FIRMWARE_CXGB4
+	  has been renamed to BR2_PACKAGE_LINUX_FIRMWARE_CXGB4_T4
+	  to better account for the fact that a T5 variant exists.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7
+	bool "BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7 has been renamed"
+	help
+	  The option BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7 was
+	  renamed to BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_REV_7. You must
+	  select it in:
+	      Target packages -> Hardware handling ->
+	      Firmware -> linux-firmware -> WiFi firmware ->
+	      iwlwifi 3160/726x revision to use (revision 7)
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8
+	bool "BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8 has been renamed"
+	help
+	  The option BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8 was
+	  renamed to BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_REV_8. You must
+	  select it in:
+	      Target packages -> Hardware handling ->
+	      Firmware -> linux-firmware -> WiFi firmware ->
+	      iwlwifi 3160/726x revision to use (revision 8)
+
+###############################################################################
 comment "Legacy options removed in 2014.08"
+
+config BR2_PACKAGE_LIBELF
+	bool "libelf has been removed"
+	select BR2_PACKAGE_ELFUTILS
+	select BR2_LEGACY
+	help
+	  The libelf package provided an old version of the libelf library
+	  and is deprecated. The libelf library is now provided by the
+	  elfutils package.
 
 config BR2_KERNEL_HEADERS_3_8
 	bool "kernel headers version 3.8.x are no longer supported"

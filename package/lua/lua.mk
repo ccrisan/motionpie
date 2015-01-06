@@ -12,7 +12,11 @@ endif
 LUA_SITE = http://www.lua.org/ftp
 LUA_INSTALL_STAGING = YES
 LUA_LICENSE = MIT
+ifeq ($(BR2_PACKAGE_LUA_5_1),y)
 LUA_LICENSE_FILES = COPYRIGHT
+else
+LUA_LICENSE_FILES = doc/readme.html
+endif
 
 LUA_PROVIDES = luainterpreter
 
@@ -50,10 +54,6 @@ endif
 HOST_LUA_DEPENDENCIES =
 HOST_LUA_CFLAGS = -Wall -fPIC -DLUA_USE_DLOPEN -DLUA_USE_POSIX
 HOST_LUA_MYLIBS = -ldl
-
-ifeq ($(BR2_PACKAGE_LUA_5_2),y)
-HOST_LUA_CFLAGS += -DLUA_COMPAT_ALL
-endif
 
 define LUA_BUILD_CMDS
 	$(MAKE) \

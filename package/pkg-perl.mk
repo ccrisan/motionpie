@@ -19,7 +19,8 @@
 #
 ################################################################################
 
-PERL_ARCHNAME	= $(ARCH)-linux
+PERL_ARCHNAME = $(ARCH)-linux
+PERL_RUN = PERL5LIB= $(HOST_DIR)/usr/bin/perl
 
 ################################################################################
 # inner-perl-package -- defines how the configuration, compilation and
@@ -38,6 +39,8 @@ PERL_ARCHNAME	= $(ARCH)-linux
 
 define inner-perl-package
 
+$(2)_DEPENDENCIES += host-perl
+
 #
 # Configure step. Only define it if not already defined by the package
 # .mk file. And take care of the differences between host and target
@@ -51,7 +54,7 @@ define $(2)_CONFIGURE_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
-		perl Build.PL \
+		$$(PERL_RUN) Build.PL \
 			--config ar="$$(TARGET_AR)" \
 			--config full_ar="$$(TARGET_AR)" \
 			--config cc="$$(TARGET_CC)" \
@@ -69,12 +72,12 @@ define $(2)_CONFIGURE_CMDS
 			--install_path script=/usr/bin \
 			--install_path bindoc=/usr/share/man/man1 \
 			--install_path libdoc=/usr/share/man/man3 \
-			$$($(2)_CONF_OPT); \
+			$$($(2)_CONF_OPTS); \
 	else \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
 		PERL_AUTOINSTALL=--skipdeps \
-		perl Makefile.PL \
+		$$(PERL_RUN) Makefile.PL \
 			AR="$$(TARGET_AR)" \
 			FULL_AR="$$(TARGET_AR)" \
 			CC="$$(TARGET_CC)" \
@@ -91,7 +94,7 @@ define $(2)_CONFIGURE_CMDS
 			INSTALLVENDORSCRIPT=/usr/bin \
 			INSTALLVENDORMAN1DIR=/usr/share/man/man1 \
 			INSTALLVENDORMAN3DIR=/usr/share/man/man3 \
-			$$($(2)_CONF_OPT); \
+			$$($(2)_CONF_OPTS); \
 	fi
 endef
 else
@@ -101,18 +104,14 @@ define $(2)_CONFIGURE_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
-		perl Build.PL \
-			--install_base $$(HOST_DIR)/usr \
-			--installdirs vendor \
-			$$($(2)_CONF_OPT); \
+		$$(PERL_RUN) Build.PL \
+			$$($(2)_CONF_OPTS); \
 	else \
 		$$($(2)_CONF_ENV) \
 		PERL_MM_USE_DEFAULT=1 \
 		PERL_AUTOINSTALL=--skipdeps \
-		perl Makefile.PL \
-			INSTALL_BASE=$$(HOST_DIR)/usr \
-			INSTALLDIRS=vendor \
-			$$($(2)_CONF_OPT); \
+		$$(PERL_RUN) Makefile.PL \
+			$$($(2)_CONF_OPTS); \
 	fi
 endef
 endif
@@ -129,11 +128,11 @@ ifeq ($(4),target)
 # Build package for target
 define $(2)_BUILD_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_BUILD_OPT) build; \
+		$$(PERL_RUN) Build $$($(2)_BUILD_OPTS) build; \
 	else \
 		$$(MAKE1) \
 			PERL_INC=$$(STAGING_DIR)/usr/lib/perl5/$$(PERL_VERSION)/$$(PERL_ARCHNAME)/CORE \
-			$$($(2)_BUILD_OPT) pure_all; \
+			$$($(2)_BUILD_OPTS) pure_all; \
 	fi
 endef
 else
@@ -141,9 +140,9 @@ else
 # Build package for host
 define $(2)_BUILD_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_BUILD_OPT) build; \
+		$$(PERL_RUN) Build $$($(2)_BUILD_OPTS) build; \
 	else \
-		$$(MAKE1) $$($(2)_BUILD_OPT) pure_all; \
+		$$(MAKE1) $$($(2)_BUILD_OPTS) pure_all; \
 	fi
 endef
 endif
@@ -156,9 +155,9 @@ endif
 ifndef $(2)_INSTALL_CMDS
 define $(2)_INSTALL_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_INSTALL_TARGET_OPT) install; \
+		$$(PERL_RUN) Build $$($(2)_INSTALL_TARGET_OPTS) install; \
 	else \
-		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPT) pure_install; \
+		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPTS) pure_install; \
 	fi
 endef
 endif
@@ -170,9 +169,9 @@ endif
 ifndef $(2)_INSTALL_TARGET_CMDS
 define $(2)_INSTALL_TARGET_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
-		perl Build $$($(2)_INSTALL_TARGET_OPT) install; \
+		$$(PERL_RUN) Build $$($(2)_INSTALL_TARGET_OPTS) install; \
 	else \
-		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPT) pure_install; \
+		$$(MAKE1) $$($(2)_INSTALL_TARGET_OPTS) pure_install; \
 	fi
 endef
 endif

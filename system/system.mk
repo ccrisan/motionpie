@@ -2,6 +2,7 @@ TARGET_GENERIC_HOSTNAME = $(call qstrip,$(BR2_TARGET_GENERIC_HOSTNAME))
 TARGET_GENERIC_ISSUE = $(call qstrip,$(BR2_TARGET_GENERIC_ISSUE))
 TARGET_GENERIC_ROOT_PASSWD = $(call qstrip,$(BR2_TARGET_GENERIC_ROOT_PASSWD))
 TARGET_GENERIC_PASSWD_METHOD = $(call qstrip,$(BR2_TARGET_GENERIC_PASSWD_METHOD))
+TARGET_GENERIC_BIN_SH = $(call qstrip,$(BR2_SYSTEM_BIN_SH))
 TARGET_GENERIC_GETTY_PORT = $(call qstrip,$(BR2_TARGET_GENERIC_GETTY_PORT))
 TARGET_GENERIC_GETTY_BAUDRATE = $(call qstrip,$(BR2_TARGET_GENERIC_GETTY_BAUDRATE))
 TARGET_GENERIC_GETTY_TERM = $(call qstrip,$(BR2_TARGET_GENERIC_GETTY_TERM))
@@ -46,6 +47,17 @@ define SYSTEM_ROOT_PASSWD
 endef
 TARGET_FINALIZE_HOOKS += SYSTEM_ROOT_PASSWD
 
+ifeq ($(BR2_SYSTEM_BIN_SH_NONE),y)
+define SYSTEM_BIN_SH
+	rm -f $(TARGET_DIR)/bin/sh
+endef
+else
+define SYSTEM_BIN_SH
+	ln -sf $(TARGET_GENERIC_BIN_SH) $(TARGET_DIR)/bin/sh
+endef
+endif
+TARGET_FINALIZE_HOOKS += SYSTEM_BIN_SH
+
 ifeq ($(BR2_TARGET_GENERIC_GETTY),y)
 ifeq ($(BR2_PACKAGE_SYSVINIT),y)
 # In sysvinit inittab, the "id" must not be longer than 4 bytes, so we
@@ -67,12 +79,12 @@ endif
 ifeq ($(BR2_TARGET_GENERIC_REMOUNT_ROOTFS_RW),y)
 # Find commented line, if any, and remove leading '#'s
 define SYSTEM_REMOUNT_RW
-	$(SED) '/^#.*# REMOUNT_ROOTFS_RW$$/s~^#\+~~' $(TARGET_DIR)/etc/inittab
+	$(SED) '/^#.*-o remount,rw \/$$/s~^#\+~~' $(TARGET_DIR)/etc/inittab
 endef
 else
 # Find uncommented line, if any, and add a leading '#'
 define SYSTEM_REMOUNT_RW
-	$(SED) '/^[^#].*# REMOUNT_ROOTFS_RW$$/s~^~#~' $(TARGET_DIR)/etc/inittab
+	$(SED) '/^[^#].*-o remount,rw \/$$/s~^~#~' $(TARGET_DIR)/etc/inittab
 endef
 endif
 TARGET_FINALIZE_HOOKS += SYSTEM_REMOUNT_RW

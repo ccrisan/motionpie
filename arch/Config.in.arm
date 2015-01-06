@@ -37,6 +37,18 @@ config BR2_ARM_CPU_HAS_THUMB
 config BR2_ARM_CPU_HAS_THUMB2
 	bool
 
+config BR2_ARM_CPU_ARMV4
+	bool
+
+config BR2_ARM_CPU_ARMV5
+	bool
+
+config BR2_ARM_CPU_ARMV6
+	bool
+
+config BR2_ARM_CPU_ARMV7A
+	bool
+
 choice
 	prompt "Target Architecture Variant"
 	depends on BR2_arm || BR2_armeb
@@ -47,78 +59,84 @@ choice
 config BR2_arm920t
 	bool "arm920t"
 	select BR2_ARM_CPU_HAS_THUMB
+	select BR2_ARM_CPU_ARMV4
 config BR2_arm922t
 	bool "arm922t"
 	select BR2_ARM_CPU_HAS_THUMB
+	select BR2_ARM_CPU_ARMV4
 config BR2_arm926t
 	bool "arm926t"
 	select BR2_ARM_CPU_MAYBE_HAS_VFPV2
 	select BR2_ARM_CPU_HAS_THUMB
-config BR2_arm10t
-	bool "arm10t"
-	select BR2_ARM_CPU_HAS_THUMB
-config BR2_arm1136jf_s_r0
-	bool "arm1136jf_s rev0"
+	select BR2_ARM_CPU_ARMV5
+config BR2_arm1136jf_s
+	bool "arm1136jf-s"
 	select BR2_ARM_CPU_HAS_VFPV2
 	select BR2_ARM_CPU_HAS_THUMB
-config BR2_arm1136jf_s_r1
-	bool "arm1136jf_s rev1"
-	select BR2_ARM_CPU_HAS_VFPV2
-	select BR2_ARM_CPU_HAS_THUMB
+	select BR2_ARM_CPU_ARMV6
 config BR2_arm1176jz_s
 	bool "arm1176jz-s"
 	select BR2_ARM_CPU_HAS_THUMB
+	select BR2_ARM_CPU_ARMV6
 config BR2_arm1176jzf_s
 	bool "arm1176jzf-s"
 	select BR2_ARM_CPU_HAS_VFPV2
 	select BR2_ARM_CPU_HAS_THUMB
+	select BR2_ARM_CPU_ARMV6
 config BR2_cortex_a5
 	bool "cortex-A5"
 	select BR2_ARM_CPU_MAYBE_HAS_NEON
 	select BR2_ARM_CPU_MAYBE_HAS_VFPV4
 	select BR2_ARM_CPU_HAS_THUMB2
+	select BR2_ARM_CPU_ARMV7A
 config BR2_cortex_a7
 	bool "cortex-A7"
 	select BR2_ARM_CPU_HAS_NEON
 	select BR2_ARM_CPU_HAS_VFPV4
 	select BR2_ARM_CPU_HAS_THUMB2
+	select BR2_ARM_CPU_ARMV7A
 config BR2_cortex_a8
 	bool "cortex-A8"
 	select BR2_ARM_CPU_HAS_NEON
 	select BR2_ARM_CPU_HAS_VFPV3
 	select BR2_ARM_CPU_HAS_THUMB2
+	select BR2_ARM_CPU_ARMV7A
 config BR2_cortex_a9
 	bool "cortex-A9"
 	select BR2_ARM_CPU_MAYBE_HAS_NEON
 	select BR2_ARM_CPU_MAYBE_HAS_VFPV3
 	select BR2_ARM_CPU_HAS_THUMB2
+	select BR2_ARM_CPU_ARMV7A
 config BR2_cortex_a12
 	bool "cortex-A12"
 	select BR2_ARM_CPU_HAS_NEON
 	select BR2_ARM_CPU_HAS_VFPV4
 	select BR2_ARM_CPU_HAS_THUMB2
+	select BR2_ARM_CPU_ARMV7A
 config BR2_cortex_a15
 	bool "cortex-A15"
 	select BR2_ARM_CPU_HAS_NEON
 	select BR2_ARM_CPU_HAS_VFPV4
 	select BR2_ARM_CPU_HAS_THUMB2
+	select BR2_ARM_CPU_ARMV7A
 config BR2_fa526
 	bool "fa526/626"
+	select BR2_ARM_CPU_ARMV4
 config BR2_pj4
 	bool "pj4"
 	select BR2_ARM_CPU_HAS_VFPV3
+	select BR2_ARM_CPU_ARMV7A
 config BR2_strongarm
 	bool "strongarm sa110/sa1100"
+	select BR2_ARM_CPU_ARMV4
 config BR2_xscale
 	bool "xscale"
 	select BR2_ARM_CPU_HAS_THUMB
+	select BR2_ARM_CPU_ARMV5
 config BR2_iwmmxt
 	bool "iwmmxt"
+	select BR2_ARM_CPU_ARMV5
 endchoice
-
-config BR2_arm1136jf_s
-	bool
-	default BR2_arm1136jf_s_r0 || BR2_arm1136jf_s_r1
 
 choice
 	prompt "Target ABI"
@@ -344,7 +362,6 @@ config BR2_ARCH_HAS_ATOMICS
 	default y
 
 config BR2_GCC_TARGET_CPU
-	default "arm920"	if BR2_arm920
 	default "arm920t"	if BR2_arm920t
 	default "arm922t"	if BR2_arm922t
 	default "arm926ej-s"	if BR2_arm926t
@@ -362,27 +379,6 @@ config BR2_GCC_TARGET_CPU
 	default "marvell-pj4"	if BR2_pj4
 	default "strongarm"	if BR2_strongarm
 	default "xscale"	if BR2_xscale
-	default "iwmmxt"	if BR2_iwmmxt
-
-config BR2_GCC_TARGET_ARCH
-	default "armv4t"	if BR2_arm920t
-	default "armv4t"	if BR2_arm922t
-	default "armv5te"	if BR2_arm926t
-	default "armv5t"	if BR2_arm10t
-	default "armv6j"	if BR2_arm1136jf_s_r0
-	default "armv6k"	if BR2_arm1136jf_s_r1
-	default "armv6zk"	if BR2_arm1176jz_s
-	default "armv6zk"	if BR2_arm1176jzf_s
-	default "armv7-a"	if BR2_cortex_a5
-	default "armv7-a"	if BR2_cortex_a7
-	default "armv7-a"	if BR2_cortex_a8
-	default "armv7-a"	if BR2_cortex_a9
-	default "armv7-a"	if BR2_cortex_a12
-	default "armv7-a"	if BR2_cortex_a15
-	default "armv4"		if BR2_fa526
-	default "armv7-a"	if BR2_pj4
-	default "armv4"		if BR2_strongarm
-	default "armv5te"	if BR2_xscale
 	default "iwmmxt"	if BR2_iwmmxt
 
 config BR2_GCC_TARGET_ABI

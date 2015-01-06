@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBSTROPHE_VERSION = d408eaf2bbfe5ff5c56eab01463c278f9891c08e
+LIBSTROPHE_VERSION = 0.8.6
 LIBSTROPHE_SITE = $(call github,strophe,libstrophe,$(LIBSTROPHE_VERSION))
 LIBSTROPHE_DEPENDENCIES = openssl host-pkgconf
 LIBSTROPHE_AUTORECONF = YES
@@ -22,7 +22,7 @@ ifeq ($(BR2_PACKAGE_EXPAT),y)
 # configure script assumes expat should be used.
 LIBSTROPHE_DEPENDENCIES += expat
 else
-LIBSTROPHE_CONF_OPT += --with-libxml2
+LIBSTROPHE_CONF_OPTS += --with-libxml2
 LIBSTROPHE_DEPENDENCIES += libxml2
 endif
 

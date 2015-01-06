@@ -11,13 +11,10 @@ SDL_IMAGE_INSTALL_STAGING = YES
 SDL_IMAGE_LICENSE = zlib
 SDL_IMAGE_LICENSE_FILES = COPYING
 
-SDL_IMAGE_CONF_OPT = --with-sdl-prefix=$(STAGING_DIR)/usr \
+SDL_IMAGE_CONF_OPTS = --with-sdl-prefix=$(STAGING_DIR)/usr \
 		--with-sdl-exec-prefix=$(STAGING_DIR)/usr \
 		--disable-sdltest \
 		--disable-static \
-		--disable-jpg-shared \
-		--disable-png-shared \
-		--disable-tif-shared \
 		--enable-bmp=$(if $(BR2_PACKAGE_SDL_IMAGE_BMP),yes,no) \
 		--enable-gif=$(if $(BR2_PACKAGE_SDL_IMAGE_GIF),yes,no) \
 		--enable-jpg=$(if $(BR2_PACKAGE_SDL_IMAGE_JPEG),yes,no) \
@@ -38,13 +35,13 @@ SDL_IMAGE_DEPENDENCIES = sdl \
 	$(if $(BR2_PACKAGE_SDL_IMAGE_TIFF),tiff) \
 	$(if $(BR2_PACKAGE_SDL_IMAGE_WEBP),webp)
 
-HOST_SDL_IMAGE_CONF_OPT = --with-sdl-prefix=$(HOST_DIR)/usr \
-                --with-sdl-exec-prefix=$(HOST_DIR)/usr \
-                --disable-sdltest \
-                --disable-static \
-                --disable-jpg-shared \
-                --disable-png-shared \
-                --disable-tif-shared \
+HOST_SDL_IMAGE_CONF_OPTS = --with-sdl-prefix=$(HOST_DIR)/usr \
+		--with-sdl-exec-prefix=$(HOST_DIR)/usr \
+		--disable-sdltest \
+		--disable-static \
+		--disable-jpg-shared \
+		--disable-png-shared \
+		--disable-tif-shared \
 
 HOST_SDL_IMAGE_DEPENDENCIES = host-libjpeg host-libpng host-sdl
 

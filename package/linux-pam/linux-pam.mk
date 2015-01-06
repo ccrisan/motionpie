@@ -8,7 +8,7 @@ LINUX_PAM_VERSION = 1.1.8
 LINUX_PAM_SOURCE = Linux-PAM-$(LINUX_PAM_VERSION).tar.bz2
 LINUX_PAM_SITE = http://linux-pam.org/library
 LINUX_PAM_INSTALL_STAGING = YES
-LINUX_PAM_CONF_OPT = \
+LINUX_PAM_CONF_OPTS = \
 	--disable-prelude \
 	--disable-isadir \
 	--disable-nis \
@@ -23,7 +23,7 @@ LINUX_PAM_LICENSE_FILES = Copyright
 
 ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
 	LINUX_PAM_DEPENDENCIES += gettext
-	LINUX_PAM_MAKE_OPT += LIBS=-lintl
+	LINUX_PAM_MAKE_OPTS += LIBS=-lintl
 endif
 
 # Install default pam config (deny everything)

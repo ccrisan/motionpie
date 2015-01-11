@@ -1,5 +1,7 @@
 #!/bin/sh
 
+conf="/etc/sshd_config"
+
 # Make sure the ssh-keygen progam exists
 [ -f /usr/bin/ssh-keygen ] || exit 0
 
@@ -37,7 +39,7 @@ umask 077
 
 start() {
     echo -n "Starting sshd: "
-    /usr/sbin/sshd
+    /usr/sbin/sshd -f $conf
     touch /var/lock/sshd
     echo "done"
 }
@@ -71,5 +73,3 @@ case "$1" in
 esac
 
 exit $?
-
-

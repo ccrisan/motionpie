@@ -105,7 +105,6 @@ rm -f $TARGET/usr/bin/getopt
 rm -f $TARGET/bin/isosize
 rm -f $TARGET/usr/sbin/fdformat
 
-rm -f $TARGET/usr/bin/ssh
 rm -f $TARGET/usr/bin/slogin
 rm -f $TARGET/usr/bin/ssh-keyscan
 rm -f $TARGET/usr/bin/ssh-add

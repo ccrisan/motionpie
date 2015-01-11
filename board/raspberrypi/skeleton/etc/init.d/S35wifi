@@ -24,8 +24,7 @@ if [ -z "$SSID" ]; then
 fi
 
 connected() {
-    output=$(wpa_cli status 2>&1)
-    if [ -n "$(echo ${output} | grep ${SSID})" ] && [ -n "$(echo ${output} | grep COMPLETED)" ]; then
+    if ip link show dev $iface 2>&1 | grep LOWER_UP > /dev/null 2>&1; then
         return 0
     else
         return 1

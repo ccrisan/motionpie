@@ -1,0 +1,3 @@
+config BR2_PACKAGE_MOTION_MMAL
+	bool "motion-mmal"
+	help

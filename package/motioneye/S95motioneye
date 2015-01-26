@@ -1,7 +1,17 @@
 #!/bin/sh
 
 watch_timeout=120
-port=$(cat /programs/motioneye/settings.py | grep PORT | tr -d ' ' | cut -d '=' -f 2)
+conf="/data/etc/motioneye.conf"
+
+def_port=$(cat /programs/motioneye/settings.py | grep PORT | tr -d ' ' | cut -d '=' -f 2)
+
+if [ -f "$conf" ]; then
+    opts=$(cat "$conf" | while read line; do echo "--$line"; done)
+    port=$(echo "$opts" | grep -oE 'port [[:digit:]]+' | cut -d ' ' -f 2)
+else
+    echo "port $def_port" > "$conf"
+    port=$def_port
+fi
 
 responsive() {
     if wget -q -t 1 -T 2 -O - http://127.0.0.1:$port/static/img/motioneye-logo.svg >/dev/null 2>&1; then
@@ -30,7 +40,7 @@ watch() {
 
 start() {
     echo -n "Starting motioneye: "
-    /usr/bin/python2.7 /programs/motioneye/motioneye.py >>/var/log/motioneye.log 2>&1 &
+    /usr/bin/python2.7 /programs/motioneye/motioneye.py >>/var/log/motioneye.log $opts 2>&1 &
 
     count=0
     while true; do

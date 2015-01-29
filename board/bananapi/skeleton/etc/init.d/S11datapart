@@ -1,0 +1,114 @@
+#!/bin/bash
+
+DISK_DEV="/dev/mmcblk0"
+DATA_DEV="${DISK_DEV}p3"
+set +e
+
+# don't execute the script if kernel cmdline has "nodatapart" keyword
+if /bin/cat /proc/cmdline | /bin/grep "nodatapart"; then
+    exit;
+fi
+
+
+start() {
+    echo "Setting up data partition"
+
+    # if the partition is not present, allocate it and issue a reboot
+    if ! [ -b $DATA_DEV ]; then
+        echo "Allocating data partition"
+        echo -e "n
+    p
+    3
+    \n
+    \n
+    w
+    " | /sbin/fdisk $DISK_DEV
+        sync
+        sleep 1
+        echo b > /proc/sysrq-trigger
+    fi
+
+    # if the filesystem is not valid (not yet formatted), format it
+    if /usr/sbin/debugfs -R 'lcd /' $DATA_DEV 2>&1 | grep 'Bad magic'; then
+        echo "Formatting data partition"
+        mkfs.ext4 $DATA_DEV
+        mount /data
+
+    fi
+
+    if df /dev/mmcblk0p3 >/dev/null 2>&1; then
+        # make sure required directories exist
+        mkdir -p /data/etc
+        mkdir -p /data/log
+        mkdir -p /data/output
+        mkdir -p /data/media
+        chmod 775 /data/output
+        chmod 775 /data/media
+        
+        # make sure a localtime symlink exists
+        if ! [ -e /data/etc/localtime ]; then
+            ln -s /usr/share/zoneinfo/UTC /data/etc/localtime
+        fi
+
+        # make sure root and admin users exist
+        touch /data/etc/shadow
+        chmod go-rwx /data/etc/shadow
+        if ! grep root /data/etc/shadow &>/dev/null; then
+            echo 'root::::::::' >> /data/etc/shadow
+        fi
+        if ! grep admin /data/etc/shadow &>/dev/null; then
+            echo 'admin::::::::' >> /data/etc/shadow
+        fi
+
+        # set root and admin passwords
+        if [ -f /data/etc/motion.conf ]; then
+            password=$(cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3)
+        fi
+        if [ -z "$password" ]; then
+    		sn=$(cat /proc/cpuinfo | grep Serial | tr -d ' ' | cut -d ':' -f 2)
+    		password=${sn: -8}
+            echo "Using default root/admin password: $password"
+        else
+            echo "Setting custom root/admin password"
+        fi
+
+        echo -en "$password\n$password\n" | passwd &>/dev/null
+        echo -en "$password\n$password\n" | passwd admin &>/dev/null
+        sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /data/etc/shadow # removes pwd expiration
+        sed -r -i 's/admin:([^:]+):[[:digit:]]+:/admin:\1::/' /data/etc/shadow # removes pwd expiration
+
+        # mount binds
+        mount --bind /data/output /home/ftp/sdcard
+        mount --bind /data/media /home/ftp/storage
+    fi
+}
+
+stop() {
+    echo -n
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    restart|reload)
+        restart
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
+

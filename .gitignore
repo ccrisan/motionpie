@@ -5,6 +5,7 @@
 /.config.old
 /..config.tmp
 /.config
+/defconfig
 *.depend
 *.o
 /*.patch

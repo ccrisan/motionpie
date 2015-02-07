@@ -1,8 +1,0 @@
-#!/bin/sh
-
-test -f /etc/modules || exit 0
-
-for module in $(cat /etc/modules); do
-    modprobe $module || true
-done
-

@@ -13,6 +13,8 @@ umask 077
 
 start() {
     echo -n "Starting sshd: "
+    hostname=$(hostname)
+    echo "Welcome to $hostname!" > /var/cache/sshd_banner
     /usr/sbin/sshd -f $conf
     touch /var/lock/sshd
     echo "done"

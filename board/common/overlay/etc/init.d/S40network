@@ -91,6 +91,9 @@ watch_eth0() {
 }
 
 start() {
+    hostname=$(hostname)
+    echo "send host-name = \"$hostname\";" > /var/cache/dhclient.conf
+
     start_lo
     start_wlan0
     start_eth0

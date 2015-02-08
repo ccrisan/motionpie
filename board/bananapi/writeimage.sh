@@ -5,7 +5,7 @@ function usage() {
     echo "Usage: $0 [options...]" 1>&2
     echo ""
     echo "Available options:"
-    echo "    <-i image_file> - indicates the path to the image file (e.g. -i /home/user/Download/motionBanana.img)"
+    echo "    <-i image_file> - indicates the path to the image file (e.g. -i /home/user/Download/motionPie.img)"
     echo "    <-d sdcard_dev> - indicates the path to the sdcard block device (e.g. -d /dev/mmcblk0)"
     echo "    [-a off|public|auth|writable] - configures the internal samba server (e.g. -a auth)"
     echo "        default - shares are read-only, no authentication required"

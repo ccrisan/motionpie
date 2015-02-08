@@ -8,7 +8,7 @@ function msg() {
 
 function cleanup {
     set +e
-    
+
     # unmount loop mounts
     mount | grep /dev/loop | cut -d ' ' -f 3 | xargs -r umount
 
@@ -21,10 +21,7 @@ trap cleanup EXIT
 cd $(dirname $0)
 SCRIPT_DIR=$(pwd)
 
-IMG_DIR=$SCRIPT_DIR/../../output/images/
-
-PROG_ROOT="/programs"
-PROG_DIR="$PROG_ROOT/motioneye/"
+IMG_DIR=$SCRIPT_DIR/../../output/bananapi/images/
 
 BOOT_SRC=$IMG_DIR/boot
 BOOT=$IMG_DIR/.boot
@@ -34,9 +31,9 @@ BOOT_SIZE="16" # MB
 ROOT_SRC=$IMG_DIR/rootfs.tar
 ROOT=$IMG_DIR/.root
 ROOT_IMG=$IMG_DIR/root.img
-ROOT_SIZE="180" # MB
+ROOT_SIZE="120" # MB
 
-DISK_SIZE="200" # MB
+DISK_SIZE="140" # MB
 
 # boot filesystem
 msg "creating boot loop device"
@@ -163,8 +160,7 @@ msg "destroying root loop device"
 losetup -d $loop_dev
 sync
 
-mv $DISK_IMG $(dirname $DISK_IMG)/motionBanana.img
-DISK_IMG=$(dirname $DISK_IMG)/motionBanana.img
+mv $DISK_IMG $(dirname $DISK_IMG)/motionPie.img
+DISK_IMG=$(dirname $DISK_IMG)/motionPie.img
 
 msg "$(realpath "$DISK_IMG") is ready"
-

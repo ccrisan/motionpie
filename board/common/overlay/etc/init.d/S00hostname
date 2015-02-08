@@ -5,7 +5,7 @@ start() {
 
     sn=$(cat /proc/cpuinfo | grep Serial | tr -d ' ' | cut -d ':' -f 2)
     sn=${sn: -8}
-    hostname="mb-$sn"
+    hostname="mp-$sn"
     /bin/hostname $hostname
     echo "Welcome to $hostname!" > /var/cache/sshd_banner
     echo "send host-name = \"$hostname\";" > /var/cache/dhclient.conf

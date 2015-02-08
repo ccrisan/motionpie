@@ -8,7 +8,7 @@ function msg() {
 
 function cleanup {
     set +e
-    
+
     # unmount loop mounts
     mount | grep /dev/loop | cut -d ' ' -f 3 | xargs -r umount
 
@@ -21,10 +21,7 @@ trap cleanup EXIT
 cd $(dirname $0)
 SCRIPT_DIR=$(pwd)
 
-IMG_DIR=$SCRIPT_DIR/../../output/images/
-
-PROG_ROOT="/programs"
-PROG_DIR="$PROG_ROOT/motioneye/"
+IMG_DIR=$SCRIPT_DIR/../../output/raspberrypi/images/
 
 BOOT_SRC=$IMG_DIR/boot
 BOOT=$IMG_DIR/.boot

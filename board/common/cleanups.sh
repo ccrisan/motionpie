@@ -12,6 +12,8 @@ rm -f $TARGET/etc/default/ntp
 rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
 rm -f $TARGET/etc/motion-dist.conf
 rm -f $TARGET/etc/hostname
+rm -f $TARGET/etc/os-release
+rm -f $TARGET/boot/.gitkeep
 
 find $TARGET -name '*libmount*' | xargs rm -f
 

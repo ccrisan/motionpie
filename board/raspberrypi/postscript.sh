@@ -1,8 +1,8 @@
 #!/bin/sh
 
-TARGET="$1"
-BOARD=$(dirname $0)
-COMMON=$BOARD/../common
+export TARGET="$1"
+export BOARD=$(dirname $0)
+export COMMON=$BOARD/../common
 
 # copy System.map
 cp $TARGET/../build/linux-*/System.map $TARGET/System.map

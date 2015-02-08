@@ -7,6 +7,7 @@
 MOTION_MMAL_SITE = $(call github,dozencrows,motion,$(MOTION_MMAL_VERSION))
 MOTION_SITE = http://www.lavrsen.dk/svn/motion/trunk/
 MOTION_MMAL_VERSION = c37101be
+MOTION_MMAL_DEPENDENCIES = rpi-firmware rpi-userland
 
 define MOTION_MMAL_BUILD_CMDS
     cd $(@D); \

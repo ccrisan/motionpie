@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = b028762
-MOTIONPIE_VERSION = 20150112
+MOTIONEYE_VERSION = f316af6
+MOTIONPIE_VERSION = 20150208
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -14,7 +14,6 @@ MOTIONEYE_INSTALL_TARGET = YES
 DST_DIR = $(TARGET_DIR)/programs/motioneye
 
 define MOTIONEYE_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 package/motioneye/S95motioneye $(TARGET_DIR)/etc/init.d/S95motioneye
     mkdir -p $(DST_DIR)
     cp -r $(@D)/* $(DST_DIR)/
     cp package/motioneye/update.py $(DST_DIR)/src/update.py

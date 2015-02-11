@@ -4,7 +4,16 @@ mkdir -p /var/lib/dhcp
 dh_conf="/var/cache/dhclient.conf"
 sys_static_conf="/etc/static_ip.conf"
 static_conf="/data/etc/static_ip.conf"
-watch_timeout=20
+watch_conf="/data/etc/watch.conf"
+
+link_watch=yes
+link_watch_timeout=20
+ip_watch=yes
+ip_watch_timeout=yes
+
+if [ -f $watch_conf ]; then
+    source $watch_conf
+fi
 
 if [ -f $sys_static_conf ] && ! [ -f $static_conf ]; then
     mkdir -p $(dirname $static_conf)
@@ -13,23 +22,62 @@ fi
 
 test -r $static_conf && source $static_conf
 
+watch_eth0() {
+    count=0
+    while true; do
+        sleep 5
+        if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
+            count=0
+        else
+            if [ $count -lt $link_watch_timeout ]; then
+                count=$(($count + 5))
+            else
+                logger -t ethernet -s "disconnected for $link_watch_timeout seconds, rebooting"
+                reboot
+            fi
+        fi
+    done
+}
+
+watch_ip() {
+    iface=$1
+    count=0
+    while true; do
+        sleep 5
+        if ip addr show dev $iface &>/dev/null; then
+            count=0
+        else
+            if [ $count -lt $ip_watch_timeout ]; then
+                count=$(($count + 5))
+            else
+                logger -t network -s "$iface had no IP address for $ip_watch_timeout seconds, rebooting"
+                reboot
+            fi
+        fi
+    done
+}
+
 start_lo() {
     ifconfig lo up
 }
 
 start_wlan0() {
     if [ "$(cat /sys/class/net/wlan0/carrier 2>/dev/null)" != "1" ]; then
-        echo "wlan0: no carrier"
+        echo "wlan0: no link"
         return
     fi
-    
+
     if [ -n "$static_ip" ]; then
         echo "wlan0: setting static IP to $static_ip"
         ifconfig wlan0 $static_ip up
         static_ip="" # won't be used again
-    else    
+    else
         echo "wlan0: starting dhclient"
         dhclient -cf "$dh_conf" wlan0
+    fi
+
+    if [ "$ip_watch" == "yes" ]; then
+        watch_ip wlan0 &
     fi
 }
 
@@ -49,7 +97,7 @@ start_eth0() {
     # bring it up
     ifconfig eth0 up
 
-    # wait for carrier
+    # wait for link
     count=0
     while [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" != "1" ] && [ $count -lt 3 ]; do
         sleep 1
@@ -57,37 +105,26 @@ start_eth0() {
     done
 
     if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" != "1" ]; then
-        echo "eth0: no carrier"
-        return # no carrier
+        echo "eth0: no link"
+        return # no link
     fi
 
     if [ -n "$static_ip" ]; then
         echo "eth0: setting static IP to $static_ip"
         ifconfig eth0 $static_ip up
         static_ip="" # won't be used again
-    else    
+    else
         echo "eth0: starting dhclient"
         dhclient -cf "$dh_conf" eth0
     fi
-    
-    watch_eth0 &
-}
 
-watch_eth0() {
-    count=0
-    while true; do
-        sleep 5
-        if [ "$(cat /sys/class/net/eth0/carrier 2>/dev/null)" == "1" ]; then
-            count=0
-        else
-            if [ $count -lt $watch_timeout ]; then
-                count=$(($count + 5))
-            else
-                logger -t ethernet -s "disconnected for $watch_timeout seconds, rebooting"
-                reboot
-            fi
-        fi
-    done
+    if [ "$link_watch" == "yes" ]; then
+        watch_eth0 &
+    fi
+
+    if [ "$ip_watch" == "yes" ]; then
+        watch_ip eth0 &
+    fi
 }
 
 start() {
@@ -97,12 +134,12 @@ start() {
     start_lo
     start_wlan0
     start_eth0
-    
+
     if [ -n "$static_gw" ]; then
         echo "setting static gateway to $static_gw"
         ip route add default via $static_gw
     fi
-    
+
     if [ -n "$static_dns" ]; then
         echo "setting static DNS server to $static_dns"
         echo "nameserver $static_dns" > /etc/resolv.conf
@@ -129,7 +166,7 @@ case "$1" in
         "$0" stop
         "$0" start
         ;;
-        
+
     *)
         echo "Usage: $0 {start|stop|restart}"
         exit 1

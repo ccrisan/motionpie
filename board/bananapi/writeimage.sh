@@ -230,12 +230,8 @@ fi
 # rebooting upon network issues
 if [ -n "$DISABLE_NR" ]; then
     msg "disabling reboot on network errors"
-    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi
-    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S35wifi
-    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S36ppp
-    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S36ppp
-    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S40network
-    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S40network
+    sed -i.bak 's%link_watch=yes%link_watch=no%' $ROOT/etc/watch.conf
+    sed -i.bak 's%ip_watch=yes%ip_watch=no%' $ROOT/etc/watch.conf
 fi
 
 msg "removing .bak files"

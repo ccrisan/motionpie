@@ -47,6 +47,7 @@ watch() {
         else
             if [ $count -lt $link_watch_timeout ]; then
                 count=$(($count + 5))
+                logger -t wifi -s "disconnected"
             else
                 logger -t wifi -s "disconnected for $link_watch_timeout seconds, rebooting"
                 reboot

@@ -38,6 +38,7 @@ watch() {
         else
             if [ $count -lt $link_watch_timeout ]; then
                 count=$(($count + 5))
+                logger -t ppp -s "disconnected"
             else
                 logger -t ppp -s "disconnected for $link_watch_timeout seconds, rebooting"
                 reboot

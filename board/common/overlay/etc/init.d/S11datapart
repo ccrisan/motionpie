@@ -80,8 +80,8 @@ start() {
         mount --bind /data/output /home/ftp/sdcard
         mount --bind /data/media /home/ftp/storage
         
-        # copy sys config files
-        if [ -f /etc/watch.conf ]; then
+        # copy common sys config files
+        if [ -f /etc/watch.conf ] && ! [ -f /data/etc/watch.conf ]; then
             cp /etc/watch.conf /data/etc/watch.conf
         fi
     fi

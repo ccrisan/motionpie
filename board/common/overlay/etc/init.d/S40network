@@ -9,7 +9,7 @@ watch_conf="/data/etc/watch.conf"
 link_watch=yes
 link_watch_timeout=20
 ip_watch=yes
-ip_watch_timeout=yes
+ip_watch_timeout=40
 
 if [ -f $watch_conf ]; then
     source $watch_conf
@@ -31,6 +31,7 @@ watch_eth0() {
         else
             if [ $count -lt $link_watch_timeout ]; then
                 count=$(($count + 5))
+                logger -t ethernet -s "disconnected"
             else
                 logger -t ethernet -s "disconnected for $link_watch_timeout seconds, rebooting"
                 reboot
@@ -44,11 +45,12 @@ watch_ip() {
     count=0
     while true; do
         sleep 5
-        if ip addr show dev $iface &>/dev/null; then
+        if ip addr show dev $iface | grep inet &>/dev/null; then
             count=0
         else
             if [ $count -lt $ip_watch_timeout ]; then
                 count=$(($count + 5))
+                logger -t network -s "$iface has no IP address"
             else
                 logger -t network -s "$iface had no IP address for $ip_watch_timeout seconds, rebooting"
                 reboot

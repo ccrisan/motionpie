@@ -23,7 +23,7 @@ function usage() {
     echo "        default - ssh server enabled"
     echo "        off - ssh server disabled"
     echo "        on - ssh server enabled"
-    echo "    [-l] - disables the LED on the CSI camera module"
+    echo "    [-l] - enables the LED on the CSI camera module"
     echo "    [-n ssid:psk] - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
     echo "    [-o none|modest|medium|high|turbo] - overclocks the PI according to a preset (e.g. -o high)"
     echo "        default - arm=900Mhz, core=500Mhz, sdram=500MHz, ov=6"
@@ -66,7 +66,7 @@ while getopts "a:d:f:h:i:ln:o:p:s:w" o; do
             DISK_IMG=$OPTARG
             ;;
         l)
-            DISABLE_LED=true
+            ENABLE_LED=true
             ;;
         n)
             IFS=":" NETWORK=($OPTARG)
@@ -212,9 +212,9 @@ if [ -n "$SSH_MODE" ] && [ "$SSH_MODE" != "on" ]; then
 fi
 
 # camera led
-if [ -n "$DISABLE_LED" ]; then
-    msg "disabling camera LED"
-    echo "disable_camera_led=1" >> $BOOT/config.txt
+if [ -n "$ENABLE_LED" ]; then
+    msg "enabling camera LED"
+    sed -i.bak "s/disable_camera_led=1/disable_camera_led=0/" $BOOT/config.txt
 fi
 
 # overclocking
@@ -301,12 +301,8 @@ fi
 # rebooting upon network issues
 if [ -n "$DISABLE_NR" ]; then
     msg "disabling reboot on network errors"
-    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S35wifi
-    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S35wifi
-    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S36ppp
-    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S36ppp
-    sed -i.bak 's%rebooting%ignoring%' $ROOT/etc/init.d/S40network
-    sed -i.bak 's%reboot%%' $ROOT/etc/init.d/S40network
+    sed -i.bak 's%link_watch=yes%link_watch=no%' $ROOT/etc/watch.conf
+    sed -i.bak 's%ip_watch=yes%ip_watch=no%' $ROOT/etc/watch.conf
 fi
 
 msg "removing .bak files"

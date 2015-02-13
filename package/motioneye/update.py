@@ -18,6 +18,7 @@
 import json
 import logging
 import os.path
+import re
 import shutil
 import subprocess
 import time
@@ -26,7 +27,8 @@ import urllib2
 import settings
 
 
-_DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s/motionPie-%(version)s.img.gz'.format(
+_BOARD = open('/etc/board').strip()
+_DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s/motionpie-%(board)s-%(version)s.img.gz'.format(
         owner=settings.REPO[0], repo=settings.REPO[1])
 _LIST_VERSIONS_URL = 'https://api.github.com/repos/{owner}/{repo}/releases'.format(
         owner=settings.REPO[0], repo=settings.REPO[1])
@@ -47,14 +49,24 @@ def get_all_versions():
     url += '?_=' + str(int(time.time())) # prevents caching
     
     try:
+        logging.debug('board is %s' % _BOARD)
         logging.debug('fetching %s...' % url)
-        
+
         response = urllib2.urlopen(url, timeout=settings.REMOTE_REQUEST_TIMEOUT)
-        versions = json.load(response)
-        versions = [v['name'] for v in versions if not v.get('prerelease') or getattr(settings, 'PRERELEASES', False)]
-        
-        logging.debug('available versions: %(versions)s' % {
-                'versions': ', '.join(versions)})
+        releases = json.load(response)
+
+        versions = []
+        for release in releases:
+            if release.get('prerelease') and not getattr(settings, 'PRERELEASES', False):
+                continue
+            
+            for asset in release.get('assets', []):
+                if not re.match('^motionpie-%s-\d{8}\.img.gz$' % board, asset['name']):
+                    continue
+                    
+            versions.append(release['name'])
+
+        logging.debug('available versions: %(versions)s' % {'versions': ', '.join(versions)})
 
         return sorted(versions)
 
@@ -94,7 +106,7 @@ def compare_versions(version1, version2):
 # updating
 
 def download(version):
-    url = _DOWNLOAD_URL % {'version': version}
+    url = _DOWNLOAD_URL % {'version': version, 'board': board}
 
     try:
         logging.info('downloading %s...' % url)

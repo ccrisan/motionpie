@@ -28,12 +28,20 @@ import settings
 
 
 _BOARD = open('/etc/board').read().strip()
-_DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s/motionpie-%(board)s-%(version)s.img.gz'.format(
-        owner=settings.REPO[0], repo=settings.REPO[1])
-_LIST_VERSIONS_URL = 'https://api.github.com/repos/{owner}/{repo}/releases'.format(
-        owner=settings.REPO[0], repo=settings.REPO[1])
-_DOWNLOAD_DIR = '/data/.firmware_update'
-_DOWNLOAD_FILE_NAME = os.path.join(_DOWNLOAD_DIR, 'firmware.gz')
+
+if settings.REPO:
+    _DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s/motionpie-%(board)s-%(version)s.img.gz'.format(
+            owner=settings.REPO[0], repo=settings.REPO[1])
+    _LIST_VERSIONS_URL = 'https://api.github.com/repos/{owner}/{repo}/releases'.format(
+            owner=settings.REPO[0], repo=settings.REPO[1])
+    _DOWNLOAD_DIR = '/data/.firmware_update'
+    _DOWNLOAD_FILE_NAME = os.path.join(_DOWNLOAD_DIR, 'firmware.gz')
+
+else:
+    _DOWNLOAD_URL = None
+    _LIST_VERSIONS_URL = None
+    _DOWNLOAD_DIR = None
+    _DOWNLOAD_FILE_NAME = None
 
 
 # versions

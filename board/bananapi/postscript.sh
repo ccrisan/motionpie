@@ -14,5 +14,8 @@ cp $TARGET/../images/script.bin $TARGET/../images/boot/
 #cp $TARGET/../images/sun7i-a20-bananapi.dtb $TARGET/../images/boot/
 mkimage -C none -A arm -T script -d $BOARD/boot.cmd $TARGET/../images/boot/boot.scr
 
+# disable software updating
+sed -i 's/REPO = /#REPO = /' $TARGET/programs/motioneye/settings.py
+
 $COMMON/startup-scripts.sh
 $COMMON/cleanups.sh

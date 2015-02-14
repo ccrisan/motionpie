@@ -1,14 +1,14 @@
 #!/bin/sh
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 <board> [make_target]"
+    echo "Usage: $0 <board> [make_targets...]"
     exit 1
 fi
 
 set -e # exit at first error
 
 board=$1
-target=$2
+target=${*:2}
 cd $(dirname $0)
 basedir=$(pwd)
 outputdir=$basedir/output/$board

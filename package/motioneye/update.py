@@ -69,7 +69,7 @@ def get_all_versions():
                 continue
             
             for asset in release.get('assets', []):
-                if not re.match('^motionpie-%s-\d{8}\.img.gz$' % board, asset['name']):
+                if not re.match('^motionpie-%s-\d{8}\.img.gz$' % _BOARD, asset['name']):
                     continue
                     
             versions.append(release['name'])
@@ -114,7 +114,7 @@ def compare_versions(version1, version2):
 # updating
 
 def download(version):
-    url = _DOWNLOAD_URL % {'version': version, 'board': board}
+    url = _DOWNLOAD_URL % {'version': version, 'board': _BOARD}
 
     try:
         logging.info('downloading %s...' % url)

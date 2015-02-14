@@ -8,6 +8,7 @@ start() {
     echo $sn > /var/cache/serial_number
     hostname="mp-$sn"
     /bin/hostname $hostname
+    echo "127.0.0.1 localhost motionpie $hostname" > /etc/hosts
 
     echo "done"
 }

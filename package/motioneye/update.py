@@ -27,7 +27,7 @@ import urllib2
 import settings
 
 
-_BOARD = open('/etc/board').strip()
+_BOARD = open('/etc/board').read().strip()
 _DOWNLOAD_URL = 'https://github.com/{owner}/{repo}/releases/download/%(version)s/motionpie-%(board)s-%(version)s.img.gz'.format(
         owner=settings.REPO[0], repo=settings.REPO[1])
 _LIST_VERSIONS_URL = 'https://api.github.com/repos/{owner}/{repo}/releases'.format(

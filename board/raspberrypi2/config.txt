@@ -1,0 +1,9 @@
+start_file=start.elf
+fixup_file=fixup.elf
+arm_freq=900
+core_freq=500
+sdram_freq=500
+over_voltage=6
+gpu_mem_256=128
+gpu_mem_512=128
+disable_camera_led=0

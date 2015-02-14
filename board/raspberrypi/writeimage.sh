@@ -23,7 +23,7 @@ function usage() {
     echo "        default - ssh server enabled"
     echo "        off - ssh server disabled"
     echo "        on - ssh server enabled"
-    echo "    [-l] - enables the LED on the CSI camera module"
+    echo "    [-l] - disables the LED on the CSI camera module"
     echo "    [-n ssid:psk] - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
     echo "    [-o none|modest|medium|high|turbo] - overclocks the PI according to a preset (e.g. -o high)"
     echo "        default - arm=900Mhz, core=500Mhz, sdram=500MHz, ov=6"
@@ -66,7 +66,7 @@ while getopts "a:d:f:h:i:ln:o:p:s:w" o; do
             DISK_IMG=$OPTARG
             ;;
         l)
-            ENABLE_LED=true
+            DISABLE_LED=true
             ;;
         n)
             IFS=":" NETWORK=($OPTARG)
@@ -212,9 +212,9 @@ if [ -n "$SSH_MODE" ] && [ "$SSH_MODE" != "on" ]; then
 fi
 
 # camera led
-if [ -n "$ENABLE_LED" ]; then
-    msg "enabling camera LED"
-    sed -i.bak "s/disable_camera_led=1/disable_camera_led=0/" $BOOT/config.txt
+if [ -n "$DISABLE_LED" ]; then
+    msg "disabling camera LED"
+    sed -i.bak "s/disable_camera_led=0/disable_camera_led=1/" $BOOT/config.txt
 fi
 
 # overclocking

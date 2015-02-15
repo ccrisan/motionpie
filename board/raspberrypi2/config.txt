@@ -1,6 +1,6 @@
 start_file=start.elf
 fixup_file=fixup.elf
-arm_freq=900
+arm_freq=800
 core_freq=500
 sdram_freq=500
 over_voltage=6

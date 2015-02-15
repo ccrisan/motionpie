@@ -16,3 +16,4 @@
 *.pyc
 /.download
 /.buildroot-ccache-*
+*.img.gz

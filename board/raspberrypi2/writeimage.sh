@@ -26,7 +26,7 @@ function usage() {
     echo "    [-l] - disables the LED on the CSI camera module"
     echo "    [-n ssid:psk] - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
     echo "    [-o none|modest|medium|high|turbo] - overclocks the PI according to a preset (e.g. -o high)"
-    echo "        default - arm=900Mhz, core=500Mhz, sdram=500MHz, ov=6"
+    echo "        default - arm=800Mhz, core=500Mhz, sdram=500MHz, ov=6"
     echo "        none - arm=700Mhz, core=250Mhz, sdram=400MHz, ov=0"
     echo "        modest - arm=800Mhz, core=250Mhz, sdram=400MHz, ov=0"
     echo "        medium - arm=900Mhz, core=250Mhz, sdram=450MHz, ov=2"

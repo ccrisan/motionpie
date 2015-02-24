@@ -4,19 +4,22 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = 753c396
-MOTIONPIE_VERSION = 20150215
+MOTIONEYE_VERSION = 4346cbc2
+MOTIONPIE_VERSION = 20150224
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
 MOTIONEYE_LICENSE_FILES = LICENCE
 MOTIONEYE_INSTALL_TARGET = YES
+
 DST_DIR = $(TARGET_DIR)/programs/motioneye
 
 define MOTIONEYE_INSTALL_TARGET_CMDS
     mkdir -p $(DST_DIR)
     cp -r $(@D)/* $(DST_DIR)/
-    cp package/motioneye/update.py $(DST_DIR)/src/update.py
+    cp package/motioneye/update.py $(DST_DIR)/src/
+    cp package/motioneye/ipctl.py $(DST_DIR)/src/
+    cp package/motioneye/servicectl.py $(DST_DIR)/src/
 
     # settings
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
@@ -40,6 +43,9 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%motionEye is up to date%motionPie is up to date%" $(DST_DIR)/static/js/main.js
     sed -i "s%motionEye was successfully updated%motionPie was successfully updated%" $(DST_DIR)/static/js/main.js
     sed -r -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js
+    
+    # additional config
+    sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl/' $(DST_DIR)/src/config.py
 endef
 
 $(eval $(generic-package))

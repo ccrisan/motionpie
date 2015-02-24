@@ -1,6 +1,6 @@
 
-# Copyright (c) 2014 Calin Crisan
-# This file is part of motionEye.
+# Copyright (c) 2015 Calin Crisan
+# This file is part of motionPie.
 #
 # motionEye is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

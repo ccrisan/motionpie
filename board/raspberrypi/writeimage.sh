@@ -24,7 +24,7 @@ function usage() {
     echo "        off - ssh server disabled"
     echo "        on - ssh server enabled"
     echo "    [-l] - disables the LED on the CSI camera module"
-    echo "    [-n ssid:psk] - sets the wireless network name and key (e.g. -n mynet:mykey1234)"
+    echo "    [-n ssid:psk] - sets the wireless network name and key (e.g. -n mynet:mykey1234). Network names with spaces should be enclosed in single quotes."
     echo "    [-o none|modest|medium|high|turbo] - overclocks the PI according to a preset (e.g. -o high)"
     echo "        default - arm=900Mhz, core=500Mhz, sdram=500MHz, ov=6"
     echo "        none - arm=700Mhz, core=250Mhz, sdram=400MHz, ov=0"
@@ -270,7 +270,7 @@ fi
 
 # wifi
 if [ -n "$SSID" ]; then
-    msg "creating wireless configuration"
+    msg "creating wireless configuration with network name [$SSID] and password [$PSK]"
     conf=$ROOT/etc/wpa_supplicant.conf
     echo "update_config=1" > $conf
     echo "ctrl_interface=/var/run/wpa_supplicant" >> $conf

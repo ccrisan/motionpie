@@ -46,6 +46,9 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     
     # additional config
     sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl/' $(DST_DIR)/src/config.py
+    
+    # reboot when motion process hangs
+    sed -r -i "s%raise Exception\('could not terminate the motion process'\)%logging.error('could not terminate the motion process'); os.system('reboot')%" $(DST_DIR)/src/motionctl.py
 endef
 
 $(eval $(generic-package))

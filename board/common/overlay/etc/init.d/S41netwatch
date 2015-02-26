@@ -19,7 +19,7 @@ watch() {
     count=0
     netwatch_retries=$(($netwatch_retries - 1))
     while true; do
-        if nc -n -w $netwatch_timeout $netwatch_host $netwatch_port </dev/null >/dev/null 2>&1; then
+        if nc -w $netwatch_timeout $netwatch_host $netwatch_port </dev/null >/dev/null 2>&1; then
             count=0
         else
             if [ $count -lt $netwatch_retries ]; then

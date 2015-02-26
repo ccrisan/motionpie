@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = 4346cbc2
-MOTIONPIE_VERSION = 20150224
+MOTIONEYE_VERSION = c7a1a6d
+MOTIONPIE_VERSION = 20150226
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -20,6 +20,8 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     cp package/motioneye/update.py $(DST_DIR)/src/
     cp package/motioneye/ipctl.py $(DST_DIR)/src/
     cp package/motioneye/servicectl.py $(DST_DIR)/src/
+    cp package/motioneye/watchctl.py $(DST_DIR)/src/
+    cp package/motioneye/extractl.py $(DST_DIR)/src/
 
     # settings
     mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
@@ -45,7 +47,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -r -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js
     
     # additional config
-    sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl\nimport watchctl/' $(DST_DIR)/src/config.py
+    sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept:\n    pass/' $(DST_DIR)/src/config.py
     
     # reboot when motion process hangs
     sed -r -i "s%raise Exception\('could not terminate the motion process'\)%logging.error('could not terminate the motion process'); os.system('reboot')%" $(DST_DIR)/src/motionctl.py

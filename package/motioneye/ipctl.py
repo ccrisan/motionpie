@@ -97,11 +97,11 @@ def _get_ip_settings():
 
 
 def _set_ip_settings(s):
-    type = s['ipConfigType']
-    ip = s['ipConfigStaticAddr']
-    mask = s['ipConfigStaticMask']
-    gw = s['ipConfigStaticGw']
-    dns = s['ipConfigStaticDns']
+    type = s.get('ipConfigType', 'dhcp')
+    ip = s.get('ipConfigStaticAddr', '192.168.1.101')
+    mask = s.get('ipConfigStaticMask', '255.255.255.0')
+    gw = s.get('ipConfigStaticGw', '192.168.1.1')
+    dns = s.get('ipConfigStaticDns', '8.8.8.8')
     
     cidr = '24'
     if mask:

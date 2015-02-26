@@ -45,7 +45,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -r -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js
     
     # additional config
-    sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl/' $(DST_DIR)/src/config.py
+    sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl\nimport watchctl/' $(DST_DIR)/src/config.py
     
     # reboot when motion process hangs
     sed -r -i "s%raise Exception\('could not terminate the motion process'\)%logging.error('could not terminate the motion process'); os.system('reboot')%" $(DST_DIR)/src/motionctl.py

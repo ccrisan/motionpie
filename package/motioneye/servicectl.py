@@ -85,6 +85,14 @@ def _get_service_settings():
 
 
 def _set_service_settings(s):
+    s.setdefault('ftpEnabled', True)
+    s.setdefault('ftpAuth', True)
+    s.setdefault('ftpWritable', False)
+    s.setdefault('smbEnabled', True)
+    s.setdefault('smbAuth', True)
+    s.setdefault('smbWritable', False)
+    s.setdefault('sshEnabled', True)
+
     # FTP
     ftp_mode = 'off' if not s['ftpEnabled'] else ('public' if not s['ftpAuth'] else ('auth' if not s['ftpWritable'] else 'writable'))
     logging.debug('setting FTP mode: %s' % ftp_mode)

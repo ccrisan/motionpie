@@ -18,17 +18,17 @@
 import logging
 import os.path
 
-from config import additional_config, additional_section
+from config import additional_config
 
 
 CONFIG_TXT = '/boot/config.txt'
 
 OVERCLOCK = {
-    '700': '700|250|400|0',
-    '800': '800|250|400|0',
-    '900': '900|250|450|0',
-    '950': '950|250|450|0',
-    '1000': '1000|500|600|6'
+    700: '700|250|400|0',
+    800: '800|250|400|0',
+    900: '900|250|450|0',
+    950: '950|250|450|0',
+    1000: '1000|500|600|6'
 }
 
 def _get_board_settings():
@@ -156,14 +156,18 @@ def _set_board_settings(s):
 
     with open(CONFIG_TXT, 'w') as f:
         for line in lines:
-            f.write(line + '\n')
+            if not line.strip():
+                continue
+            if not line.endswith('\n'):
+                line += '\n'
+            f.write(line)
 
 
-@additional_section
-def board():
+@additional_config
+def boardSeparator():
     return {
-        'label': 'Raspberry PI Tweaks',
-        'description': 'tweak your Raspberry PI board',
+        'type': 'separator',
+        'section': 'expertSettings',
         'advanced': True
     }
 
@@ -176,7 +180,7 @@ def gpuMem():
         'type': 'number',
         'min': '16',
         'max': '448',
-        'section': 'board',
+        'section': 'expertSettings',
         'advanced': True,
         'reboot': True,
         'get': _get_board_settings,
@@ -191,7 +195,7 @@ def cameraLed():
         'label': 'Enable CSI Camera Led',
         'description': 'control the led on the CSI camera board',
         'type': 'bool',
-        'section': 'board',
+        'section': 'expertSettings',
         'advanced': True,
         'reboot': True,
         'get': _get_board_settings,
@@ -213,10 +217,11 @@ def overclock():
             ('950|250|450|0', 'high (950/250/450/0)'),
             ('1000|500|600|6', 'turbo (1000/500/600/6)')
         ],
-        'section': 'board',
+        'section': 'expertSettings',
         'advanced': True,
         'reboot': True,
         'get': _get_board_settings,
         'set': _set_board_settings,
         'get_set_dict': True
     }
+

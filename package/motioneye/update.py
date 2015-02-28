@@ -185,6 +185,9 @@ def perform_update(version):
     logging.info('killing motioneye init script...')
     os.system('kill $(pidof S95motioneye)')
 
+    logging.info('stopping netwatch init script...')
+    os.system('/etc/init.d/S41netwatch stop')
+
     download(version)
     
     logging.info('backing up /boot/config.txt')

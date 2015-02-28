@@ -98,7 +98,11 @@ def _set_motioneye_settings(s):
 
     with open(MOTIONEYE_CONF, 'w') as f:
         for line in lines:
-            f.write(line + '\n')
+            if not line.strip():
+                continue
+            if not line.endswith('\n'):
+                line += '\n'
+            f.write(line)
 
 
 def _get_date_settings():

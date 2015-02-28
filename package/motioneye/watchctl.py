@@ -15,12 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
+import logging
 import os.path
 
 from config import additional_config, additional_section
 
 
-WATCH_CONF_FILE = '/data/etc/watch.conf'
+WATCH_CONF = '/data/etc/watch.conf'
 
 
 def _get_watch_settings():
@@ -34,8 +35,10 @@ def _get_watch_settings():
     watch_connect_timeout = 5
     watch_connect_interval = 20
 
-    if os.path.exists(WATCH_CONF_FILE):
-        with open(WATCH_CONF_FILE) as f:
+    if os.path.exists(WATCH_CONF):
+        logging.debug('reading watch settings from %s' % WATCH_CONF)
+        
+        with open(WATCH_CONF) as f:
             for line in f:
                 line = line.strip()
                 if not line:
@@ -74,8 +77,8 @@ def _get_watch_settings():
 
                 elif name == 'netwatch_interval':
                     watch_connect_interval = int(value)
-
-    return {
+    
+    s = {
         'watchLink': watch_link,
         'watchLinkTimeout': watch_link_timeout,
         'watchConnect': watch_connect,
@@ -85,6 +88,13 @@ def _get_watch_settings():
         'watchConnectTimeout': watch_connect_timeout,
         'watchConnectInterval': watch_connect_interval
     }
+    
+    logging.debug(('watch settings: watch_link=%(watchLink)s, watch_link_timeout=%(watchLinkTimeout)s, ' +
+            'watch_connect=%(watchConnect)s, watch_connect_host=%(watchConnectHost)s, ' +
+            'watch_connect_port=%(watchConnectPort)s, watch_connect_retries=%(watchConnectRetries)s, ' +
+            'watch_connect_timeout=%(watchConnectTimeout)s, watch_connect_interval=%(watchConnectInterval)s') % s)
+    
+    return s
 
 
 def _set_watch_settings(s):
@@ -97,7 +107,14 @@ def _set_watch_settings(s):
     s.setdefault('watchConnectTimeout', 5)
     s.setdefault('watchConnectInterval', 20)
 
-    with open(WATCH_CONF_FILE, 'w') as f:
+    logging.debug('writing watch settings to %s: ' % WATCH_CONF +
+            ('watch_link=%(watchLink)s, watch_link_timeout=%(watchLinkTimeout)s, ' +
+            'watch_connect=%(watchConnect)s, watch_connect_host=%(watchConnectHost)s, ' +
+            'watch_connect_port=%(watchConnectPort)s, watch_connect_retries=%(watchConnectRetries)s, ' +
+            'watch_connect_timeout=%(watchConnectTimeout)s, watch_connect_interval=%(watchConnectInterval)s') % s)
+    
+
+    with open(WATCH_CONF, 'w') as f:
         f.write('link_watch=%s\n' % ['no', 'yes'][s['watchLink']])
         f.write('link_watch_timeout=%s\n' % s['watchLinkTimeout'])
         f.write('\n')

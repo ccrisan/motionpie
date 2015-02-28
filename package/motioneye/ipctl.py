@@ -35,6 +35,8 @@ def _get_ip_settings():
     dns_comment = False
     
     if os.path.exists(STATIC_IP_CONF):
+        logging.debug('reading ip settings from %s' % STATIC_IP_CONF)
+
         with open(STATIC_IP_CONF) as f:
             for line in f:
                 line = line.strip()
@@ -86,14 +88,19 @@ def _get_ip_settings():
     
     if dns_comment and type == 'static':
         dns = None
-
-    return {
+        
+    s = {
         'ipConfigType': type,
         'ipConfigStaticAddr': ip,
         'ipConfigStaticMask': mask,
         'ipConfigStaticGw': gw,
         'ipConfigStaticDns': dns
     }
+    
+    logging.debug(('ip settings: type=%(ipConfigType)s, addr=%(ipConfigStaticAddr)s, mask=%(ipConfigStaticMask)s, ' +
+            'gw=%(ipConfigStaticGw)s, dns=%(ipConfigStaticDns)s') % s)
+
+    return s
 
 
 def _set_ip_settings(s):
@@ -103,6 +110,10 @@ def _set_ip_settings(s):
     gw = s.get('ipConfigStaticGw', '192.168.1.1')
     dns = s.get('ipConfigStaticDns', '8.8.8.8')
     
+    logging.debug('writing ip settings to %s: ' % STATIC_IP_CONF +
+            ('type=%(ipConfigType)s, addr=%(ipConfigStaticAddr)s, mask=%(ipConfigStaticMask)s, ' +
+            'gw=%(ipConfigStaticGw)s, dns=%(ipConfigStaticDns)s') % s)
+
     cidr = '24'
     if mask:
         binary_str = ''
@@ -110,9 +121,6 @@ def _set_ip_settings(s):
             binary_str += bin(int(octet))[2:].zfill(8)
         cidr = str(len(binary_str.rstrip('0')))
 
-    logging.debug('writing ip settings to %s: ip=%s/%s, gw=%s, dns=%s' %
-            (STATIC_IP_CONF, ip, cidr, gw, dns))
-    
     comment = '#' if type == 'dhcp' else ''
     with open(STATIC_IP_CONF, 'w') as f:
         f.write(comment + 'static_ip="%s/%s"\n' % (ip, cidr))

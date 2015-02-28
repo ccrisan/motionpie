@@ -15,28 +15,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
+import logging
 import os.path
 
 from config import additional_config
 
 
-MOTIONEYE_CONF_FILE = '/data/etc/motioneye.conf'
-DATE_CONF_FILE = '/data/etc/date.conf'
+MOTIONEYE_CONF = '/data/etc/motioneye.conf'
+DATE_CONF = '/data/etc/date.conf'
 
 
 def _get_motioneye_settings():
     port = 80
     motion_binary = '/usr/bin/motion'
 
-    if os.path.exists(MOTIONEYE_CONF_FILE):
-        with open(MOTIONEYE_CONF_FILE) as f:
+    if os.path.exists(MOTIONEYE_CONF):
+        logging.debug('reading motioneye settings from %s' % MOTIONEYE_CONF)
+
+        with open(MOTIONEYE_CONF) as f:
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
 
                 try:
-                    name, value = line.split(' ', 2)
+                    name, value = line.split(' ', 1)
 
                 except:
                     continue
@@ -47,20 +50,27 @@ def _get_motioneye_settings():
                 elif name == 'motion_binary':
                     motion_binary = value
 
-    return {
+    s = {
         'port': port,
         'motionBinary': motion_binary
     }
+    
+    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s' % s)
+
+    return s
 
 
 def _set_motioneye_settings(s):
     s = dict(s)
     s.setdefault('port', 80)
     s.setdefault('motionBinary', '/usr/bin/motion')
+    
+    logging.debug('writing motioneye settings to %s: ' % MOTIONEYE_CONF +
+            'port=%(port)s, motion_binary=%(motionBinary)s' % s)
 
     lines = []
-    if os.path.exists(MOTIONEYE_CONF_FILE):
-        with open(MOTIONEYE_CONF_FILE) as f:
+    if os.path.exists(MOTIONEYE_CONF):
+        with open(MOTIONEYE_CONF) as f:
             lines = f.readlines()
 
         for i, line in enumerate(lines):
@@ -86,7 +96,7 @@ def _set_motioneye_settings(s):
     if 'motionBinary' in s:
         lines.append('motion_binary %s' % s.pop('motionBinary'))
 
-    with open(MOTIONEYE_CONF_FILE, 'w') as f:
+    with open(MOTIONEYE_CONF, 'w') as f:
         for line in lines:
             f.write(line + '\n')
 
@@ -97,8 +107,10 @@ def _get_date_settings():
     date_timeout = 10
     date_interval = 900
 
-    if os.path.exists(DATE_CONF_FILE):
-        with open(DATE_CONF_FILE) as f:
+    if os.path.exists(DATE_CONF):
+        logging.debug('reading date settings from %s' % DATE_CONF)
+        
+        with open(DATE_CONF) as f:
             for line in f:
                 line = line.strip()
                 if not line:
@@ -131,12 +143,16 @@ def _get_date_settings():
                 elif name == 'date_interval':
                     date_interval = int(value)
 
-    return {
+    s = {
         'dateMethod': date_method,
         'dateHost': date_host,
         'dateTimeout': date_timeout,
         'dateInterval': date_interval
     }
+    
+    logging.debug('date settings: method=%(dateMethod)s, host=%(dateHost)s, timeout=%(dateTimeout)s, interval=%(dateInterval)s' % s)
+    
+    return s
 
 
 def _set_date_settings(s):
@@ -145,7 +161,10 @@ def _set_date_settings(s):
     s.setdefault('dateTimeout', 10)
     s.setdefault('dateInterval', 900)
 
-    with open(DATE_CONF_FILE, 'w') as f:
+    logging.debug('writing date settings to %s: ' % DATE_CONF +
+            'method=%(dateMethod)s, host=%(dateHost)s, timeout=%(dateTimeout)s, interval=%(dateInterval)s' % s)
+
+    with open(DATE_CONF, 'w') as f:
         f.write('date_method=%s\n' % s['dateMethod'])
         f.write('date_host=%s\n' % s['dateHost'])
         f.write('date_timeout=%s\n' % s['dateTimeout'])
@@ -192,15 +211,6 @@ def motionBinary():
         'get': _get_motioneye_settings,
         'set': _set_motioneye_settings,
         'get_set_dict': True
-    }
-
-
-@additional_config
-def extraDateSeparator():
-    return {
-        'type': 'separator',
-        'section': 'expertSettings',
-        'advanced': True
     }
 
 

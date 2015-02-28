@@ -22,9 +22,9 @@ import re
 from config import additional_config, additional_section
 
 
-FTP_CONF_FILE = '/data/etc/proftpd.conf'
+FTP_CONF = '/data/etc/proftpd.conf'
 FTP_DISABLE_FILE = '/data/etc/no_S70proftpd'
-SMB_CONF_FILE = '/data/etc/smb.conf'
+SMB_CONF = '/data/etc/smb.conf'
 SMB_DISABLE_FILE = '/data/etc/no_S91smb'
 SSH_DISABLE_FILE = '/data/etc/no_S50sshd'
 
@@ -42,8 +42,10 @@ def _get_service_settings():
     if os.path.exists(FTP_DISABLE_FILE):
         ftp_enabled = False
 
-    if os.path.exists(FTP_CONF_FILE):
-        with open(FTP_CONF_FILE) as f:
+    if os.path.exists(FTP_CONF):
+        logging.debug('reading ftp settings from %s' % FTP_CONF)
+        
+        with open(FTP_CONF) as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith('#'):
@@ -59,8 +61,10 @@ def _get_service_settings():
     if os.path.exists(SMB_DISABLE_FILE):
         smb_enabled = False
 
-    if os.path.exists(SMB_CONF_FILE):
-        with open(SMB_CONF_FILE) as f:
+    if os.path.exists(SMB_CONF):
+        logging.debug('reading smb settings from %s' % SMB_CONF)
+        
+        with open(SMB_CONF) as f:
             for line in f:
                 line = line.strip()
                 if re.match('^\s*public\s*=\s*yes\s*$', line):
@@ -72,8 +76,8 @@ def _get_service_settings():
     # SSH
     if os.path.exists(SSH_DISABLE_FILE):
         ssh_enabled = False
-
-    return {
+        
+    s = {
         'ftpEnabled': ftp_enabled,
         'ftpAuth': ftp_auth,
         'ftpWritable': ftp_writable,
@@ -82,6 +86,12 @@ def _get_service_settings():
         'smbWritable': smb_writable,
         'sshEnabled': ssh_enabled
     }
+
+    logging.debug(('service settings: ftp=%(ftpEnabled)s, ftp_auth=%(ftpAuth)s, ftp_writable=%(ftpWritable)s, ' +
+            'smb=%(smbEnabled)s, smb_auth=%(smbAuth)s, smb_writable=%(smbWritable)s, ' +
+            'ssh=%(sshEnabled)s') % s)
+
+    return s
 
 
 def _set_service_settings(s):
@@ -92,6 +102,10 @@ def _set_service_settings(s):
     s.setdefault('smbAuth', True)
     s.setdefault('smbWritable', False)
     s.setdefault('sshEnabled', True)
+
+    logging.debug(('saving service settings: ftp=%(ftpEnabled)s, ftp_auth=%(ftpAuth)s, ftp_writable=%(ftpWritable)s, ' +
+            'smb=%(smbEnabled)s, smb_auth=%(smbAuth)s, smb_writable=%(smbWritable)s, ' +
+            'ssh=%(sshEnabled)s') % s)
 
     # FTP
     ftp_mode = 'off' if not s['ftpEnabled'] else ('public' if not s['ftpAuth'] else ('auth' if not s['ftpWritable'] else 'writable'))
@@ -107,7 +121,7 @@ def _set_service_settings(s):
         with open(FTP_DISABLE_FILE, 'w'):
             pass
 
-    with open(FTP_CONF_FILE, 'w') as f:
+    with open(FTP_CONF, 'w') as f:
         if s['ftpAuth']:
             if s['ftpWritable']:
                 f.write('<Limit WRITE>\n')
@@ -139,7 +153,7 @@ def _set_service_settings(s):
         with open(SMB_DISABLE_FILE, 'w'):
             pass
 
-    with open(SMB_CONF_FILE, 'w') as f:
+    with open(SMB_CONF, 'w') as f:
         if s['smbAuth']:
             if s['smbWritable']:
                 f.write('writable = yes\n')
@@ -269,7 +283,7 @@ def smbWritable():
         'section': 'services',
         'advanced': True,
         'reboot': True,
-        'depends': ['smbAuth'],
+        'depends': ['smbAuth', 'smbEnabled'],
         'get': _get_service_settings,
         'set': _set_service_settings,
         'get_set_dict': True

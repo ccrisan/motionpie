@@ -2,7 +2,7 @@
 
 test -f /etc/modules || exit 0
 
-for module in $(cat /etc/modules); do
-    modprobe $module || true
-done
+cat /etc/modules | while read line; do test -n "$line" && /sbin/modprobe $line; done
+
+exit 0
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ -z "$1" ]; then
     echo "Usage: $0 <board|all> [mkimage|mkrelease|make_targets...]"

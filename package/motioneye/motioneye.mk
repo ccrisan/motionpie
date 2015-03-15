@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = b50d241
-MOTIONPIE_VERSION = 20150228
+MOTIONEYE_VERSION = 5b1e856
+MOTIONPIE_VERSION = 20150315
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -29,8 +29,6 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/tmp'%" $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'log'))%'/var/log'%" $(DST_DIR)/settings.py
     sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'media'))%'/data/output'%" $(DST_DIR)/settings.py
-    sed -i "s%REPO = ('ccrisan', 'motioneye')%REPO = ('ccrisan', 'motionPie')%" $(DST_DIR)/settings.py
-    #sed -i "s%LOG_LEVEL = logging.INFO%LOG_LEVEL = logging.DEBUG%" $(DST_DIR)/settings.py
     sed -i "s%8765%80%" $(DST_DIR)/settings.py
     sed -i "s%WPA_SUPPLICANT_CONF = None%WPA_SUPPLICANT_CONF = '/data/etc/wpa_supplicant.conf'%" $(DST_DIR)/settings.py
     sed -i "s%LOCAL_TIME_FILE = None%LOCAL_TIME_FILE = '/data/etc/localtime'%" $(DST_DIR)/settings.py
@@ -44,13 +42,11 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%}motionEye{%}motionPie{%" $(DST_DIR)/templates/main.html
     sed -i "s%motionEye is up to date%motionPie is up to date%" $(DST_DIR)/static/js/main.js
     sed -i "s%motionEye was successfully updated%motionPie was successfully updated%" $(DST_DIR)/static/js/main.js
-    sed -r -i "s%setTimeout\(checkServerUpdate, 2000\)%setTimeout(checkServerUpdate, 7000)%" $(DST_DIR)/static/js/main.js
+    sed -i "s%motioneye-config.tar.gz%motionpie-config.tar.gz%" $(DST_DIR)/src/handlers.py
+    sed -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/src/handlers.py
     
     # additional config
     sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept:\n    pass/' $(DST_DIR)/src/config.py
-    
-    # reboot when motion process hangs
-    sed -r -i "s%raise Exception\('could not terminate the motion process'\)%logging.error('could not terminate the motion process'); os.system('reboot')%" $(DST_DIR)/src/motionctl.py
 endef
 
 $(eval $(generic-package))

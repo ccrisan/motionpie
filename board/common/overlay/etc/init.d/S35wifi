@@ -100,7 +100,7 @@ start() {
 stop() {
     echo -n "Shutting down wpa_supplicant: "
     kill `pidof wpa_supplicant` 2>/dev/null
-    ps | grep wifi | grep -v $$ | grep -v grep | tr -s ' ' | cut -d ' ' -f 2 | xargs -r kill
+    ps | grep wifi | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
     echo "done"
 }
 

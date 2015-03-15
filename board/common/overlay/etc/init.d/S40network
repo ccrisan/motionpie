@@ -161,6 +161,7 @@ case "$1" in
     stop)
         echo -n "Stopping network: "
         killall dhclient
+        ps | grep S40network | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
         echo "done"
         ;;
 

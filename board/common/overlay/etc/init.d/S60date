@@ -68,7 +68,7 @@ start_ntp() {
 
 stop_http() {
     echo -n "Shutting down date updater: "
-    ps | grep S60date | grep -v $$ | grep -v grep | tr -s ' ' | cut -d ' ' -f 2 | xargs -r kill
+    ps | grep S60date | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
     [ $? == 0 ] && echo "done" || echo "failed"
 }
 

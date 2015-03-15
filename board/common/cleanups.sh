@@ -8,7 +8,9 @@ fi
 rm -rf $TARGET/etc/network/
 rm -rf $TARGET/etc/dhcp/
 rm -rf $TARGET/etc/ssh/
-rm -f $TARGET/etc/default/ntp
+rm -rf $TARGET/etc/rc_keymaps
+rm -rf $TARGET/etc/default
+rm -f $TARGET/etc/rc_maps.cfg
 rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
 rm -f $TARGET/etc/motion-dist.conf
 rm -f $TARGET/etc/hostname

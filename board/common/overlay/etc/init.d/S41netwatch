@@ -19,7 +19,7 @@ watch() {
     count=0
     netwatch_retries=$(($netwatch_retries - 1))
     while true; do
-        if nc -w $netwatch_timeout $netwatch_host $netwatch_port </dev/null >/dev/null 2>&1; then
+        if nc -z -w $netwatch_timeout $netwatch_host $netwatch_port </dev/null >/dev/null 2>&1; then
             count=0
         else
             if [ $count -lt $netwatch_retries ]; then
@@ -43,7 +43,7 @@ case "$1" in
 
     stop)
         echo -n "Stopping netwatch: "
-        ps | grep netwatch | grep -v $$ | grep -v grep | tr -s ' ' | cut -d ' ' -f 2 | xargs -r kill
+        ps | grep netwatch | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
         echo "done"
         ;;
 

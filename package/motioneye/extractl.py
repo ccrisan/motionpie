@@ -25,86 +25,6 @@ MOTIONEYE_CONF = '/data/etc/motioneye.conf'
 DATE_CONF = '/data/etc/date.conf'
 
 
-def _get_motioneye_settings():
-    port = 80
-    motion_binary = '/usr/bin/motion'
-
-    if os.path.exists(MOTIONEYE_CONF):
-        logging.debug('reading motioneye settings from %s' % MOTIONEYE_CONF)
-
-        with open(MOTIONEYE_CONF) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-
-                try:
-                    name, value = line.split(' ', 1)
-
-                except:
-                    continue
-
-                if name == 'port':
-                    port = int(value)
-                
-                elif name == 'motion_binary':
-                    motion_binary = value
-
-    s = {
-        'port': port,
-        'motionBinary': motion_binary
-    }
-    
-    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s' % s)
-
-    return s
-
-
-def _set_motioneye_settings(s):
-    s = dict(s)
-    s.setdefault('port', 80)
-    s.setdefault('motionBinary', '/usr/bin/motion')
-    
-    logging.debug('writing motioneye settings to %s: ' % MOTIONEYE_CONF +
-            'port=%(port)s, motion_binary=%(motionBinary)s' % s)
-
-    lines = []
-    if os.path.exists(MOTIONEYE_CONF):
-        with open(MOTIONEYE_CONF) as f:
-            lines = f.readlines()
-
-        for i, line in enumerate(lines):
-            line = line.strip()
-            if not line:
-                continue
-    
-            try:
-                name, _ = line.split(' ', 2)
-    
-            except:
-                continue
-    
-            if name == 'port':
-                lines[i] = 'port %s' % s.pop('port')
-    
-            elif name == 'motion_binary':
-                lines[i] = 'motion_binary %s' % s.pop('motionBinary')
-    
-    if 'port' in s:
-        lines.append('port %s' % s.pop('port'))
-
-    if 'motionBinary' in s:
-        lines.append('motion_binary %s' % s.pop('motionBinary'))
-
-    with open(MOTIONEYE_CONF, 'w') as f:
-        for line in lines:
-            if not line.strip():
-                continue
-            if not line.endswith('\n'):
-                line += '\n'
-            f.write(line)
-
-
 def _get_date_settings():
     date_method = 'http'
     date_host = 'google.com'
@@ -173,6 +93,102 @@ def _set_date_settings(s):
         f.write('date_host=%s\n' % s['dateHost'])
         f.write('date_timeout=%s\n' % s['dateTimeout'])
         f.write('date_interval=%s\n' % s['dateInterval'])
+
+
+def _get_motioneye_settings():
+    port = 80
+    motion_binary = '/usr/bin/motion'
+    debug = False
+
+    if os.path.exists(MOTIONEYE_CONF):
+        logging.debug('reading motioneye settings from %s' % MOTIONEYE_CONF)
+
+        with open(MOTIONEYE_CONF) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+
+                try:
+                    name, value = line.split(' ', 1)
+
+                except:
+                    continue
+                    
+                name = name.replace('_', '-')
+
+                if name == 'port':
+                    port = int(value)
+                
+                elif name == 'motion-binary':
+                    motion_binary = value
+                    
+                elif name == 'log-level':
+                    debug = value == 'debug'
+
+    s = {
+        'port': port,
+        'motionBinary': motion_binary,
+        'debug': debug
+    }
+
+    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s' % s)
+
+    return s
+
+
+def _set_motioneye_settings(s):
+    s = dict(s)
+    s.setdefault('port', 80)
+    s.setdefault('motionBinary', '/usr/bin/motion')
+    s.setdefault('debug', False)
+    
+    logging.debug('writing motioneye settings to %s: ' % MOTIONEYE_CONF +
+            'port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s' % s)
+
+    lines = []
+    if os.path.exists(MOTIONEYE_CONF):
+        with open(MOTIONEYE_CONF) as f:
+            lines = f.readlines()
+
+        for i, line in enumerate(lines):
+            line = line.strip()
+            if not line:
+                continue
+    
+            try:
+                name, _ = line.split(' ', 2)
+    
+            except:
+                continue
+            
+            name = name.replace('_', '-')
+    
+            if name == 'port':
+                lines[i] = 'port %s' % s.pop('port')
+    
+            elif name == 'motion-binary':
+                lines[i] = 'motion-binary %s' % s.pop('motionBinary')
+    
+            elif name == 'log-level':
+                lines[i] = 'log-level %s' % ['info', 'debug'][s.pop('debug')]
+
+    if 'port' in s:
+        lines.append('port %s' % s.pop('port'))
+
+    if 'motionBinary' in s:
+        lines.append('motion-binary %s' % s.pop('motionBinary'))
+
+    if 'debug' in s:
+        lines.append('log-level %s' % ['info', 'debug'][s.pop('debug')])
+
+    with open(MOTIONEYE_CONF, 'w') as f:
+        for line in lines:
+            if not line.strip():
+                continue
+            if not line.endswith('\n'):
+                line += '\n'
+            f.write(line)
 
 
 @additional_config
@@ -305,7 +321,7 @@ def motionBinary():
 def debug():
     return {
         'label': 'Enable Debugging',
-        'description': 'turning debugging on will generate verbose log messages',
+        'description': 'turning debugging on will generate verbose log messages and will mount all the partitions in read-write mode',
         'type': 'bool',
         'section': 'expertSettings',
         'advanced': True,

@@ -15,7 +15,7 @@ cp $TARGET/../images/script.bin $TARGET/../images/boot/
 mkimage -C none -A arm -T script -d $BOARD/boot.cmd $TARGET/../images/boot/boot.scr
 
 # disable software updating
-sed -i 's/REPO = /#REPO = /' $TARGET/programs/motioneye/settings.py
+sed -i 's/enable_update=True/enable_update=False/' $TARGET/programs/motioneye/src/handlers.py
 
 $COMMON/startup-scripts.sh
 $COMMON/cleanups.sh

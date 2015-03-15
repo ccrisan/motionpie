@@ -7,15 +7,23 @@ export COMMON=$BOARD/../common
 # copy System.map
 cp $TARGET/../build/linux-*/System.map $TARGET/System.map
 
-# copy kernel
-cp $TARGET/../images/zImage $TARGET/../images/boot/kernel.img
+# boot
+BOOT=$TARGET/../images/boot/
+RPI_FW=$TARGET/../images/rpi-firmware
 
-# copy fwupdater initramfs
-cp $BOARD/fwupdater.gz $TARGET/../images/boot/fwupdater.gz
+mkdir -p $BOOT
 
-# custom rpi config
-cp $BOARD/config.txt $TARGET/../images/boot/config.txt
-cp $BOARD/cmdline.txt $TARGET/../images/boot/cmdline.txt
+cp $BOARD/config.txt $BOOT
+cp $BOARD/cmdline.txt $BOOT
+cp $BOARD/fwupdater.gz $BOOT
+cp $TARGET/../images/zImage $BOOT/kernel.img
+cp $RPI_FW/bootcode.bin $BOOT
+cp $RPI_FW/start.elf $BOOT
+cp $RPI_FW/fixup.dat $BOOT
 
 $COMMON/startup-scripts.sh
 $COMMON/cleanups.sh
+
+rm -rf $TARGET/opt/vc/src
+rm -rf $TARGET/opt/vc/include
+

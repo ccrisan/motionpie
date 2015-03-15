@@ -49,13 +49,7 @@ mkdir -p $BOOT
 mount -o loop $loop_dev $BOOT
 
 msg "copying boot filesystem contents"
-cp $BOOT_SRC/bootcode.bin $BOOT
-cp $BOOT_SRC/config.txt $BOOT
-cp $BOOT_SRC/cmdline.txt $BOOT
-cp $BOOT_SRC/start.elf $BOOT
-cp $BOOT_SRC/fixup.dat $BOOT
-cp $BOOT_SRC/kernel.img $BOOT
-cp $BOOT_SRC/fwupdater.gz $BOOT
+cp $BOOT_SRC/* $BOOT
 sync
 
 msg "unmounting boot filesystem"

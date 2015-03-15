@@ -246,75 +246,78 @@ export PERL=$(shell which perl)
 # finds this perl module by exporting the proper value for PERL5LIB.
 export PERL5LIB=$(HOST_DIR)/usr/lib/perl
 
-TARGET_CONFIGURE_OPTS = PATH=$(BR_PATH) \
-		AR="$(TARGET_AR)" \
-		AS="$(TARGET_AS)" \
-		LD="$(TARGET_LD)" \
-		NM="$(TARGET_NM)" \
-		CC="$(TARGET_CC)" \
-		GCC="$(TARGET_CC)" \
-		CPP="$(TARGET_CPP)" \
-		CXX="$(TARGET_CXX)" \
-		FC="$(TARGET_FC)" \
-		RANLIB="$(TARGET_RANLIB)" \
-		READELF="$(TARGET_READELF)" \
-		STRIP="$(TARGET_STRIP)" \
-		OBJCOPY="$(TARGET_OBJCOPY)" \
-		OBJDUMP="$(TARGET_OBJDUMP)" \
-		AR_FOR_BUILD="$(HOSTAR)" \
-		AS_FOR_BUILD="$(HOSTAS)" \
-		CC_FOR_BUILD="$(HOSTCC)" \
-		GCC_FOR_BUILD="$(HOSTCC)" \
-		CXX_FOR_BUILD="$(HOSTCXX)" \
-		FC_FOR_BUILD="$(HOSTFC)" \
-		LD_FOR_BUILD="$(HOSTLD)" \
-		CPPFLAGS_FOR_BUILD="$(HOST_CPPFLAGS)" \
-		CFLAGS_FOR_BUILD="$(HOST_CFLAGS)" \
-		CXXFLAGS_FOR_BUILD="$(HOST_CXXFLAGS)" \
-		LDFLAGS_FOR_BUILD="$(HOST_LDFLAGS)" \
-		FCFLAGS_FOR_BUILD="$(HOST_FCFLAGS)" \
-		DEFAULT_ASSEMBLER="$(TARGET_AS)" \
-		DEFAULT_LINKER="$(TARGET_LD)" \
-		CPPFLAGS="$(TARGET_CPPFLAGS)" \
-		CFLAGS="$(TARGET_CFLAGS)" \
-		CXXFLAGS="$(TARGET_CXXFLAGS)" \
-		LDFLAGS="$(TARGET_LDFLAGS)" \
-		FCFLAGS="$(TARGET_FCFLAGS)" \
-		PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
-		STAGING_DIR="$(STAGING_DIR)" \
-		INTLTOOL_PERL=$(PERL)
+TARGET_CONFIGURE_OPTS = \
+	PATH=$(BR_PATH) \
+	AR="$(TARGET_AR)" \
+	AS="$(TARGET_AS)" \
+	LD="$(TARGET_LD)" \
+	NM="$(TARGET_NM)" \
+	CC="$(TARGET_CC)" \
+	GCC="$(TARGET_CC)" \
+	CPP="$(TARGET_CPP)" \
+	CXX="$(TARGET_CXX)" \
+	FC="$(TARGET_FC)" \
+	RANLIB="$(TARGET_RANLIB)" \
+	READELF="$(TARGET_READELF)" \
+	STRIP="$(TARGET_STRIP)" \
+	OBJCOPY="$(TARGET_OBJCOPY)" \
+	OBJDUMP="$(TARGET_OBJDUMP)" \
+	AR_FOR_BUILD="$(HOSTAR)" \
+	AS_FOR_BUILD="$(HOSTAS)" \
+	CC_FOR_BUILD="$(HOSTCC)" \
+	GCC_FOR_BUILD="$(HOSTCC)" \
+	CXX_FOR_BUILD="$(HOSTCXX)" \
+	FC_FOR_BUILD="$(HOSTFC)" \
+	LD_FOR_BUILD="$(HOSTLD)" \
+	CPPFLAGS_FOR_BUILD="$(HOST_CPPFLAGS)" \
+	CFLAGS_FOR_BUILD="$(HOST_CFLAGS)" \
+	CXXFLAGS_FOR_BUILD="$(HOST_CXXFLAGS)" \
+	LDFLAGS_FOR_BUILD="$(HOST_LDFLAGS)" \
+	FCFLAGS_FOR_BUILD="$(HOST_FCFLAGS)" \
+	DEFAULT_ASSEMBLER="$(TARGET_AS)" \
+	DEFAULT_LINKER="$(TARGET_LD)" \
+	CPPFLAGS="$(TARGET_CPPFLAGS)" \
+	CFLAGS="$(TARGET_CFLAGS)" \
+	CXXFLAGS="$(TARGET_CXXFLAGS)" \
+	LDFLAGS="$(TARGET_LDFLAGS)" \
+	FCFLAGS="$(TARGET_FCFLAGS)" \
+	PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
+	STAGING_DIR="$(STAGING_DIR)" \
+	INTLTOOL_PERL=$(PERL)
 
 TARGET_MAKE_ENV = PATH=$(BR_PATH)
 
 
-HOST_CONFIGURE_OPTS = PATH=$(BR_PATH) \
-		AR="$(HOSTAR)" \
-		AS="$(HOSTAS)" \
-		LD="$(HOSTLD)" \
-		NM="$(HOSTNM)" \
-		CC="$(HOSTCC)" \
-		GCC="$(HOSTCC)" \
-		CXX="$(HOSTCXX)" \
-		CPP="$(HOSTCPP)" \
-		OBJCOPY="$(HOSTOBJCOPY)" \
-		RANLIB="$(HOSTRANLIB)" \
-		CPPFLAGS="$(HOST_CPPFLAGS)" \
-		CFLAGS="$(HOST_CFLAGS)" \
-		CXXFLAGS="$(HOST_CXXFLAGS)" \
-		LDFLAGS="$(HOST_LDFLAGS)" \
-		PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 \
-		PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 \
-		PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
-		PKG_CONFIG_SYSROOT_DIR="/" \
-		PKG_CONFIG_LIBDIR="$(HOST_DIR)/usr/lib/pkgconfig:$(HOST_DIR)/usr/share/pkgconfig" \
-		LD_LIBRARY_PATH="$(HOST_DIR)/usr/lib$(if $(LD_LIBRARY_PATH),:$(LD_LIBRARY_PATH))" \
-		INTLTOOL_PERL=$(PERL)
+HOST_CONFIGURE_OPTS = \
+	PATH=$(BR_PATH) \
+	AR="$(HOSTAR)" \
+	AS="$(HOSTAS)" \
+	LD="$(HOSTLD)" \
+	NM="$(HOSTNM)" \
+	CC="$(HOSTCC)" \
+	GCC="$(HOSTCC)" \
+	CXX="$(HOSTCXX)" \
+	CPP="$(HOSTCPP)" \
+	OBJCOPY="$(HOSTOBJCOPY)" \
+	RANLIB="$(HOSTRANLIB)" \
+	CPPFLAGS="$(HOST_CPPFLAGS)" \
+	CFLAGS="$(HOST_CFLAGS)" \
+	CXXFLAGS="$(HOST_CXXFLAGS)" \
+	LDFLAGS="$(HOST_LDFLAGS)" \
+	PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1 \
+	PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 \
+	PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
+	PKG_CONFIG_SYSROOT_DIR="/" \
+	PKG_CONFIG_LIBDIR="$(HOST_DIR)/usr/lib/pkgconfig:$(HOST_DIR)/usr/share/pkgconfig" \
+	LD_LIBRARY_PATH="$(HOST_DIR)/usr/lib$(if $(LD_LIBRARY_PATH),:$(LD_LIBRARY_PATH))" \
+	INTLTOOL_PERL=$(PERL)
 
-HOST_MAKE_ENV = PATH=$(BR_PATH) \
-		LD_LIBRARY_PATH="$(HOST_DIR)/usr/lib$(if $(LD_LIBRARY_PATH),:$(LD_LIBRARY_PATH))" \
-		PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
-		PKG_CONFIG_SYSROOT_DIR="/" \
-		PKG_CONFIG_LIBDIR="$(HOST_DIR)/usr/lib/pkgconfig"
+HOST_MAKE_ENV = \
+	PATH=$(BR_PATH) \
+	LD_LIBRARY_PATH="$(HOST_DIR)/usr/lib$(if $(LD_LIBRARY_PATH),:$(LD_LIBRARY_PATH))" \
+	PKG_CONFIG="$(PKG_CONFIG_HOST_BINARY)" \
+	PKG_CONFIG_SYSROOT_DIR="/" \
+	PKG_CONFIG_LIBDIR="$(HOST_DIR)/usr/lib/pkgconfig"
 
 # This is extra environment we can not export ourselves (eg. because some
 # packages use that variable internally, eg. uboot), so we have to
@@ -323,7 +326,8 @@ HOST_MAKE_ENV = PATH=$(BR_PATH) \
 EXTRA_ENV = \
 	PATH=$(BR_PATH) \
 	BR2_DL_DIR=$(BR2_DL_DIR) \
-	BUILD_DIR=$(BUILD_DIR)
+	BUILD_DIR=$(BUILD_DIR) \
+	BR2_EXTERNAL=$(BR2_EXTERNAL)
 
 ################################################################################
 # settings we need to pass to configure
@@ -389,13 +393,19 @@ else
 ENABLE_DEBUG := --disable-debug
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 SHARED_STATIC_LIBS_OPTS = --enable-static --disable-shared
 TARGET_CFLAGS += -static
 TARGET_CXXFLAGS += -static
 TARGET_LDFLAGS += -static
-else
+else ifeq ($(BR2_SHARED_LIBS),y)
+SHARED_STATIC_LIBS_OPTS = --disable-static --enable-shared
+else ifeq ($(BR2_SHARED_STATIC_LIBS),y)
 SHARED_STATIC_LIBS_OPTS = --enable-static --enable-shared
+endif
+
+ifeq ($(BR2_COMPILER_PARANOID_UNSAFE_PATH),y)
+export BR_COMPILER_PARANOID_UNSAFE_PATH=enabled
 endif
 
 include package/pkg-download.mk
@@ -407,3 +417,4 @@ include package/pkg-python.mk
 include package/pkg-virtual.mk
 include package/pkg-generic.mk
 include package/pkg-kconfig.mk
+include package/pkg-rebar.mk

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SYSTEMD_VERSION = 216
+SYSTEMD_VERSION = 219
 SYSTEMD_SITE = http://www.freedesktop.org/software/systemd
 SYSTEMD_SOURCE = systemd-$(SYSTEMD_VERSION).tar.xz
 SYSTEMD_LICENSE = LGPLv2.1+; GPLv2+ for udev; MIT-like license for few source files listed in README
@@ -37,12 +37,8 @@ SYSTEMD_CONF_OPTS += \
 	--with-dbuspolicydir=/etc/dbus-1/system.d \
 	--with-dbussessionservicedir=/usr/share/dbus-1/services \
 	--with-dbussystemservicedir=/usr/share/dbus-1/system-services \
-	--with-dbusinterfacedir=/usr/share/dbus-1/interfaces \
-	--with-firmware-path=/lib/firmware \
 	--enable-split-usr \
-	--enable-introspection=no \
 	--disable-efi \
-	--disable-tcpwrap \
 	--disable-tests \
 	--disable-dbus \
 	--without-python
@@ -133,6 +129,14 @@ ifeq ($(BR2_PACKAGE_SYSTEMD_SMACK_SUPPORT),y)
 SYSTEMD_CONF_OPTS += --enable-smack
 else
 SYSTEMD_CONF_OPTS += --disable-smack
+endif
+
+ifeq ($(BR2_PACKAGE_BASH),)
+SYSTEMD_CONF_OPTS += --with-bashcompletiondir=
+endif
+
+ifeq ($(BR2_PACKAGE_ZSH),)
+SYSTEMD_CONF_OPTS += --with-zshcompletiondir=
 endif
 
 # mq_getattr needs -lrt

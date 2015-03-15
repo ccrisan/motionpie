@@ -176,45 +176,11 @@ def _set_date_settings(s):
 
 
 @additional_config
-def extraMotionEyeSeparator():
+def extraDateSeparator():
     return {
         'type': 'separator',
         'section': 'expertSettings',
         'advanced': True
-    }
-
-
-@additional_config
-def port():
-    return {
-        'label': 'HTTP Port',
-        'description': 'sets the port on which motionEye HTTP server listens',
-        'type': 'number',
-        'min': 1,
-        'max': 65535,
-        'section': 'expertSettings',
-        'advanced': True,
-        'reboot': True,
-        'required': True,
-        'get': _get_motioneye_settings,
-        'set': _set_motioneye_settings,
-        'get_set_dict': True
-    }
-
-
-@additional_config
-def motionBinary():
-    return {
-        'label': 'Motion Binary',
-        'description': 'sets the path to the motion binary',
-        'type': 'str',
-        'section': 'expertSettings',
-        'advanced': True,
-        'reboot': True,
-        'required': True,
-        'get': _get_motioneye_settings,
-        'set': _set_motioneye_settings,
-        'get_set_dict': True
     }
 
 
@@ -290,3 +256,63 @@ def dateInterval():
         'set': _set_date_settings,
         'get_set_dict': True
     }
+
+
+@additional_config
+def extraMotionEyeSeparator():
+    return {
+        'type': 'separator',
+        'section': 'expertSettings',
+        'advanced': True
+    }
+
+
+@additional_config
+def port():
+    return {
+        'label': 'HTTP Port',
+        'description': 'sets the port on which the motionEye HTTP server listens',
+        'type': 'number',
+        'min': 1,
+        'max': 65535,
+        'section': 'expertSettings',
+        'advanced': True,
+        'reboot': True,
+        'required': True,
+        'get': _get_motioneye_settings,
+        'set': _set_motioneye_settings,
+        'get_set_dict': True
+    }
+
+
+@additional_config
+def motionBinary():
+    return {
+        'label': 'Motion Binary',
+        'description': 'sets the path to the motion binary',
+        'type': 'str',
+        'section': 'expertSettings',
+        'advanced': True,
+        'reboot': True,
+        'required': True,
+        'get': _get_motioneye_settings,
+        'set': _set_motioneye_settings,
+        'get_set_dict': True
+    }
+
+
+@additional_config
+def debug():
+    return {
+        'label': 'Enable Debugging',
+        'description': 'turning debugging on will generate verbose log messages',
+        'type': 'bool',
+        'section': 'expertSettings',
+        'advanced': True,
+        'reboot': True,
+        'get': _get_motioneye_settings,
+        'set': _set_motioneye_settings,
+        'get_set_dict': True
+    }
+
+

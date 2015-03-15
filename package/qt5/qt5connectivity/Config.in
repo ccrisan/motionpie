@@ -4,8 +4,7 @@ config BR2_PACKAGE_QT5CONNECTIVITY
 	select BR2_PACKAGE_QT5BASE
 	select BR2_PACKAGE_QT5BASE_CONCURRENT
 	select BR2_PACKAGE_QT5BASE_DBUS
-	depends on !BR2_avr32 # bluez_utils
-	depends on !BR2_PREFER_STATIC_LIB # bluez_utils
+	depends on !BR2_STATIC_LIBS # bluez_utils
 	depends on BR2_USE_WCHAR # bluez_utils
 	depends on BR2_TOOLCHAIN_HAS_THREADS # bluez_utils
 	depends on BR2_USE_MMU # bluez_utils
@@ -15,8 +14,8 @@ config BR2_PACKAGE_QT5CONNECTIVITY
 
 	  This package corresponds to the qt5connectivity module.
 
-	  http://qt-project.org
+	  http://qt.io
 
 comment "qt5connectivity needs a toolchain w/ wchar, threads, dynamic library"
-	depends on !BR2_avr32 && BR2_USE_MMU
-	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || BR2_PREFER_STATIC_LIB
+	depends on BR2_USE_MMU
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS || BR2_STATIC_LIBS

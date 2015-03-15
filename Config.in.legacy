@@ -99,6 +99,253 @@ comment "----------------------------------------------------"
 endif
 
 ###############################################################################
+comment "Legacy options removed in 2015.05"
+
+config BR2_PACKAGE_VALGRIND_PTRCHECK
+	bool "valgrind's PTRCheck was renamed to SGCheck"
+	select BR2_LEGACY
+	select BR2_PACKAGE_VALGRIND_SGCHECK
+	help
+	  PTRCheck was renamed to SGCheck in valgrind
+
+###############################################################################
+comment "Legacy options removed in 2015.02"
+
+config BR2_PACKAGE_LIBGC
+	bool "libgc package removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_BDWGC
+	help
+	  libgc has been removed because we have the same package under a
+	  different name, bdwgc.
+
+config BR2_PACKAGE_WDCTL
+	bool "util-linux' wdctl option has been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_UTIL_LINUX_WDCTL
+	help
+	  util-linux' wdctl option has been renamed to BR2_PACKAGE_UTIL_LINUX_WDCTL
+	  to be aligned with how the other options are named.
+
+config BR2_PACKAGE_RPM_BZIP2_PAYLOADS
+	bool "rpm's bzip2 payloads option has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_BZIP2
+	help
+	  The bzip2 payloads option rely entirely on the dependant package bzip2.
+	  So, you need to select it to enable this feature.
+
+config BR2_PACKAGE_RPM_XZ_PAYLOADS
+	bool "rpm's xz payloads option has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_XZ
+	help
+	  The xz payloads option rely entirely on the dependant package xz.
+	  So, you need to select it to enable this feature.
+
+config BR2_PACKAGE_M4
+	bool "m4 target package removed"
+	select BR2_LEGACY
+	help
+	  The m4 target package has been removed, it's been
+	  deprecated for some time now.
+
+config BR2_PACKAGE_FLEX_BINARY
+	bool "flex binary in target option removed"
+	select BR2_LEGACY
+	help
+	  The flex binary in the target option has been removed.
+	  It's been deprecated for some time now and is essentially a
+	  development tool which isn't very useful in the target.
+
+config BR2_PACKAGE_BISON
+	bool "bison target package removed"
+	select BR2_LEGACY
+	help
+	  The bison target package has been removed, it's been
+	  deprecated for some time now and is essentially a development
+	  tool which isn't very useful in the target.
+
+config BR2_PACKAGE_GOB2
+	bool "gob2 target package removed"
+	select BR2_LEGACY
+	help
+	  The gob2 target package has been removed, it's been
+	  deprecated for some time now and was essentially useless
+	  without a target toolchain.
+
+config BR2_PACKAGE_DISTCC
+	bool "distcc target package removed"
+	select BR2_LEGACY
+	help
+	  The distcc target package has been removed, it's been
+	  deprecated for some time now and was essentially useless
+	  without a target toolchain.
+
+config BR2_PACKAGE_HASERL_VERSION_0_8_X
+	bool "haserl 0.8.x version removed"
+	select BR2_LEGACY
+	help
+	  The 0.8.x version option for haserl has been removed since it
+	  has been deprecated for some time now.
+	  You should be able to use the 0.9.x version without issues.
+
+config BR2_PACKAGE_STRONGSWAN_TOOLS
+	bool "strongswan option has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_STRONGSWAN_PKI
+	select BR2_PACKAGE_STRONGSWAN_SCEP
+	help
+	  The tools option has been removed upstream and the different tools
+	  have been split between the pki and scep options, with others
+	  deprecated.
+
+config BR2_PACKAGE_XBMC_ADDON_XVDR
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_ADDON_XVDR
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_PVR_ADDONS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_PVR_ADDONS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_ALSA_LIB
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_ALSA_LIB
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_AVAHI
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_AVAHI
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_DBUS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_DBUS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBBLURAY
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBBLURAY
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_GOOM
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_GOOM
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_RSXS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_RSXS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBCEC
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBCEC
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBMICROHTTPD
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBMICROHTTPD
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBNFS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBNFS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_RTMPDUMP
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_RTMPDUMP
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBSHAIRPLAY
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBSHAIRPLAY
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBSMBCLIENT
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBSMBCLIENT
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBTHEORA
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBTHEORA
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBUSB
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBUSB
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBVA
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBVA
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_WAVPACK
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_WAVPACK
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PREFER_STATIC_LIB
+	bool "static library option renamed"
+	select BR2_LEGACY
+	help
+	  The BR2_PREFER_STATIC_LIB was renamed to BR2_STATIC_LIBS. It
+	  highlights the fact that the option no longer "prefers"
+	  static libraries, but "enforces" static libraries (i.e
+	  shared libraries are completely unused).
+
+	  Take care of updating the type of libraries you want under the
+	  "Build options" menu.
+
+###############################################################################
 comment "Legacy options removed in 2014.11"
 
 config BR2_x86_generic

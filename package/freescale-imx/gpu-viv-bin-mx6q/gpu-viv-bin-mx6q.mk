@@ -15,12 +15,7 @@ GPU_VIV_BIN_MX6Q_SOURCE = gpu-viv-bin-mx6q-$(GPU_VIV_BIN_MX6Q_VERSION).bin
 GPU_VIV_BIN_MX6Q_INSTALL_STAGING = YES
 
 GPU_VIV_BIN_MX6Q_LICENSE = Freescale Semiconductor Software License Agreement
-
-# No license file is included in the archive; we could extract it from
-# the self-extractor, but that's just too much effort.
-# This is a legal minefield: the EULA specifies that
-# the Board Support Package includes software and hardware (sic!)
-# for which a separate license is needed...
+GPU_VIV_BIN_MX6Q_LICENSE_FILES = EULA
 GPU_VIV_BIN_MX6Q_REDISTRIBUTE = NO
 
 GPU_VIV_BIN_MX6Q_PROVIDES = libegl libgles libopenvg
@@ -33,14 +28,8 @@ else
 GPU_VIV_BIN_MX6Q_LIB_TARGET = fb
 endif
 
-# The archive is a shell-self-extractor of a bzipped tar. It happens
-# to extract in the correct directory (gpu-viv-bin-mx6q-x.y.z)
-# The --force makes sure it doesn't fail if the source dir already exists.
-# The --auto-accept skips the license check - not needed for us
-# because we have legal-info.
 define GPU_VIV_BIN_MX6Q_EXTRACT_CMDS
-	(cd $(BUILD_DIR); \
-		sh $(DL_DIR)/$(GPU_VIV_BIN_MX6Q_SOURCE) --force --auto-accept)
+	$(call FREESCALE_IMX_EXTRACT_HELPER,$(DL_DIR)/$(GPU_VIV_BIN_MX6Q_SOURCE))
 endef
 
 # Instead of building, we fix up the inconsistencies that exist
@@ -48,12 +37,13 @@ endef
 # Make sure these commands are idempotent.
 define GPU_VIV_BIN_MX6Q_BUILD_CMDS
 	$(SED) 's/defined(LINUX)/defined(__linux__)/g' $(@D)/usr/include/*/*.h
-	for lib in EGL GAL VIVANTE; do \
+	for lib in EGL GAL VIVANTE GLESv2; do \
 		ln -sf lib$${lib}-$(GPU_VIV_BIN_MX6Q_LIB_TARGET).so \
 			$(@D)/usr/lib/lib$${lib}.so; \
 	done
-	ln -sf libGL.so.1.2 $(@D)/usr/lib/libGL.so.1
 	ln -sf libGL.so.1.2 $(@D)/usr/lib/libGL.so
+	ln -sf libGL.so.1.2 $(@D)/usr/lib/libGL.so.1
+	ln -sf libGL.so.1.2 $(@D)/usr/lib/libGL.so.1.2.0
 endef
 
 define GPU_VIV_BIN_MX6Q_INSTALL_STAGING_CMDS
@@ -82,7 +72,7 @@ endif
 define GPU_VIV_BIN_MX6Q_INSTALL_TARGET_CMDS
 	$(GPU_VIV_BIN_MX6Q_INSTALL_EXAMPLES)
 	cp -a $(@D)/usr/lib $(TARGET_DIR)/usr
-	for lib in EGL GAL VIVANTE; do \
+	for lib in EGL GAL VIVANTE GLESv2; do \
 		for f in $(TARGET_DIR)/usr/lib/lib$${lib}-*.so; do \
 			case $$f in \
 				*-$(GPU_VIV_BIN_MX6Q_LIB_TARGET).so) : ;; \

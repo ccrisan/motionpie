@@ -26,7 +26,7 @@ DIRECTFB_CONF_OPTS = \
 	--disable-video4linux2 \
 	--without-tools
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 DIRECTFB_CONF_OPTS += --disable-dynload
 endif
 
@@ -144,10 +144,10 @@ endif
 
 HOST_DIRECTFB_DEPENDENCIES = host-pkgconf host-libpng
 HOST_DIRECTFB_CONF_OPTS = \
-		--disable-multi \
-		--enable-png \
-		--with-gfxdrivers=none \
-		--with-inputdrivers=none
+	--disable-multi \
+	--enable-png \
+	--with-gfxdrivers=none \
+	--with-inputdrivers=none
 
 HOST_DIRECTFB_BUILD_CMDS = \
 	$(MAKE) -C $(@D)/tools directfb-csource

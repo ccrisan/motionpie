@@ -20,6 +20,21 @@
 #
 ################################################################################
 
+# Set compiler variables.
+ifeq ($(BR2_CCACHE),y)
+CMAKE_HOST_C_COMPILER = $(HOST_DIR)/usr/bin/ccache
+CMAKE_HOST_CXX_COMPILER = $(HOST_DIR)/usr/bin/ccache
+CMAKE_HOST_C_COMPILER_ARG1 = $(HOSTCC_NOCCACHE)
+CMAKE_HOST_CXX_COMPILER_ARG1 = $(HOSTCXX_NOCCACHE)
+else
+CMAKE_HOST_C_COMPILER = $(HOSTCC)
+CMAKE_HOST_CXX_COMPILER = $(HOSTCXX)
+endif
+
+ifneq ($(QUIET),)
+CMAKE_QUIET = -DCMAKE_RULE_MESSAGES=OFF -DCMAKE_INSTALL_MESSAGE=NEVER
+endif
+
 ################################################################################
 # inner-cmake-package -- defines how the configuration, compilation and
 # installation of a CMake package should be done, implements a few hooks to
@@ -73,8 +88,9 @@ define $(2)_CONFIGURE_CMDS
 		-DBUILD_TEST=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_TESTING=OFF \
-		-DBUILD_SHARED_LIBS=$$(if $$(BR2_PREFER_STATIC_LIB),OFF,ON) \
+		-DBUILD_SHARED_LIBS=$$(if $$(BR2_STATIC_LIBS),OFF,ON) \
 		-DUSE_CCACHE=$$(if $$(BR2_CCACHE),ON,OFF) \
+		$$(CMAKE_QUIET) \
 		$$($$(PKG)_CONF_OPTS) \
 	)
 endef
@@ -95,6 +111,13 @@ define $(2)_CONFIGURE_CMDS
 		-DCMAKE_C_FLAGS="$$(HOST_CFLAGS)" \
 		-DCMAKE_CXX_FLAGS="$$(HOST_CXXFLAGS)" \
 		-DCMAKE_EXE_LINKER_FLAGS="$$(HOST_LDFLAGS)" \
+		-DCMAKE_ASM_COMPILER="$$(HOSTAS)" \
+		-DCMAKE_C_COMPILER="$$(CMAKE_HOST_C_COMPILER)" \
+		-DCMAKE_CXX_COMPILER="$$(CMAKE_HOST_CXX_COMPILER)" \
+		$(if $$(CMAKE_HOST_C_COMPILER_ARG1),\
+			-DCMAKE_C_COMPILER_ARG1="$$(CMAKE_HOST_C_COMPILER_ARG1)" \
+			-DCMAKE_CXX_COMPILER_ARG1="$$(CMAKE_HOST_CXX_COMPILER_ARG1)" \
+		) \
 		-DCMAKE_COLOR_MAKEFILE=OFF \
 		-DBUILD_DOC=OFF \
 		-DBUILD_DOCS=OFF \
@@ -103,6 +126,7 @@ define $(2)_CONFIGURE_CMDS
 		-DBUILD_TEST=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_TESTING=OFF \
+		$$(CMAKE_QUIET) \
 		$$($$(PKG)_CONF_OPTS) \
 	)
 endef
@@ -180,6 +204,25 @@ host-cmake-package = $(call inner-cmake-package,host-$(pkgname),$(call UPPERCASE
 # Generation of the CMake toolchain file
 ################################################################################
 
+# CMAKE_SYSTEM_PROCESSOR should match uname -m
+ifeq ($(BR2_ARM_CPU_ARMV4),y)
+CMAKE_SYSTEM_PROCESSOR_ARM_VARIANT = armv4
+else ifeq ($(BR2_ARM_CPU_ARMV5),y)
+CMAKE_SYSTEM_PROCESSOR_ARM_VARIANT = armv5
+else ifeq ($(BR2_ARM_CPU_ARMV6),y)
+CMAKE_SYSTEM_PROCESSOR_ARM_VARIANT = armv6
+else ifeq ($(BR2_ARM_CPU_ARMV7A),y)
+CMAKE_SYSTEM_PROCESSOR_ARM_VARIANT = armv7
+endif
+
+ifeq ($(BR2_arm),y)
+CMAKE_SYSTEM_PROCESSOR = $(CMAKE_SYSTEM_PROCESSOR_ARM_VARIANT)l
+else ifeq ($(BR2_armeb),y)
+CMAKE_SYSTEM_PROCESSOR = $(CMAKE_SYSTEM_PROCESSOR_ARM_VARIANT)b
+else
+CMAKE_SYSTEM_PROCESSOR = $(BR2_ARCH)
+endif
+
 # In order to allow the toolchain to be relocated, we calculate the HOST_DIR
 # based on the toolchainfile.cmake file's location: $(HOST_DIR)/usr/share/buildroot
 # In all the other variables, HOST_DIR will be replaced by RELOCATED_HOST_DIR,
@@ -193,5 +236,6 @@ $(HOST_DIR)/usr/share/buildroot/toolchainfile.cmake:
 		-e 's:@@TARGET_LDFLAGS@@:$(call qstrip,$(TARGET_LDFLAGS)):' \
 		-e 's:@@TARGET_CC_NOCCACHE@@:$(subst $(HOST_DIR)/,,$(call qstrip,$(TARGET_CC_NOCCACHE))):' \
 		-e 's:@@TARGET_CXX_NOCCACHE@@:$(subst $(HOST_DIR)/,,$(call qstrip,$(TARGET_CXX_NOCCACHE))):' \
+		-e 's:@@CMAKE_SYSTEM_PROCESSOR@@:$(call qstrip,$(CMAKE_SYSTEM_PROCESSOR)):' \
 		$(TOPDIR)/support/misc/toolchainfile.cmake.in \
 		> $@

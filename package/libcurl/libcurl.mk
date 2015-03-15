@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBCURL_VERSION = 7.39.0
+LIBCURL_VERSION = 7.41.0
 LIBCURL_SOURCE = curl-$(LIBCURL_VERSION).tar.bz2
 LIBCURL_SITE = http://curl.haxx.se/download
 LIBCURL_DEPENDENCIES = host-pkgconf \
@@ -67,8 +67,3 @@ LIBCURL_POST_INSTALL_TARGET_HOOKS += LIBCURL_TARGET_CLEANUP
 endif
 
 $(eval $(autotools-package))
-
-curl: libcurl
-curl-clean: libcurl-clean
-curl-dirclean: libcurl-dirclean
-curl-source: libcurl-source

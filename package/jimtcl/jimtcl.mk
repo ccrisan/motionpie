@@ -25,16 +25,17 @@ define JIMTCL_LINK_TCLSH
 endef
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 JIMTCL_SHARED =
 JIMTCL_LIB = a
 JIMTCL_INSTALL_LIB =
 else
 JIMTCL_SHARED = --shared
 JIMTCL_LIB = so.$(JIMTCL_VERSION)
-JIMTCL_INSTALL_LIB = $(INSTALL) -D $(@D)/libjim.$(JIMTCL_LIB) \
-		     $(TARGET_DIR)/usr/lib/libjim.$(JIMTCL_LIB); \
-		     ln -s libjim.$(JIMTCL_LIB) $(TARGET_DIR)/usr/lib/libjim.so
+JIMTCL_INSTALL_LIB = \
+	$(INSTALL) -D $(@D)/libjim.$(JIMTCL_LIB) \
+	$(TARGET_DIR)/usr/lib/libjim.$(JIMTCL_LIB); \
+	ln -s libjim.$(JIMTCL_LIB) $(TARGET_DIR)/usr/lib/libjim.so
 endif
 
 define JIMTCL_CONFIGURE_CMDS
@@ -51,7 +52,7 @@ endef
 
 define JIMTCL_INSTALL_STAGING_CMDS
 	for i in $(JIMTCL_HEADERS_TO_INSTALL); do \
-		cp -a $(@D)/$$i $(STAGING_DIR)/usr/include/ ; \
+		cp -a $(@D)/$$i $(STAGING_DIR)/usr/include/ || exit 1 ; \
 	done; \
 	$(INSTALL) -D $(@D)/libjim.$(JIMTCL_LIB) $(STAGING_DIR)/usr/lib/libjim.$(JIMTCL_LIB);
 	ln -s libjim.$(JIMTCL_LIB) $(STAGING_DIR)/usr/lib/libjim.so

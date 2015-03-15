@@ -15,8 +15,10 @@ DVB_APPS_DEPENDENCIES = libiconv
 DVB_APPS_LDLIBS += -liconv
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
-DVB_APPS_MAKE_OPTS += static=1
+ifeq ($(BR2_STATIC_LIBS),y)
+DVB_APPS_MAKE_OPTS += enable_shared=no
+else ifeq ($(BR2_SHARED_LIBS),y)
+DVB_APPS_MAKE_OPTS += enable_static=no
 endif
 
 DVB_APPS_INSTALL_STAGING = YES

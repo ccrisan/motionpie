@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-VALGRIND_VERSION = 3.10.0
+VALGRIND_VERSION = 3.10.1
 VALGRIND_SITE = http://valgrind.org/downloads
 VALGRIND_SOURCE = valgrind-$(VALGRIND_VERSION).tar.bz2
 VALGRIND_LICENSE = GPLv2 GFDLv1.2
@@ -91,12 +91,12 @@ endef
 VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_REMOVE_DHAT
 endif
 
-ifeq ($(BR2_PACKAGE_VALGRIND_PTRCHECK),)
-define VALGRIND_REMOVE_PTRCHECK
-	rm -f $(TARGET_DIR)/usr/lib/valgrind/*ptrcheck*
+ifeq ($(BR2_PACKAGE_VALGRIND_SGCHECK),)
+define VALGRIND_REMOVE_SGCHECK
+	rm -f $(TARGET_DIR)/usr/lib/valgrind/*sgcheck*
 endef
 
-VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_REMOVE_PTRCHECK
+VALGRIND_POST_INSTALL_TARGET_HOOKS += VALGRIND_REMOVE_SGCHECK
 endif
 
 ifeq ($(BR2_PACKAGE_VALGRIND_BBV),)

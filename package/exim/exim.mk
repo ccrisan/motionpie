@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-EXIM_VERSION = 4.84
+EXIM_VERSION = 4.85
 EXIM_SOURCE = exim-$(EXIM_VERSION).tar.bz2
 EXIM_SITE = ftp://ftp.exim.org/pub/exim/exim4
 EXIM_LICENSE = GPLv2+
@@ -86,7 +86,7 @@ endef
 endif # CUSTOM_CONFIG
 
 # exim needs a bit of love to build statically
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 EXIM_STATIC_FLAGS = LFLAGS="-pthread --static"
 endif
 

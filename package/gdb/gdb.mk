@@ -19,11 +19,9 @@ GDB_SOURCE = gdb-$(GDB_VERSION).tar.gz
 GDB_FROM_GIT = y
 endif
 
-ifeq ($(GDB_VERSION),6.7.1-avr32-2.1.5)
-GDB_SITE = ftp://www.at91.com/pub/buildroot
-endif
-
-ifeq ($(GDB_VERSION),7.8)
+# Starting from 7.8.x, bz2 tarballs no longer available, use .tar.xz
+# instead.
+ifneq ($(filter 7.8.%,$(GDB_VERSION)),)
 GDB_SOURCE = gdb-$(GDB_VERSION).tar.xz
 endif
 
@@ -74,6 +72,8 @@ GDB_CONF_ENV = \
 	bash_cv_have_mbstate_t=yes \
 	gdb_cv_func_sigsetjmp=yes
 
+# The shared only build is not supported by gdb, so enable static build for
+# build-in libraries with --enable-static.
 GDB_CONF_OPTS = \
 	--without-uiout \
 	--disable-gdbtk \
@@ -83,7 +83,8 @@ GDB_CONF_OPTS = \
 	$(if $(BR2_PACKAGE_GDB_SERVER),--enable-gdbserver) \
 	--with-curses \
 	--without-included-gettext \
-	--disable-werror
+	--disable-werror \
+	--enable-static
 
 ifeq ($(BR2_PACKAGE_GDB_TUI),y)
 	GDB_CONF_OPTS += --enable-tui
@@ -124,12 +125,9 @@ endif
 #  * --target, because we're doing a cross build rather than a real
 #    host build.
 #  * --enable-static because gdb really wants to use libbfd.a
-#  * --disable-shared, otherwise the old 6.7 version specific to AVR32
-#    doesn't build because it wants to link a shared libbfd.so against
-#    non-PIC liberty.a.
 HOST_GDB_CONF_OPTS = \
 	--target=$(GNU_TARGET_NAME) \
-	--enable-static --disable-shared \
+	--enable-static \
 	--without-uiout \
 	--disable-gdbtk \
 	--without-x \

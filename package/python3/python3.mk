@@ -5,11 +5,18 @@
 ################################################################################
 
 PYTHON3_VERSION_MAJOR = 3.4
-PYTHON3_VERSION = $(PYTHON3_VERSION_MAJOR).1
+PYTHON3_VERSION = $(PYTHON3_VERSION_MAJOR).2
 PYTHON3_SOURCE = Python-$(PYTHON3_VERSION).tar.xz
 PYTHON3_SITE = http://python.org/ftp/python/$(PYTHON3_VERSION)
 PYTHON3_LICENSE = Python software foundation license v2, others
 PYTHON3_LICENSE_FILES = LICENSE
+
+# Python itself doesn't use libtool, but it includes the source code
+# of libffi, which uses libtool. Unfortunately, it uses a beta version
+# of libtool for which we don't have a matching patch. However, this
+# is not a problem, because we don't use the libffi copy included in
+# the Python sources, but instead use an external libffi library.
+PYTHON3_LIBTOOL_PATCH = NO
 
 # Python needs itself and a "pgen" program to build itself, both being
 # provided in the Python sources. So in order to cross-compile Python,
@@ -29,6 +36,7 @@ HOST_PYTHON3_CONF_OPTS += 	\
 	--enable-unicodedata	\
 	--disable-test-modules	\
 	--disable-idle3		\
+	--disable-ossaudiodev	\
 	--disable-pyo-build
 
 # Make sure that LD_LIBRARY_PATH overrides -rpath.
@@ -99,6 +107,12 @@ endif
 
 ifeq ($(BR2_PACKAGE_PYTHON3_ZLIB),y)
 PYTHON3_DEPENDENCIES += zlib
+endif
+
+ifeq ($(BR2_PACKAGE_PYTHON3_OSSAUDIODEV),y)
+PYTHON3_CONF_OPTS += --enable-ossaudiodev
+else
+PYTHON3_CONF_OPTS += --disable-ossaudiodev
 endif
 
 PYTHON3_CONF_ENV += \

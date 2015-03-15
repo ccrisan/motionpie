@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-POSTGRESQL_VERSION = 9.3.5
+POSTGRESQL_VERSION = 9.4.1
 POSTGRESQL_SOURCE = postgresql-$(POSTGRESQL_VERSION).tar.bz2
 POSTGRESQL_SITE = http://ftp.postgresql.org/pub/source/v$(POSTGRESQL_VERSION)
 POSTGRESQL_LICENSE = PostgreSQL
@@ -67,6 +67,14 @@ POSTGRESQL_POST_INSTALL_STAGING_HOOKS += POSTGRESQL_INSTALL_CUSTOM_PG_CONFIG
 define POSTGRESQL_INSTALL_INIT_SYSV
 	$(INSTALL) -m 0755 -D package/postgresql/S50postgresql \
 		$(TARGET_DIR)/etc/init.d/S50postgresql
+endef
+
+define POSTGRESQL_INSTALL_INIT_SYSTEMD
+	$(INSTALL) -D -m 644 package/postgresql/postgresql.service \
+		$(TARGET_DIR)/etc/systemd/system/postgresql.service
+	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
+	ln -fs ../postgresql.service \
+		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/postgresql.service
 endef
 
 $(eval $(autotools-package))

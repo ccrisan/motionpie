@@ -4,14 +4,12 @@
 #
 ################################################################################
 
-PINENTRY_VERSION = 0.8.3
+PINENTRY_VERSION = 0.9.0
 PINENTRY_SOURCE = pinentry-$(PINENTRY_VERSION).tar.bz2
 PINENTRY_SITE = ftp://ftp.gnupg.org/gcrypt/pinentry
 PINENTRY_LICENSE = GPLv2+
 PINENTRY_LICENSE_FILES = COPYING
 PINENTRY_DEPENDENCIES = $(if $(BR2_PACKAGE_LIBICONV),libiconv)
-PINENTRY_CONF_OPTS = --disable-pinentry-gtk # gtk1
-PINENTRY_CONF_OPTS += --disable-pinentry-qt  # qt3
 PINENTRY_CONF_OPTS += --without-libcap       # requires PAM
 
 # build with X if available
@@ -23,7 +21,7 @@ endif
 
 # pinentry-ncurses backend
 ifeq ($(BR2_PACKAGE_PINENTRY_NCURSES),y)
-PINENTRY_CONF_OPTS += --enable-ncurses
+PINENTRY_CONF_OPTS += --enable-ncurses --with-ncurses-include-dir=none
 PINENTRY_DEPENDENCIES += ncurses
 else
 PINENTRY_CONF_OPTS += --disable-ncurses

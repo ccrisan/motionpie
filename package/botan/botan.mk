@@ -11,7 +11,6 @@ BOTAN_LICENSE = BSD-2c
 BOTAN_LICENSE_FILES = doc/license.txt
 
 BOTAN_INSTALL_STAGING = YES
-BOTAN_INSTALL_TARGET = YES
 
 BOTAN_CONF_OPTS = \
 	--cpu=$(BR2_ARCH) \
@@ -19,7 +18,7 @@ BOTAN_CONF_OPTS = \
 	--cc=gcc \
 	--cc-bin="$(TARGET_CXX)"
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 	BOTAN_CONF_OPTS += --disable-shared --no-autoload
 endif
 

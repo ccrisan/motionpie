@@ -1,8 +1,0 @@
-config BR2_PACKAGE_WIRINGPI
-	bool "wiringpi"
-	depends on BR2_arm
-	help
-	  GPIO Interface library for the Raspberry Pi.
-
-	  http://wiringpi.com/
-

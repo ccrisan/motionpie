@@ -5,11 +5,12 @@
 ################################################################################
 
 PYTHON_VERSION_MAJOR = 2.7
-PYTHON_VERSION = $(PYTHON_VERSION_MAJOR).8
+PYTHON_VERSION = $(PYTHON_VERSION_MAJOR).9
 PYTHON_SOURCE = Python-$(PYTHON_VERSION).tar.xz
 PYTHON_SITE = http://python.org/ftp/python/$(PYTHON_VERSION)
 PYTHON_LICENSE = Python software foundation license v2, others
 PYTHON_LICENSE_FILES = LICENSE
+PYTHON_LIBTOOL_PATCH = NO
 
 # Python needs itself to be built, so in order to cross-compile
 # Python, we need to build a host Python first. This host Python is
@@ -32,6 +33,7 @@ HOST_PYTHON_CONF_OPTS += 	\
 	--disable-test-modules	\
 	--disable-bz2		\
 	--disable-ssl		\
+	--disable-ossaudiodev	\
 	--disable-pyo-build
 
 # Make sure that LD_LIBRARY_PATH overrides -rpath.
@@ -116,6 +118,12 @@ endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_HASHLIB),y)
 PYTHON_DEPENDENCIES += openssl
+endif
+
+ifeq ($(BR2_PACKAGE_PYTHON_OSSAUDIODEV),y)
+PYTHON_CONF_OPTS += --enable-ossaudiodev
+else
+PYTHON_CONF_OPTS += --disable-ossaudiodev
 endif
 
 PYTHON_CONF_ENV += \

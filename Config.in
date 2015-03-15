@@ -167,8 +167,6 @@ config BR2_PRIMARY_SITE
 	  default if the file is not found.
 	  Valid URIs are URIs recognized by $(WGET) and scp URIs of the form
 	  scp://[user@]host:path.
-	  NOTE: This works for all packages using the central package
-	  infrastructure (generic, autotools, cmake, ...)
 
 config BR2_PRIMARY_SITE_ONLY
 	bool "Only allow downloads from primary download site"
@@ -298,19 +296,19 @@ config BR2_DEPRECATED
 
 if BR2_DEPRECATED
 
-config BR2_DEPRECATED_SINCE_2013_11
-	bool
-	default y
-
-config BR2_DEPRECATED_SINCE_2014_02
-	bool
-	default y
-
 config BR2_DEPRECATED_SINCE_2014_05
 	bool
 	default y
 
 config BR2_DEPRECATED_SINCE_2014_08
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2015_02
+	bool
+	default y
+
+config BR2_DEPRECATED_SINCE_2015_05
 	bool
 	default y
 
@@ -525,19 +523,45 @@ config BR2_ENABLE_SSP
 comment "enabling Stack Smashing Protection requires support in the toolchain"
 	depends on !BR2_TOOLCHAIN_HAS_SSP
 
-config BR2_PREFER_STATIC_LIB
-	bool "build statically linked applications, no dynamic libraries"
+choice
+	bool "libraries"
+	default BR2_SHARED_LIBS if BR2_BINFMT_SUPPORTS_SHARED
+	default BR2_STATIC_LIBS if !BR2_BINFMT_SUPPORTS_SHARED
 	help
-	  Build all applications for the target statically linked.
-	  This potentially increases your filesystem size and should only be
-	  used if you know what you do.
+	  Select the type of libraries you want to use on the target.
 
-	  Note that some applications cannot be build statically and so are
-	  intentionally disabled.
+	  The default is to build dynamic libraries and use those on
+	  the target filesystem, except when the architecture and/or
+	  the selected binary format does not support shared
+	  libraries.
 
-	  The default (if this option is disabled) is to build dynamic
-	  libraries and dynamically link applications to use those on the
-	  target filesystem.
+config BR2_STATIC_LIBS
+	bool "static only"
+	help
+	  Build and use only static libraries. No shared libraries
+	  will be instaled on the target. This potentially increases
+	  your code size and should only be used if you know what you
+	  are doing. Note that some packages may not be available when
+	  this option is enabled, due to their need for dynamic
+	  library support.
+
+config BR2_SHARED_LIBS
+	bool "shared only"
+	depends on BR2_BINFMT_SUPPORTS_SHARED
+	help
+	  Build and use only shared libraries. This is the recommended
+	  solution as it saves space and build time.
+
+config BR2_SHARED_STATIC_LIBS
+	bool "both static and shared"
+	depends on BR2_BINFMT_SUPPORTS_SHARED
+	help
+	  Build both shared and static libraries, but link executables
+	  dynamically. While building both shared and static libraries
+	  take more time and more disk space, having static libraries
+	  may be useful to link some of the applications statically.
+
+endchoice
 
 
 config BR2_PACKAGE_OVERRIDE_FILE
@@ -568,6 +592,26 @@ config BR2_GLOBAL_PATCH_DIR
 
 	  Otherwise, if the directory <global-patch-dir>/<packagename> exists,
 	  then all *.patch files in the directory will be applied.
+
+menu "Advanced"
+
+config BR2_COMPILER_PARANOID_UNSAFE_PATH
+	bool "paranoid check of library/header paths"
+	help
+	  By default, when this option is disabled, when the Buildroot
+	  cross-compiler will encounter an unsafe library or header
+	  path (such as /usr/include, or /usr/lib), the compiler will
+	  display a warning.
+
+	  By enabling this option, this warning is turned into an
+	  error, which will completely abort the build when such
+	  unsafe paths are encountered.
+
+	  Note that this mechanism is available for both the internal
+	  toolchain (through gcc and binutils patches) and external
+	  toolchain backends (through the external toolchain wrapper).
+
+endmenu
 
 endmenu
 

@@ -4,20 +4,16 @@
 #
 ################################################################################
 
-DILLO_VERSION = 3.0.4
+DILLO_VERSION = 3.0.4.1
 DILLO_SOURCE = dillo-$(DILLO_VERSION).tar.bz2
 DILLO_SITE = http://www.dillo.org/download
 DILLO_LICENSE = GPLv3+
 DILLO_LICENSE_FILES = COPYING
-# dillo-0001-configure.ac-change-fltk-config-test-to-be-more-cros.patch
-# touches configure.ac
+# configure.ac gets patched, so autoreconf is necessary
 DILLO_AUTORECONF = YES
-
-DILLO_DEPENDENCIES = fltk
-
+DILLO_DEPENDENCIES = fltk zlib \
+	$(if $(BR2_PACKAGE_LIBICONV),libiconv)
 DILLO_CONF_ENV = ac_cv_path_FLTK_CONFIG=$(STAGING_DIR)/usr/bin/fltk-config
-
-DILLO_DEPENDENCIES += $(if $(BR2_PACKAGE_LIBICONV),libiconv)
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
 	DILLO_CONF_OPTS += --enable-ssl

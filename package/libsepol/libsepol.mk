@@ -5,7 +5,7 @@
 ################################################################################
 
 LIBSEPOL_VERSION = 2.1.9
-LIBSEPOL_SITE = http://userspace.selinuxproject.org/releases/20130423
+LIBSEPOL_SITE = https://raw.githubusercontent.com/wiki/SELinuxProject/selinux/files/releases/20130423
 LIBSEPOL_LICENSE = LGPLv2.1+
 LIBSEPOL_LICENSE_FILES = COPYING
 
@@ -13,7 +13,7 @@ LIBSEPOL_INSTALL_STAGING = YES
 
 LIBSEPOL_MAKE_FLAGS = $(TARGET_CONFIGURE_OPTS)
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 LIBSEPOL_MAKE_FLAGS += STATIC=1
 endif
 

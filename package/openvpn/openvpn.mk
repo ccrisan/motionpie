@@ -4,14 +4,14 @@
 #
 ################################################################################
 
-OPENVPN_VERSION = 2.3.5
+OPENVPN_VERSION = 2.3.6
 OPENVPN_SOURCE = openvpn-$(OPENVPN_VERSION).tar.xz
 OPENVPN_SITE = http://swupdate.openvpn.net/community/releases
 OPENVPN_DEPENDENCIES = host-pkgconf
 OPENVPN_LICENSE = GPLv2
 OPENVPN_LICENSE_FILES = COPYRIGHT.GPL
 OPENVPN_CONF_OPTS = --disable-plugin-auth-pam --enable-iproute2 \
-	$(if $(BR2_PREFER_STATIC_LIB),--disable-plugins)
+	$(if $(BR2_STATIC_LIBS),--disable-plugins)
 OPENVPN_CONF_ENV = IFCONFIG=/sbin/ifconfig \
 	NETSTAT=/bin/netstat \
 	ROUTE=/sbin/route
@@ -50,6 +50,9 @@ endif
 define OPENVPN_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 755 $(@D)/src/openvpn/openvpn \
 		$(TARGET_DIR)/usr/sbin/openvpn
+endef
+
+define OPENVPN_INSTALL_INIT_SYSV
 	$(INSTALL) -m 755 -D package/openvpn/S60openvpn \
 		$(TARGET_DIR)/etc/init.d/S60openvpn
 endef

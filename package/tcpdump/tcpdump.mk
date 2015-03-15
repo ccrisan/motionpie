@@ -8,15 +8,19 @@ TCPDUMP_VERSION = 4.6.2
 TCPDUMP_SITE = http://www.tcpdump.org/release
 TCPDUMP_LICENSE = BSD-3c
 TCPDUMP_LICENSE_FILES = LICENSE
-TCPDUMP_CONF_ENV = ac_cv_linux_vers=2 td_cv_buggygetaddrinfo=no \
-		PCAP_CONFIG=$(STAGING_DIR)/usr/bin/pcap-config
-TCPDUMP_CONF_OPTS = --without-crypto --with-system-libpcap \
-		$(if $(BR2_PACKAGE_TCPDUMP_SMB),--enable-smb,--disable-smb)
+TCPDUMP_CONF_ENV = \
+	ac_cv_linux_vers=2 \
+	td_cv_buggygetaddrinfo=no \
+	PCAP_CONFIG=$(STAGING_DIR)/usr/bin/pcap-config
+TCPDUMP_CONF_OPTS = \
+	--without-crypto \
+	--with-system-libpcap \
+	$(if $(BR2_PACKAGE_TCPDUMP_SMB),--enable-smb,--disable-smb)
 TCPDUMP_DEPENDENCIES = zlib libpcap
 # Patching aclocal.m4
 TCPDUMP_AUTORECONF = YES
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 TCPDUMP_CONF_OPTS += LIBS="$(shell $(STAGING_DIR)/usr/bin/pcap-config --static --additional-libs)"
 endif
 

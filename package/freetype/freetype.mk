@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-FREETYPE_VERSION = 2.5.3
+FREETYPE_VERSION = 2.5.5
 FREETYPE_SOURCE = freetype-$(FREETYPE_VERSION).tar.bz2
 FREETYPE_SITE = http://downloads.sourceforge.net/project/freetype/freetype2/$(FREETYPE_VERSION)
 FREETYPE_INSTALL_STAGING = YES
@@ -98,6 +98,7 @@ HOST_FREETYPE_POST_INSTALL_HOOKS += HOST_FREETYPE_FIX_FREETYPE_INCLUDE
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
 
-# freetype-patch uses autogen.sh so add it as a order-only-prerequisite
-# because it is a phony target.
-$(FREETYPE_TARGET_PATCH): | host-automake
+# freetype-patch and host-freetype-patch use autogen.sh so add
+# host-automake as a order-only-prerequisite because it is a phony
+# target.
+$(FREETYPE_TARGET_PATCH) $(HOST_FREETYPE_TARGET_PATCH): | host-automake

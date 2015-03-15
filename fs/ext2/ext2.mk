@@ -4,27 +4,32 @@
 #
 ################################################################################
 
-EXT2_OPTS :=
+EXT2_OPTS = -G $(BR2_TARGET_ROOTFS_EXT2_GEN) -R $(BR2_TARGET_ROOTFS_EXT2_REV)
 
 ifneq ($(strip $(BR2_TARGET_ROOTFS_EXT2_BLOCKS)),0)
 EXT2_OPTS += -b $(BR2_TARGET_ROOTFS_EXT2_BLOCKS)
 endif
 
 ifneq ($(strip $(BR2_TARGET_ROOTFS_EXT2_INODES)),0)
-EXT2_OPTS += -N $(BR2_TARGET_ROOTFS_EXT2_INODES)
+EXT2_OPTS += -i $(BR2_TARGET_ROOTFS_EXT2_INODES)
 endif
 
 ifneq ($(strip $(BR2_TARGET_ROOTFS_EXT2_RESBLKS)),0)
-EXT2_OPTS += -m $(BR2_TARGET_ROOTFS_EXT2_RESBLKS)
+EXT2_OPTS += -r $(BR2_TARGET_ROOTFS_EXT2_RESBLKS)
 endif
 
-ROOTFS_EXT2_DEPENDENCIES = host-genext2fs host-e2fsprogs
+# Not qstrip-ing the variable, because it may contain spaces, but we must
+# qstrip it when checking. Furthermore, we need to further quote it, so
+# that the quotes do not get eaten by the echo statement when creating the
+# fakeroot script
+ifneq ($(call qstrip,$(BR2_TARGET_ROOTFS_EXT2_LABEL)),)
+EXT2_OPTS += -l '$(BR2_TARGET_ROOTFS_EXT2_LABEL)'
+endif
 
-EXT2_ENV = GEN=$(BR2_TARGET_ROOTFS_EXT2_GEN)
-EXT2_ENV += REV=$(BR2_TARGET_ROOTFS_EXT2_REV)
+ROOTFS_EXT2_DEPENDENCIES = host-mke2img
 
 define ROOTFS_EXT2_CMD
-	PATH=$(BR_PATH) $(EXT2_ENV) fs/ext2/genext2fs.sh -d $(TARGET_DIR) $(EXT2_OPTS) $@
+	PATH=$(BR_PATH) mke2img -d $(TARGET_DIR) $(EXT2_OPTS) -o $@
 endef
 
 rootfs-ext2-symlink:

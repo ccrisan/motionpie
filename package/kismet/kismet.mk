@@ -4,13 +4,20 @@
 #
 ################################################################################
 
-KISMET_VERSION = 2013-03-R1b
-KISMET_SOURCE = kismet-$(KISMET_VERSION).tar.xz
-KISMET_SITE = http://www.kismetwireless.net/code
+KISMET_VERSION = Kismet-2014-02-R1
+KISMET_SITE = http://www.kismetwireless.net/kismet.git
+KISMET_SITE_METHOD = git
 KISMET_DEPENDENCIES = host-pkgconf libpcap ncurses libnl
 KISMET_CONF_OPTS += --with-netlink-version=3
 KISMET_LICENSE = GPLv2+
 KISMET_LICENSE_FILES = debian/copyright
+
+# We touch configure.in:
+KISMET_AUTORECONF = YES
+
+ifeq ($(BR2_STATIC_LIBS),y)
+KISMET_CONF_ENV = LIBS="-lpcap $(shell $(STAGING_DIR)/usr/bin/pcap-config --static --additional-libs)"
+endif
 
 ifeq ($(BR2_PACKAGE_PCRE),y)
 	KISMET_DEPENDENCIES += pcre

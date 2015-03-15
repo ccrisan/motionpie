@@ -60,11 +60,10 @@ config BR2_PACKAGE_PYTHON_CURSES
 	help
 	  curses module for Python.
 
-config BR2_PACKAGE_PYTHON_PYEXPAT
-	select BR2_PACKAGE_EXPAT
-	bool "pyexpat"
+config BR2_PACKAGE_PYTHON_OSSAUDIODEV
+	bool "ossaudiodev module"
 	help
-	  pyexpat module for Python.
+	  ossaudiodev module for Python.
 
 config BR2_PACKAGE_PYTHON_READLINE
 	select BR2_PACKAGE_READLINE
@@ -108,6 +107,12 @@ config BR2_PACKAGE_PYTHON_SQLITE
 	select BR2_PACKAGE_SQLITE
 	help
 	  SQLite database support
+
+config BR2_PACKAGE_PYTHON_PYEXPAT
+	select BR2_PACKAGE_EXPAT
+	bool "xml module"
+	help
+	  pyexpat and xml libraries for Python
 
 config BR2_PACKAGE_PYTHON_ZLIB
 	bool "zlib module"

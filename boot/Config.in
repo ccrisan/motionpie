@@ -4,6 +4,5 @@ source "boot/grub/Config.in"
 source "boot/grub2/Config.in"
 source "boot/syslinux/Config.in"
 source "boot/uboot/Config.in"
-source "boot/rpi-firmware/Config.in"
 
 endmenu

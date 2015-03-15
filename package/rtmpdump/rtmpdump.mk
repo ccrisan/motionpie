@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RTMPDUMP_VERSION = 79459a2b43f41ac44a2ec001139bcb7b1b8f7497
+RTMPDUMP_VERSION = a107cef9b392616dff54fabfd37f985ee2190a6f
 RTMPDUMP_SITE = git://git.ffmpeg.org/rtmpdump
 RTMPDUMP_INSTALL_STAGING = YES
 # Note that rtmpdump is GPLv2 but librtmp has its own license and since we only
@@ -29,7 +29,7 @@ endif
 
 RTMPDUMP_CFLAGS = $(TARGET_CFLAGS)
 
-ifneq ($(BR2_PREFER_STATIC_LIB),y)
+ifneq ($(BR2_STATIC_LIBS),y)
 RTMPDUMP_CFLAGS += -fPIC
 else
 RTMPDUMP_SHARED = "SHARED="
@@ -39,7 +39,7 @@ define RTMPDUMP_BUILD_CMDS
 	$(MAKE) CRYPTO=$(RTMPDUMP_CRYPTO) \
 		prefix=/usr \
 		XCFLAGS="$(RTMPDUMP_CFLAGS)" \
-		XLDFLAGS="$(TARGET_CFLAGS)" \
+		XLDFLAGS="$(TARGET_LDFLAGS)" \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
 		$(RTMPDUMP_SHARED) \
 		-C $(@D)/librtmp

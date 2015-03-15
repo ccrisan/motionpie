@@ -1,0 +1,20 @@
+diff -uNr v4l-utils-1.6.2-orig/utils/v4l2-ctl/v4l2-ctl-common.cpp v4l-utils-1.6.2-new/utils/v4l2-ctl/v4l2-ctl-common.cpp
+--- v4l-utils-1.6.2-orig/utils/v4l2-ctl/v4l2-ctl-common.cpp	2015-03-15 16:57:51.326973715 +0200
++++ v4l-utils-1.6.2-new/utils/v4l2-ctl/v4l2-ctl-common.cpp	2015-03-15 17:00:39.944860469 +0200
+@@ -661,7 +661,15 @@
+ 	static char *const subopts[] = {
+ 	    NULL
+ 	};
+-	int opt = getsubopt(subs, subopts, value);
++
++	/* ugly ucblic getsubopt hack */
++	if (*subs) {
++	    *value = strdup(*subs);
++	    *subs[0] = 0;
++    }
++
++    char *dummy;
++	int opt = getsubopt(subs, subopts, &dummy);
+ 
+ 	if (*value == NULL) {
+ 		fprintf(stderr, "No value given to suboption <%s>\n",

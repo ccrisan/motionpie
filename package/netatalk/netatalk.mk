@@ -4,9 +4,10 @@
 #
 ################################################################################
 
-NETATALK_VERSION = 3.1.2
+NETATALK_VERSION = 3.1.7
 NETATALK_SITE = http://downloads.sourceforge.net/project/netatalk/netatalk/$(NETATALK_VERSION)
 NETATALK_SOURCE = netatalk-$(NETATALK_VERSION).tar.bz2
+# For 0001-Fix-setting-of-LD_LIBRARY_FLAGS-shlibpath_var.patch
 NETATALK_AUTORECONF = YES
 NETATALK_CONFIG_SCRIPTS = netatalk-config
 NETATALK_DEPENDENCIES = host-pkgconf openssl berkeleydb libgcrypt libgpg-error \
@@ -50,12 +51,9 @@ else
 	NETATALK_CONF_OPTS += --disable-cups
 endif
 
-define NETATALK_INSTALL_EXTRA_FILES
-	[ -f $(TARGET_DIR)/etc/init.d/S50netatalk ] || \
-		$(INSTALL) -m 0755 -D package/netatalk/S50netatalk \
-			$(TARGET_DIR)/etc/init.d/S50netatalk
+define NETATALK_INSTALL_INIT_SYSV
+	$(INSTALL) -m 0755 -D package/netatalk/S50netatalk \
+		$(TARGET_DIR)/etc/init.d/S50netatalk
 endef
-
-NETATALK_POST_INSTALL_TARGET_HOOKS += NETATALK_INSTALL_EXTRA_FILES
 
 $(eval $(autotools-package))

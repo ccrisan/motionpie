@@ -4,10 +4,11 @@
 #
 ################################################################################
 
-RUBY_VERSION_MAJOR = 2.1
-RUBY_VERSION = $(RUBY_VERSION_MAJOR).5
-RUBY_VERSION_EXT = 2.1.0
+RUBY_VERSION_MAJOR = 2.2
+RUBY_VERSION = $(RUBY_VERSION_MAJOR).1
+RUBY_VERSION_EXT = 2.2.0
 RUBY_SITE = http://cache.ruby-lang.org/pub/ruby/$(RUBY_VERSION_MAJOR)
+RUBY_SOURCE = ruby-$(RUBY_VERSION).tar.xz
 RUBY_DEPENDENCIES = host-pkgconf host-ruby
 HOST_RUBY_DEPENDENCIES = host-pkgconf
 RUBY_MAKE_ENV = $(TARGET_MAKE_ENV)
@@ -63,6 +64,13 @@ ifeq ($(BR2_PACKAGE_GMP),y)
 else
 	RUBY_CONF_OPTS += --without-gmp
 endif
+
+# workaround for amazing build failure, see
+# http://lists.busybox.net/pipermail/buildroot/2014-December/114273.html
+define RUBY_REMOVE_VERCONF_H
+	rm -f $(@D)/verconf.h
+endef
+RUBY_POST_CONFIGURE_HOOKS += RUBY_REMOVE_VERCONF_H
 
 # Remove rubygems and friends, as they need extensions that aren't
 # built and a target compiler.

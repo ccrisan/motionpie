@@ -4,9 +4,10 @@
 #
 ################################################################################
 
-WGET_VERSION = 1.16
+WGET_VERSION = 1.16.2
 WGET_SOURCE = wget-$(WGET_VERSION).tar.xz
 WGET_SITE = $(BR2_GNU_MIRROR)/wget
+WGET_DEPENDENCIES = host-pkgconf
 WGET_LICENSE = GPLv3+
 WGET_LICENSE_FILES = COPYING
 

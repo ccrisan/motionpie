@@ -11,6 +11,7 @@ X264_LICENSE = GPLv2+
 X264_DEPENDENCIES = host-pkgconf
 X264_LICENSE_FILES = COPYING
 X264_INSTALL_STAGING = YES
+X264_CONF_OPTS = --disable-avs
 
 ifeq ($(BR2_i386)$(BR2_x86_64),y)
 X264_DEPENDENCIES += host-yasm
@@ -22,7 +23,7 @@ else
 X264_CONF_OPTS += --disable-asm
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 X264_CONF_OPTS += --enable-pic --enable-shared
 endif
 

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ICU_VERSION = 51.2
+ICU_VERSION = 54.1
 ICU_SOURCE = icu4c-$(subst .,_,$(ICU_VERSION))-src.tgz
 ICU_SITE = http://download.icu-project.org/files/icu4c/$(ICU_VERSION)
 ICU_LICENSE = ICU License
@@ -13,8 +13,10 @@ ICU_LICENSE_FILES = license.html
 ICU_DEPENDENCIES = host-icu
 ICU_INSTALL_STAGING = YES
 ICU_CONFIG_SCRIPTS = icu-config
-ICU_CONF_OPTS = --with-cross-build=$(HOST_ICU_DIR)/source --disable-samples \
-		--disable-tests
+ICU_CONF_OPTS = \
+	--with-cross-build=$(HOST_ICU_DIR)/source \
+	--disable-samples \
+	--disable-tests
 HOST_ICU_CONF_OPTS = \
 	--disable-samples \
 	--disable-tests \

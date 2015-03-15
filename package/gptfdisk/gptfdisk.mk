@@ -26,7 +26,7 @@ GPTFDISK_DEPENDENCIES += icu
 GPTFDISK_MAKE_OPTS += USE_UTF16=y
 endif
 
-ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE)$(BR2_PREFER_STATIC_LIB),yy)
+ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE)$(BR2_STATIC_LIBS),yy)
 GPTFDISK_MAKE_OPTS += LDLIBS=-lintl
 endif
 
@@ -37,7 +37,7 @@ endef
 
 define GPTFDISK_INSTALL_TARGET_CMDS
 	for i in $(GPTFDISK_TARGETS_y); do \
-		$(INSTALL) -D -m 0755 $(@D)/$$i $(TARGET_DIR)/usr/sbin/$$i; \
+		$(INSTALL) -D -m 0755 $(@D)/$$i $(TARGET_DIR)/usr/sbin/$$i || exit 1; \
 	done
 endef
 

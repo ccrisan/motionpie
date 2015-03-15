@@ -10,16 +10,17 @@ OPEN2300_VERSION = 12
 OPEN2300_LICENSE = GPLv2
 OPEN2300_LICENSE_FILES = COPYING
 
-OPEN2300_BINS = open2300 dump2300 log2300 fetch2300 wu2300 cw2300 history2300 \
-		histlog2300 bin2300 xml2300 light2300 interval2300 minmax2300
+OPEN2300_BINS = \
+	open2300 dump2300 log2300 fetch2300 wu2300 cw2300 history2300 \
+	histlog2300 bin2300 xml2300 light2300 interval2300 minmax2300
 OPEN2300_CFLAGS = $(TARGET_CFLAGS)
 OPEN2300_LDFLAGS = $(TARGET_LDFLAGS)
 
 ifeq ($(BR2_PACKAGE_MYSQL),y)
 	OPEN2300_DEPENDENCIES += mysql
-	OPEN2300_BINS         += mysql2300 mysqlhistlog2300
-	OPEN2300_CFLAGS       += -I$(STAGING_DIR)/usr/include/mysql
-	OPEN2300_LDFLAGS      += -L$(STAGING_DIR)/usr/lib/mysql -lmysqlclient
+	OPEN2300_BINS += mysql2300 mysqlhistlog2300
+	OPEN2300_CFLAGS += -I$(STAGING_DIR)/usr/include/mysql
+	OPEN2300_LDFLAGS += -L$(STAGING_DIR)/usr/lib/mysql -lmysqlclient
 endif
 
 define OPEN2300_BUILD_CMDS

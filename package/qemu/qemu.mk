@@ -16,13 +16,12 @@ QEMU_LICENSE_FILES = COPYING COPYING.LIB
 #-------------------------------------------------------------
 # Host-qemu
 
-HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2 host-pixman
+HOST_QEMU_DEPENDENCIES = host-pkgconf host-python host-zlib host-libglib2 host-pixman
 
 #       BR ARCH         qemu
 #       -------         ----
 #       arm             arm
 #       armeb           armeb
-#       avr32           not supported
 #       bfin            not supported
 #       i386            i386
 #       i486            i386
@@ -59,6 +58,32 @@ HOST_QEMU_ARCH = ppc
 endif
 HOST_QEMU_TARGETS = $(HOST_QEMU_ARCH)-linux-user
 
+ifeq ($(BR2_PACKAGE_HOST_QEMU),y)
+HOST_QEMU_HOST_SYSTEM_TYPE = $(shell uname -s)
+ifneq ($(HOST_QEMU_HOST_SYSTEM_TYPE),Linux)
+$(error "qemu-user can only be used on Linux hosts")
+endif
+
+# kernel version as major*256 + minor
+HOST_QEMU_HOST_SYSTEM_VERSION = $(shell uname -r | awk -F. '{ print $$1 * 256 + $$2 }')
+HOST_QEMU_TARGET_SYSTEM_VERSION = $(shell echo $(BR2_TOOLCHAIN_HEADERS_AT_LEAST) | awk -F. '{ print $$1 * 256 + $$2 }')
+HOST_QEMU_COMPARE_VERSION = $(shell test $(HOST_QEMU_HOST_SYSTEM_VERSION) -ge $(HOST_QEMU_TARGET_SYSTEM_VERSION) && echo OK)
+
+#
+# The principle of qemu-user is that it emulates the instructions of
+# the target architecture when running the binary, and then when this
+# binary does a system call, it converts this system call into a
+# system call on the host machine. This mechanism makes an assumption:
+# that the target binary will not do system calls that do not exist on
+# the host. This basically requires that the target binary should be
+# built with kernel headers that are older or the same as the kernel
+# version running on the host machine.
+#
+ifneq ($(HOST_QEMU_COMPARE_VERSION),OK)
+$(error "Refusing to build qemu-user: target Linux version newer than host's.")
+endif
+endif
+
 define HOST_QEMU_CONFIGURE_CMDS
 	cd $(@D); $(HOST_CONFIGURE_OPTS) ./configure    \
 		--target-list="$(HOST_QEMU_TARGETS)"    \
@@ -66,6 +91,7 @@ define HOST_QEMU_CONFIGURE_CMDS
 		--interp-prefix=$(STAGING_DIR)          \
 		--cc="$(HOSTCC)"                        \
 		--host-cc="$(HOSTCC)"                   \
+		--python=$(HOST_DIR)/usr/bin/python2    \
 		--extra-cflags="$(HOST_CFLAGS)"         \
 		--extra-ldflags="$(HOST_LDFLAGS)"
 endef

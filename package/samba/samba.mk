@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SAMBA_VERSION = 3.6.24
+SAMBA_VERSION = 3.6.25
 SAMBA_SITE = http://ftp.samba.org/pub/samba/stable
 SAMBA_SUBDIR = source3
 SAMBA_INSTALL_STAGING = YES
@@ -136,6 +136,22 @@ endef
 
 SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_REMOVE_UNNEEDED_BINARIES
 
+ifeq ($(BR2_PACKAGE_SAMBA_LIBNSS_WINS),y)
+define SAMBA_INSTALL_LIBNSS_WINS
+	$(INSTALL) -m 0755 -D $(@D)/nsswitch/libnss_wins.so $(TARGET_DIR)/lib/libnss_wins.so.2
+	ln -snf libnss_wins.so.2 $(TARGET_DIR)/lib/libnss_wins.so
+endef
+SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_INSTALL_LIBNSS_WINS
+endif
+
+ifeq ($(BR2_PACKAGE_SAMBA_LIBNSS_WINBIND),y)
+define SAMBA_INSTALL_LIBNSS_WINBIND
+	$(INSTALL) -m 0755 -D $(@D)/nsswitch/libnss_winbind.so $(TARGET_DIR)/lib/libnss_winbind.so.2
+	ln -snf libnss_winbind.so.2 $(TARGET_DIR)/lib/libnss_winbind.so
+endef
+SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_INSTALL_LIBNSS_WINBIND
+endif
+
 define SAMBA_REMOVE_SWAT_DOCUMENTATION
 	# Remove the documentation
 	rm -rf $(TARGET_DIR)/usr/swat/help/manpages
@@ -161,17 +177,14 @@ ifeq ($(BR2_PACKAGE_SAMBA_SWAT),y)
 SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_REMOVE_SWAT_DOCUMENTATION
 endif
 
-define SAMBA_INSTALL_INITSCRIPTS_CONFIG
-	# install start/stop script
-	@if [ ! -f $(TARGET_DIR)/etc/init.d/S91smb ]; then \
-		$(INSTALL) -m 0755 -D package/samba/S91smb $(TARGET_DIR)/etc/init.d/S91smb; \
-	fi
-	# install config
-	@if [ ! -f $(TARGET_DIR)/etc/samba/smb.conf ]; then \
-		$(INSTALL) -m 0644 -D package/samba/simple.conf $(TARGET_DIR)/etc/samba/smb.conf; \
-	fi
+define SAMBA_INSTALL_CONFIG
+	$(INSTALL) -m 0644 -D package/samba/simple.conf $(TARGET_DIR)/etc/samba/smb.conf
 endef
 
-SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_INSTALL_INITSCRIPTS_CONFIG
+SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_INSTALL_CONFIG
+
+define SAMBA_INSTALL_INIT_SYSV
+	$(INSTALL) -m 0755 -D package/samba/S91smb $(TARGET_DIR)/etc/init.d/S91smb
+endef
 
 $(eval $(autotools-package))

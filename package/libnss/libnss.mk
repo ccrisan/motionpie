@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBNSS_VERSION = 3.17.2
+LIBNSS_VERSION = 3.17.4
 LIBNSS_SOURCE = nss-$(LIBNSS_VERSION).tar.gz
 LIBNSS_SITE = https://ftp.mozilla.org/pub/mozilla.org/security/nss/releases/NSS_$(subst .,_,$(LIBNSS_VERSION))_RTM/src
 LIBNSS_DISTDIR = dist
@@ -13,20 +13,21 @@ LIBNSS_DEPENDENCIES = libnspr sqlite zlib
 LIBNSS_LICENSE = MPLv2.0
 LIBNSS_LICENSE_FILES = nss/COPYING
 
-LIBNSS_BUILD_VARS = MOZILLA_CLIENT=1 \
-		NSPR_INCLUDE_DIR=$(STAGING_DIR)/usr/include/nspr \
-		NSPR_LIB_DIR=$(STAGING_DIR)/usr/lib \
-		BUILD_OPT=1 \
-		NS_USE_GCC=1 \
-		NSS_USE_SYSTEM_SQLITE=1 \
-		NSS_ENABLE_ECC=1 \
-		NATIVE_CC="$(HOSTCC)" \
-		TARGETCC="$(TARGET_CC)" \
-		TARGETCCC="$(TARGET_CXX)" \
-		TARGETRANLIB="$(TARGET_RANLIB)" \
-		OS_ARCH="Linux" \
-		OS_RELEASE="2.6" \
-		OS_TEST="$(ARCH)"
+LIBNSS_BUILD_VARS = \
+	MOZILLA_CLIENT=1 \
+	NSPR_INCLUDE_DIR=$(STAGING_DIR)/usr/include/nspr \
+	NSPR_LIB_DIR=$(STAGING_DIR)/usr/lib \
+	BUILD_OPT=1 \
+	NS_USE_GCC=1 \
+	NSS_USE_SYSTEM_SQLITE=1 \
+	NSS_ENABLE_ECC=1 \
+	NATIVE_CC="$(HOSTCC)" \
+	TARGETCC="$(TARGET_CC)" \
+	TARGETCCC="$(TARGET_CXX)" \
+	TARGETRANLIB="$(TARGET_RANLIB)" \
+	OS_ARCH="Linux" \
+	OS_RELEASE="2.6" \
+	OS_TEST="$(ARCH)"
 
 ifeq ($(BR2_ARCH_IS_64),y)
 # MIPS64 n32 is treated as a 32-bit architecture by libnss.
@@ -35,7 +36,6 @@ ifeq ($(BR2_MIPS_NABI32),)
 LIBNSS_BUILD_VARS += USE_64=1
 endif
 endif
-
 
 define LIBNSS_BUILD_CMDS
 	$(MAKE1) -C $(@D)/nss coreconf \

@@ -11,7 +11,10 @@ UCLIBC_LICENSE_FILES = COPYING.LIB
 
 ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
 UCLIBC_SITE = http://www.uclibc.org/downloads/snapshots
-else ifeq ($(BR2_arc),y)
+else ifeq ($(BR2_UCLIBC_NG_VERSION_1_0_0),y)
+UCLIBC_SITE = http://downloads.uclibc-ng.org/releases/$(UCLIBC_VERSION)/
+UCLIBC_SOURCE = uClibc-ng-$(UCLIBC_VERSION).tar.xz
+else ifeq ($(BR2_UCLIBC_VERSION_ARC_GIT),y)
 UCLIBC_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,uClibc,$(UCLIBC_VERSION))
 UCLIBC_SOURCE = uClibc-$(UCLIBC_VERSION).tar.gz
 else ifeq ($(BR2_UCLIBC_VERSION_XTENSA_GIT),y)
@@ -40,10 +43,10 @@ endif
 UCLIBC_KCONFIG_FILE = $(UCLIBC_CONFIG_FILE)
 
 UCLIBC_KCONFIG_OPTS = \
-		$(UCLIBC_MAKE_FLAGS) \
-		PREFIX=$(STAGING_DIR) \
-		DEVEL_PREFIX=/usr/ \
-		RUNTIME_PREFIX=$(STAGING_DIR)/ \
+	$(UCLIBC_MAKE_FLAGS) \
+	PREFIX=$(STAGING_DIR) \
+	DEVEL_PREFIX=/usr/ \
+	RUNTIME_PREFIX=$(STAGING_DIR)/ \
 
 UCLIBC_TARGET_ARCH = $(call qstrip,$(BR2_UCLIBC_TARGET_ARCH))
 
@@ -54,8 +57,9 @@ ifeq ($(UCLIBC_GENERATE_LOCALES),)
 UCLIBC_LOCALES = en_US
 else
 # Strip out the encoding part of locale names, if any
-UCLIBC_LOCALES = $(foreach locale,$(UCLIBC_GENERATE_LOCALES),\
-		   $(firstword $(subst .,$(space),$(locale))))
+UCLIBC_LOCALES = \
+	$(foreach locale,$(UCLIBC_GENERATE_LOCALES),\
+	$(firstword $(subst .,$(space),$(locale))))
 endif
 
 #
@@ -190,16 +194,6 @@ define UCLIBC_BFIN_CONFIG
 endef
 endif
 endif # bfin
-
-#
-# AVR32 definitions
-#
-
-ifeq ($(UCLIBC_TARGET_ARCH),avr32)
-define UCLIBC_AVR32_CONFIG
-	$(call KCONFIG_ENABLE_OPT,LINKRELAX,$(@D)/.config)
-endef
-endif # avr32
 
 #
 # x86 definitions
@@ -398,7 +392,7 @@ endif
 # static/shared libs
 #
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 UCLIBC_SHARED_LIBS_CONFIG = $(call KCONFIG_DISABLE_OPT,HAVE_SHARED,$(@D)/.config)
 else
 UCLIBC_SHARED_LIBS_CONFIG = $(call KCONFIG_ENABLE_OPT,HAVE_SHARED,$(@D)/.config)
@@ -431,7 +425,6 @@ define UCLIBC_KCONFIG_FIXUP_CMDS
 	$(UCLIBC_SH_TYPE_CONFIG)
 	$(UCLIBC_SPARC_TYPE_CONFIG)
 	$(UCLIBC_POWERPC_TYPE_CONFIG)
-	$(UCLIBC_AVR32_CONFIG)
 	$(UCLIBC_BFIN_CONFIG)
 	$(UCLIBC_X86_TYPE_CONFIG)
 	$(UCLIBC_ENDIAN_CONFIG)
@@ -458,21 +451,9 @@ define UCLIBC_BUILD_TEST_SUITE
 endef
 endif
 
-# In uClibc 0.9.31 parallel building is broken so we have to disable it
-# Fortunately uClibc 0.9.31 is only used by AVR32 and in its turn AVR32 is
-# about to be removed from buildroot.
-#
-# So as soon as AVR32 is removed please revert this patch so instead of
-# UCLIBC_MAKE normal "MAKE" is used in UCLIBC_BUILD_CMDS
-ifeq ($(BR2_UCLIBC_VERSION_0_9_31),y)
-	UCLIBC_MAKE = $(MAKE1)
-else
-	UCLIBC_MAKE = $(MAKE)
-endif
-
 define UCLIBC_BUILD_CMDS
-	$(UCLIBC_MAKE) -C $(@D) $(UCLIBC_MAKE_FLAGS) headers
-	$(UCLIBC_MAKE) -C $(@D) $(UCLIBC_MAKE_FLAGS)
+	$(MAKE) -C $(@D) $(UCLIBC_MAKE_FLAGS) headers
+	$(MAKE) -C $(@D) $(UCLIBC_MAKE_FLAGS)
 	$(MAKE) -C $(@D)/utils \
 		PREFIX=$(HOST_DIR) \
 		HOSTCC="$(HOSTCC)" hostutils
@@ -497,6 +478,21 @@ define UCLIBC_INSTALL_UTILS_TARGET
 endef
 endif
 
+# gcc produces binaries that use ld{64,}-uClibc.so.0 as the program
+# interpreter, but since uClibc-ng version is 1.0.0, it generates
+# ld{64,}-uClibc.so.1. In order to avoid changing gcc, we simply
+# create the necessary symbolic links here.
+ifeq ($(BR2_UCLIBC_NG_VERSION_1_0_0),y)
+define UCLIBC_INSTALL_LDSO_SYMLINKS
+	if [ -e $(TARGET_DIR)/lib/ld64-uClibc.so.1 ]; then \
+		(cd $(TARGET_DIR)/lib;ln -sf ld64-uClibc.so.1 ld64-uClibc.so.0) \
+	fi
+	if [ -e $(TARGET_DIR)/lib/ld-uClibc.so.1 ]; then \
+		(cd $(TARGET_DIR)/lib;ln -sf ld-uClibc.so.1 ld-uClibc.so.0) \
+	fi
+endef
+endif
+
 define UCLIBC_INSTALL_TARGET_CMDS
 	$(MAKE1) -C $(@D) \
 		$(UCLIBC_MAKE_FLAGS) \
@@ -507,10 +503,11 @@ define UCLIBC_INSTALL_TARGET_CMDS
 	$(UCLIBC_INSTALL_UTILS_TARGET)
 	$(UCLIBC_BUILD_TEST_SUITE)
 	$(UCLIBC_INSTALL_TEST_SUITE)
+	$(UCLIBC_INSTALL_LDSO_SYMLINKS)
 endef
 
 # STATIC has no ld* tools, only getconf
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 define UCLIBC_INSTALL_UTILS_STAGING
 	$(INSTALL) -D -m 0755 $(@D)/utils/ldd.host $(HOST_DIR)/usr/bin/ldd
 	ln -sf ldd $(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-ldd

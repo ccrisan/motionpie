@@ -25,7 +25,7 @@ NGINX_CONF_OPTS = \
 # So, we just need to create the directories used by nginx with the right
 # ownership.
 define NGINX_PERMISSIONS
-	/var/lib/nginx	d	755	33	33	-	-	-	-	-
+	/var/lib/nginx d 755 33 33 - - - - -
 endef
 
 # disable external libatomic_ops because its detection fails.
@@ -88,7 +88,6 @@ endif
 
 # misc. modules
 NGINX_CONF_OPTS += \
-	$(if $(BR2_PACKAGE_NGINX_RTSIG_MODULE),--with-rtsig_module) \
 	$(if $(BR2_PACKAGE_NGINX_SELECT_MODULE),--with-select_module,--without-select_module) \
 	$(if $(BR2_PACKAGE_NGINX_POLL_MODULE),--with-poll_module,--without-poll_module)
 

@@ -25,7 +25,7 @@ endif
 ifeq ($(BR2_PACKAGE_DNSMASQ_DNSSEC),y)
 	DNSMASQ_DEPENDENCIES += gmp nettle
 	DNSMASQ_COPTS += -DHAVE_DNSSEC
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 	DNSMASQ_COPTS += -DHAVE_DNSSEC_STATIC
 endif
 endif
@@ -57,7 +57,7 @@ ifeq ($(BR2_PACKAGE_DNSMASQ_LUA),y)
 	DNSMASQ_DEPENDENCIES += lua
 
 # liblua uses dlopen when dynamically linked
-ifneq ($(BR2_PREFER_STATIC_LIB),y)
+ifneq ($(BR2_STATIC_LIBS),y)
 	DNSMASQ_MAKE_OPTS += LIBS+="-ldl"
 endif
 
@@ -101,9 +101,17 @@ define DNSMASQ_BUILD_CMDS
 	$(DNSMASQ_MAKE_ENV) $(MAKE1) -C $(@D) $(DNSMASQ_MAKE_OPTS) all$(DNSMASQ_I18N)
 endef
 
+ifeq ($(BR2_PACKAGE_DBUS),y)
+define DNSMASQ_INSTALL_DBUS
+	$(INSTALL) -m 0644 -D $(@D)/dbus/dnsmasq.conf \
+		$(TARGET_DIR)/etc/dbus-1/system.d/dnsmasq.conf
+endef
+endif
+
 define DNSMASQ_INSTALL_TARGET_CMDS
 	$(DNSMASQ_MAKE_ENV) $(MAKE) -C $(@D) $(DNSMASQ_MAKE_OPTS) install$(DNSMASQ_I18N)
 	mkdir -p $(TARGET_DIR)/var/lib/misc/
+	$(DNSMASQ_INSTALL_DBUS)
 endef
 
 define DNSMASQ_INSTALL_INIT_SYSV

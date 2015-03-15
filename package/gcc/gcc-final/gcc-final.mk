@@ -44,18 +44,17 @@ endef
 # Languages supported by the cross-compiler
 GCC_FINAL_CROSS_LANGUAGES-y = c
 GCC_FINAL_CROSS_LANGUAGES-$(BR2_INSTALL_LIBSTDCPP) += c++
-GCC_FINAL_CROSS_LANGUAGES-$(BR2_INSTALL_FORTRAN) += fortran
-GCC_FINAL_CROSS_LANGUAGES-$(BR2_INSTALL_OBJC)    += objc
 GCC_FINAL_CROSS_LANGUAGES = $(subst $(space),$(comma),$(GCC_FINAL_CROSS_LANGUAGES-y))
 
 HOST_GCC_FINAL_CONF_OPTS = \
 	$(HOST_GCC_COMMON_CONF_OPTS) \
 	--enable-languages=$(GCC_FINAL_CROSS_LANGUAGES) \
 	$(DISABLE_LARGEFILE) \
+	--enable-poison-system-directories \
 	--with-build-time-tools=$(HOST_DIR)/usr/$(GNU_TARGET_NAME)/bin
 
 # Disable shared libs like libstdc++ if we do static since it confuses linking
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 HOST_GCC_FINAL_CONF_OPTS += --disable-shared
 else
 HOST_GCC_FINAL_CONF_OPTS += --enable-shared
@@ -131,14 +130,6 @@ ifeq ($(BR2_GCC_ENABLE_OPENMP),y)
 HOST_GCC_FINAL_USR_LIBS += libgomp
 endif
 
-ifeq ($(BR2_INSTALL_FORTRAN),y)
-HOST_GCC_FINAL_USR_LIBS += libgfortran
-endif
-
-ifeq ($(BR2_INSTALL_OBJC),y)
-HOST_GCC_FINAL_USR_LIBS += libobjc
-endif
-
 ifeq ($(BR2_GCC_ENABLE_LIBMUDFLAP),y)
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
 HOST_GCC_FINAL_USR_LIBS += libmudflapth
@@ -155,7 +146,7 @@ define HOST_GCC_FINAL_INSTALL_STATIC_LIBS
 	done
 endef
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 define HOST_GCC_FINAL_INSTALL_SHARED_LIBS
 	for i in $(HOST_GCC_FINAL_USR_LIBS) ; do \
 		cp -dpf $(HOST_DIR)/usr/$(GNU_TARGET_NAME)/lib*/$${i}.so* \

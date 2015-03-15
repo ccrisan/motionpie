@@ -61,11 +61,10 @@ config BR2_PACKAGE_PYTHON3_DECIMAL
 	help
 	  decimal module for Python3.
 
-config BR2_PACKAGE_PYTHON3_PYEXPAT
-	select BR2_PACKAGE_EXPAT
-	bool "pyexpat"
+config BR2_PACKAGE_PYTHON3_OSSAUDIODEV
+	bool "ossaudiodev module"
 	help
-	  pyexpat module for Python3.
+	  ossaudiodev module for Python3.
 
 config BR2_PACKAGE_PYTHON3_READLINE
 	select BR2_PACKAGE_READLINE
@@ -91,6 +90,12 @@ config BR2_PACKAGE_PYTHON3_SQLITE
 	select BR2_PACKAGE_SQLITE
 	help
 	  SQLite database support
+
+config BR2_PACKAGE_PYTHON3_PYEXPAT
+	select BR2_PACKAGE_EXPAT
+	bool "xml module"
+	help
+	  pyexpat and xml libraries for Python3.
 
 config BR2_PACKAGE_PYTHON3_ZLIB
 	bool "zlib module"

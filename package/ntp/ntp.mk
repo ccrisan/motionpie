@@ -5,25 +5,28 @@
 ################################################################################
 
 NTP_VERSION_MAJOR = 4.2
-NTP_VERSION = $(NTP_VERSION_MAJOR).6p5
+NTP_VERSION = $(NTP_VERSION_MAJOR).8p1
 NTP_SITE = http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-$(NTP_VERSION_MAJOR)
+NTP_DEPENDENCIES = host-pkgconf libevent
 NTP_LICENSE = ntp license
 NTP_LICENSE_FILES = COPYRIGHT
 NTP_CONF_ENV = ac_cv_lib_md5_MD5Init=no
+NTP_CONF_OPTS = \
+	--with-shared \
+	--program-transform-name=s,,, \
+	--disable-tickadj \
+	--with-yielding-select=yes \
+	--disable-local-libevent
 
 ifneq ($(BR2_INET_IPV6),y)
 	NTP_CONF_ENV += isc_cv_have_in6addr_any=no
 endif
 
-NTP_CONF_OPTS = --with-shared \
-		--program-transform-name=s,,, \
-		--disable-tickadj
-
 ifeq ($(BR2_PACKAGE_OPENSSL),y)
 	NTP_CONF_OPTS += --with-crypto
 	NTP_DEPENDENCIES += openssl
 else
-	NTP_CONF_OPTS += --without-crypto
+	NTP_CONF_OPTS += --without-crypto --disable-openssl-random
 endif
 
 ifeq ($(BR2_PACKAGE_NTP_NTPSNMPD),y)
@@ -47,12 +50,12 @@ define NTP_PATCH_FIXUPS
 endef
 
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTP_KEYGEN) += util/ntp-keygen
-NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTP_WAIT) += scripts/ntp-wait
+NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTP_WAIT) += scripts/ntp-wait/ntp-wait
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTPDATE) += ntpdate/ntpdate
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTPDC) += ntpdc/ntpdc
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTPQ) += ntpq/ntpq
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTPSNMPD) += ntpsnmpd/ntpsnmpd
-NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTPTRACE) += scripts/ntptrace
+NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_NTPTRACE) += scripts/ntptrace/ntptrace
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_SNTP) += sntp/sntp
 NTP_INSTALL_FILES_$(BR2_PACKAGE_NTP_TICKADJ) += util/tickadj
 

@@ -133,7 +133,9 @@ if [ ! -z "$CXXCOMPILER" ] ; then
 		echo
 		echo "You may have to install 'g++' on your build machine"
 	fi
+fi
 
+if [ -n "$CXXCOMPILER_VERSION" ] ; then
 	CXXCOMPILER_MAJOR=$(echo $CXXCOMPILER_VERSION | sed -e "s/\..*//g")
 	CXXCOMPILER_MINOR=$(echo $CXXCOMPILER_VERSION | sed -e "s/^$CXXCOMPILER_MAJOR\.//g" -e "s/\..*//g")
 	if [ $CXXCOMPILER_MAJOR -lt 3 -o $CXXCOMPILER_MAJOR -eq 2 -a $CXXCOMPILER_MINOR -lt 95 ] ; then
@@ -225,7 +227,7 @@ if grep -q ^BR2_HOSTARCH_NEEDS_IA32_LIBS=y $BR2_CONFIG ; then
 fi
 
 if grep -q ^BR2_HOSTARCH_NEEDS_IA32_COMPILER=y $BR2_CONFIG ; then
-	if ! echo "int main(void) {}" | gcc -m32 -x c - -o /dev/null ; then
+	if ! echo "int main(void) {}" | gcc -m32 -x c - -o /dev/null 2>/dev/null; then
 		echo
 		echo "Your Buildroot configuration needs a compiler capable of building 32 bits binaries."
 		echo "If you're running a Debian/Ubuntu distribution, install the gcc-multilib package."

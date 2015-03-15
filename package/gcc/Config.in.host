@@ -8,7 +8,6 @@ config BR2_GCC_SUPPORTS_GRAPHITE
 
 choice
 	prompt "GCC compiler Version"
-	default BR2_GCC_VERSION_4_2_2_AVR32_2_1_5 if BR2_avr32
 	default BR2_GCC_VERSION_4_8_ARC if BR2_arc
 	default BR2_GCC_VERSION_4_9_X if BR2_microblaze || BR2_powerpc64le
 	default BR2_GCC_VERSION_4_5_X if BR2_bfin
@@ -16,25 +15,21 @@ choice
 	help
 	  Select the version of gcc you wish to use.
 
-	config BR2_GCC_VERSION_4_2_2_AVR32_2_1_5
-		bool "gcc 4.2.2-avr32-2.1.5"
-		# Only supported architecture
-		depends on BR2_avr32
-
 	config BR2_GCC_VERSION_4_5_X
 		bool "gcc 4.5.x"
 		# Broken or unsupported architectures
 		depends on !BR2_microblaze && !BR2_aarch64 && !BR2_arc \
-			&& !BR2_avr32  && !BR2_powerpc64le
+			&& !BR2_powerpc64le && !BR2_nios2
 		# Broken or unsupported ARM cores
 		depends on !BR2_cortex_a7 && !BR2_cortex_a12 && \
 			!BR2_cortex_a15 && !BR2_fa526 && !BR2_pj4
 		# Broken or unsupported PPC cores
-		depends on !BR2_powerpc_power8
-		# SPARC -mcpu=leon3 appeared in gcc 4.8.3
+		depends on !BR2_powerpc_e5500 && !BR2_powerpc_e6500 && \
+			!BR2_powerpc_power8
+		# SPARC -mcpu=leon3 appeared in gcc 4.8.x
 		depends on !BR2_sparc_leon3
 		# Broken or unsupported X86 cores
-		depends on !BR2_x86_corei7 && !BR2_x86_jaguar
+		depends on !BR2_x86_corei7 && !BR2_x86_jaguar && !BR2_x86_steamroller
 		# ARM EABIhf support appeared in gcc 4.6
 		depends on !BR2_ARM_EABIHF
 		# musl patches only for gcc 4.7+
@@ -45,22 +40,23 @@ choice
 		bool "gcc 4.7.x"
 		# Broken or unsupported architectures
 		depends on !BR2_microblaze && !BR2_aarch64 && !BR2_arc \
-			&& !BR2_avr32 && !BR2_bfin && !BR2_powerpc64le
+			&& !BR2_bfin && !BR2_powerpc64le && !BR2_nios2
 		# Broken or unsupported ARM cores
 		depends on !BR2_cortex_a12 && !BR2_pj4
 		# Broken or unsupported PPC cores
-		depends on !BR2_powerpc_power8
-		# SPARC -mcpu=leon3 appeared in gcc 4.8.3
+		depends on !BR2_powerpc_e5500 && !BR2_powerpc_e6500 && \
+			!BR2_powerpc_power8
+		# SPARC -mcpu=leon3 appeared in gcc 4.8.x
 		depends on !BR2_sparc_leon3
 		# Broken or unsupported x86 cores
-		depends on !BR2_x86_jaguar
+		depends on !BR2_x86_jaguar && !BR2_x86_steamroller
 		select BR2_GCC_NEEDS_MPC
 
 	config BR2_GCC_VERSION_4_8_X
 		bool "gcc 4.8.x"
 		# Broken or unsupported architectures
-		depends on !BR2_microblaze && !BR2_arc && !BR2_avr32 \
-			&& !BR2_bfin && !BR2_powerpc64le
+		depends on !BR2_microblaze && !BR2_arc \
+			&& !BR2_bfin && !BR2_powerpc64le && !BR2_nios2
 		# Broken or unsupported ARM cores
 		depends on !BR2_cortex_a12
 		# Broken or unsupported PPC cores
@@ -77,7 +73,7 @@ choice
 	config BR2_GCC_VERSION_4_9_X
 		bool "gcc 4.9.x"
 		# Broken or unsupported architectures
-		depends on !BR2_arc && !BR2_avr32 && !BR2_bfin
+		depends on !BR2_arc && !BR2_bfin
 		# PR60102 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60102
 		select BR2_GCC_NEEDS_MPC
 		select BR2_GCC_SUPPORTS_GRAPHITE
@@ -86,16 +82,15 @@ endchoice
 
 config BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE
 	bool
-	default y if !BR2_GCC_VERSION_4_2_2_AVR32_2_1_5
+	default y
 
 config BR2_GCC_VERSION
 	string
-	default "4.2.2-avr32-2.1.5" if BR2_GCC_VERSION_4_2_2_AVR32_2_1_5
 	default "4.5.4"     if BR2_GCC_VERSION_4_5_X
 	default "4.7.4"     if BR2_GCC_VERSION_4_7_X
-	default "4.8.3"     if BR2_GCC_VERSION_4_8_X
+	default "4.8.4"     if BR2_GCC_VERSION_4_8_X
 	default "4.9.2"     if BR2_GCC_VERSION_4_9_X
-	default "arc-2014.08" if BR2_GCC_VERSION_4_8_ARC
+	default "arc-2014.12" if BR2_GCC_VERSION_4_8_ARC
 
 config BR2_EXTRA_GCC_CONFIG_OPTIONS
 	string "Additional gcc options"
@@ -108,34 +103,10 @@ config BR2_EXTRA_GCC_CONFIG_OPTIONS
 config BR2_TOOLCHAIN_BUILDROOT_CXX
 	bool "Enable C++ support"
 	select BR2_INSTALL_LIBSTDCPP
-	depends on !(BR2_GCC_VERSION_4_2_2_AVR32_2_1_5 && \
-		     BR2_TOOLCHAIN_BUILDROOT_LOCALE)
 	help
 	  Enable this option if you want your toolchain to support the
 	  C++ language and you want C++ libraries to be installed on
 	  your target system.
-
-comment "C++ support broken in uClibc with locale enabled with gcc 4.2"
-	depends on BR2_GCC_VERSION_4_2_2_AVR32_2_1_5 && BR2_TOOLCHAIN_BUILDROOT_LOCALE
-
-config BR2_INSTALL_OBJC
-	bool "Enable Objective-C support"
-	depends on !BR2_avr32
-	depends on BR2_DEPRECATED_SINCE_2013_11
-	help
-	  Enable the support for the Objective-C language in the
-	  cross-compiler, and install the Objective-C runtime to the
-	  target.
-
-config BR2_INSTALL_FORTRAN
-	bool "Enable Fortran support"
-	depends on !BR2_avr32
-	depends on BR2_DEPRECATED_SINCE_2013_11
-	select BR2_PACKAGE_LIBMPFR
-	help
-	  Enable the support for the Fortran language in the
-	  cross-compiler, and install the Fortran runtime to the
-	  target.
 
 config BR2_GCC_ENABLE_TLS
 	bool "Enable compiler tls support" if BR2_TOOLCHAIN_BUILDROOT_UCLIBC
@@ -145,9 +116,16 @@ config BR2_GCC_ENABLE_TLS
 	  Enable the compiler to generate code for accessing
 	  thread local storage variables
 
+config BR2_GCC_ENABLE_LTO
+	bool "Enable compiler link-time-optimization support"
+	select BR2_BINUTILS_ENABLE_LTO
+	help
+	  This option enables link-time optimization (LTO) support in
+	  gcc.
+
 config BR2_GCC_ENABLE_OPENMP
 	bool "Enable compiler OpenMP support"
-	depends on !BR2_PTHREADS_NONE && !BR2_avr32 && !BR2_arc && !BR2_microblaze
+	depends on !BR2_PTHREADS_NONE && !BR2_arc && !BR2_microblaze
 	help
 	  Enable OpenMP support for the compiler
 
@@ -155,7 +133,7 @@ config BR2_GCC_ENABLE_LIBMUDFLAP
 	bool "Enable libmudflap support"
 	# There are architectures, or specific configurations for
 	# which mudflap is not supported.
-	depends on !BR2_avr32 && !BR2_bfin && !BR2_ARM_INSTRUCTIONS_THUMB && !BR2_powerpc_SPE
+	depends on !BR2_bfin && !BR2_ARM_INSTRUCTIONS_THUMB && !BR2_powerpc_SPE
 	depends on !BR2_GCC_VERSION_4_9_X
 	help
 	  libmudflap is a gcc library used for the mudflap pointer

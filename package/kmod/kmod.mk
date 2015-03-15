@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-KMOD_VERSION = 18
+KMOD_VERSION = 20
 KMOD_SOURCE = kmod-$(KMOD_VERSION).tar.xz
 KMOD_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/kmod
 KMOD_INSTALL_STAGING = YES
@@ -62,6 +62,10 @@ endef
 KMOD_POST_INSTALL_TARGET_HOOKS += KMOD_INSTALL_TOOLS
 else
 KMOD_CONF_OPTS += --disable-tools
+endif
+
+ifeq ($(BR2_PACKAGE_BASH),)
+KMOD_CONF_OPTS += --with-bashcompletiondir=
 endif
 
 # We only install depmod, since that's the only tool used for the

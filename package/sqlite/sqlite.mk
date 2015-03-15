@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-SQLITE_VERSION = 3080701
+SQLITE_VERSION = 3080803
 SQLITE_SOURCE = sqlite-autoconf-$(SQLITE_VERSION).tar.gz
-SQLITE_SITE = http://www.sqlite.org/2014
+SQLITE_SITE = http://www.sqlite.org/2015
 SQLITE_LICENSE = Public domain
 SQLITE_INSTALL_STAGING = YES
 
@@ -39,7 +39,7 @@ endif
 
 SQLITE_CONF_ENV = CFLAGS="$(TARGET_CFLAGS) $(SQLITE_CFLAGS)"
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 SQLITE_CONF_OPTS += --enable-dynamic-extensions=no
 endif
 

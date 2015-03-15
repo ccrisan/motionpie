@@ -12,7 +12,7 @@ config BR2_PACKAGE_QT5BASE
 	  contains the base Qt libraries: QtCore, QtNetwork, QtGui,
 	  QtWidgets, etc.
 
-	  http://qt-project.org
+	  http://qt.io
 
 if BR2_PACKAGE_QT5BASE
 
@@ -24,10 +24,9 @@ config BR2_PACKAGE_QT5BASE_LICENSE_APPROVED
 	  By doing this you will not be asked while the library is compiled.
 	  Please read and understand the license terms before approving this.
 
-	  LGPL v2.1: http://qt-project.org/doc/qt-5.0/qtdoc/lgpl.html
-	  GPL  v3.0: http://qt-project.org/doc/qt-5.0/qtdoc/gpl.html
+	  LGPL: http://doc.qt.io/qt-5/lgpl.html
 
-	  See also http://qt-project.org/doc/qt-5.0/qtdoc/licensing.html
+	  See also http://doc.qt.io/qt-5/licensing.html
 
 config BR2_PACKAGE_QT5BASE_EXAMPLES
 	bool "Compile and install examples (with code)"
@@ -37,7 +36,7 @@ config BR2_PACKAGE_QT5BASE_EXAMPLES
 	  If unsure, say N.
 
 config BR2_PACKAGE_QT5BASE_NETWORK
-       def_bool y
+	def_bool y
 
 config BR2_PACKAGE_QT5BASE_CONCURRENT
 	bool "concurrent module"
@@ -45,7 +44,7 @@ config BR2_PACKAGE_QT5BASE_CONCURRENT
 	  This options enables the Qt5Concurrent library.
 
 config BR2_PACKAGE_QT5BASE_SQL
-       def_bool y
+	def_bool y
 
 if BR2_PACKAGE_QT5BASE_SQL
 config BR2_PACKAGE_QT5BASE_MYSQL
@@ -54,7 +53,6 @@ config BR2_PACKAGE_QT5BASE_MYSQL
 	select BR2_PACKAGE_NCURSES
 	select BR2_PACKAGE_READLINE
 	depends on BR2_USE_MMU # mysql
-	depends on !BR2_avr32 # mysql
 	help
 	  Build MySQL plugin
 	  If unsure, say n.
@@ -251,12 +249,12 @@ config BR2_PACKAGE_QT5BASE_ICU
 
 config BR2_PACKAGE_QT5BASE_TSLIB
 	bool "Enable Tslib support"
-	depends on !BR2_PREFER_STATIC_LIB # dlopen
+	depends on !BR2_STATIC_LIBS # dlopen
 	select BR2_PACKAGE_TSLIB
 	help
 	  This options enables the Tslib plugin
 
 comment "tslib support needs a toolchain w/ dynamic library"
-	depends on BR2_PREFER_STATIC_LIB
+	depends on BR2_STATIC_LIBS
 
 endif

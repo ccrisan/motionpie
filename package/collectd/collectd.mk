@@ -4,26 +4,29 @@
 #
 ################################################################################
 
-COLLECTD_VERSION = 5.4.1
+COLLECTD_VERSION = 5.4.2
 COLLECTD_SITE = http://collectd.org/files
+COLLECTD_SOURCE = collectd-$(COLLECTD_VERSION).tar.bz2
 COLLECTD_CONF_ENV = ac_cv_lib_yajl_yajl_alloc=yes
 COLLECTD_INSTALL_STAGING = YES
 COLLECTD_LICENSE = GPLv2 LGPLv2.1
 COLLECTD_LICENSE_FILES = COPYING
 
 # These require unmet dependencies, are fringe, pointless or deprecated
-COLLECTD_PLUGINS_DISABLE = amqp apple_sensors aquaero ascent dbi email \
-		gmond hddtemp ipmi ipvs java libvirt lpar lvm madwifi mbmon \
-		modbus multimeter netapp netlink nginx \
-		notify_desktop notify_email numa nut onewire oracle perl pf \
-		pinba postgresql powerdns python redis routeros rrdcached \
-		sigrok tape target_v5upgrade teamspeak2 ted \
-		tokyotyrant uuid varnish vserver write_mongodb write_redis \
-		xmms zfs_arc
+COLLECTD_PLUGINS_DISABLE = \
+	amqp apple_sensors aquaero ascent dbi email \
+	gmond hddtemp ipmi java libvirt lpar lvm madwifi mbmon \
+	mic multimeter netapp  notify_desktop notify_email numa \
+	nut onewire oracle perl pf pinba powerdns python redis routeros \
+	rrdcached sigrok tape target_v5upgrade teamspeak2 ted \
+	tokyotyrant uuid varnish vserver write_mongodb write_redis \
+	xmms zfs_arc
 
 COLLECTD_CONF_ENV += LIBS="-lm"
 
-COLLECTD_CONF_OPTS += --with-nan-emulation --with-fp-layout=nothing \
+COLLECTD_CONF_OPTS += \
+	--with-nan-emulation \
+	--with-fp-layout=nothing \
 	--with-perl-bindings=no \
 	$(foreach p, $(COLLECTD_PLUGINS_DISABLE), --disable-$(p)) \
 	$(if $(BR2_PACKAGE_COLLECTD_AGGREGATION),--enable-aggregation,--disable-aggregation) \
@@ -53,6 +56,7 @@ COLLECTD_CONF_OPTS += --with-nan-emulation --with-fp-layout=nothing \
 	$(if $(BR2_PACKAGE_COLLECTD_HASHED),--enable-match_hashed,--disable-match_hashed) \
 	$(if $(BR2_PACKAGE_COLLECTD_INTERFACE),--enable-interface,--disable-interface) \
 	$(if $(BR2_PACKAGE_COLLECTD_IPTABLES),--enable-iptables,--disable-iptables) \
+	$(if $(BR2_PACKAGE_COLLECTD_IPVS),--enable-ipvs,--disable-ipvs) \
 	$(if $(BR2_PACKAGE_COLLECTD_IRQ),--enable-irq,--disable-irq) \
 	$(if $(BR2_PACKAGE_COLLECTD_LOAD),--enable-load,--disable-load) \
 	$(if $(BR2_PACKAGE_COLLECTD_LOGFILE),--enable-logfile,--disable-logfile) \
@@ -60,15 +64,19 @@ COLLECTD_CONF_OPTS += --with-nan-emulation --with-fp-layout=nothing \
 	$(if $(BR2_PACKAGE_COLLECTD_MEMCACHEC),--enable-memcachec,--disable-memcachec) \
 	$(if $(BR2_PACKAGE_COLLECTD_MEMCACHED),--enable-memcached,--disable-memcached) \
 	$(if $(BR2_PACKAGE_COLLECTD_MEMORY),--enable-memory,--disable-memory) \
+	$(if $(BR2_PACKAGE_COLLECTD_MODBUS),--enable-modbus,--disable-modbus) \
 	$(if $(BR2_PACKAGE_COLLECTD_MYSQL),--enable-mysql,--disable-mysql) \
+	$(if $(BR2_PACKAGE_COLLECTD_NETLINK),--enable-netlink,--disable-netlink) \
 	$(if $(BR2_PACKAGE_COLLECTD_NETWORK),--enable-network,--disable-network) \
 	$(if $(BR2_PACKAGE_COLLECTD_NFS),--enable-nfs,--disable-nfs) \
+	$(if $(BR2_PACKAGE_COLLECTD_NGINX),--enable-nginx,--disable-nginx) \
 	$(if $(BR2_PACKAGE_COLLECTD_NOTIFICATION),--enable-target_notification,--disable-target_notification) \
 	$(if $(BR2_PACKAGE_COLLECTD_NOTIFY_EMAIL),--enable-notify_email,--disable-notify_email) \
 	$(if $(BR2_PACKAGE_COLLECTD_NTPD),--enable-ntpd,--disable-ntpd) \
 	$(if $(BR2_PACKAGE_COLLECTD_OLSRD),--enable-olsrd,--disable-olsrd) \
 	$(if $(BR2_PACKAGE_COLLECTD_OPENVPN),--enable-openvpn,--disable-openvpn) \
 	$(if $(BR2_PACKAGE_COLLECTD_PING),--enable-ping,--disable-ping) \
+	$(if $(BR2_PACKAGE_COLLECTD_POSTGRESQL),--enable-postgresql,--disable-postgresql) \
 	$(if $(BR2_PACKAGE_COLLECTD_PROCESSES),--enable-processes,--disable-processes) \
 	$(if $(BR2_PACKAGE_COLLECTD_PROTOCOLS),--enable-protocols,--disable-protocols) \
 	$(if $(BR2_PACKAGE_COLLECTD_REGEX),--enable-match_regex,--disable-match-regex) \
@@ -98,7 +106,8 @@ COLLECTD_CONF_OPTS += --with-nan-emulation --with-fp-layout=nothing \
 	$(if $(BR2_PACKAGE_COLLECTD_WIRELESS),--enable-wireless,--disable-wireless) \
 	$(if $(BR2_PACKAGE_COLLECTD_WRITEHTTP),--enable-write_http,--disable-write_http)
 
-COLLECTD_DEPENDENCIES = host-pkgconf \
+COLLECTD_DEPENDENCIES = \
+	host-pkgconf \
 	$(if $(BR2_PACKAGE_COLLECTD_APACHE),libcurl) \
 	$(if $(BR2_PACKAGE_COLLECTD_BIND),libcurl libxml2) \
 	$(if $(BR2_PACKAGE_COLLECTD_CURL),libcurl) \
@@ -107,9 +116,13 @@ COLLECTD_DEPENDENCIES = host-pkgconf \
 	$(if $(BR2_PACKAGE_COLLECTD_DNS),libpcap) \
 	$(if $(BR2_PACKAGE_COLLECTD_IPTABLES),iptables) \
 	$(if $(BR2_PACKAGE_COLLECTD_MEMCACHEC),libmemcached) \
+	$(if $(BR2_PACKAGE_COLLECTD_MODBUS),libmodbus) \
 	$(if $(BR2_PACKAGE_COLLECTD_MYSQL),mysql) \
+	$(if $(BR2_PACKAGE_COLLECTD_NETLINK),libmnl) \
+	$(if $(BR2_PACKAGE_COLLECTD_NGINX),libcurl) \
 	$(if $(BR2_PACKAGE_COLLECTD_NOTIFY_EMAIL),libesmtp) \
 	$(if $(BR2_PACKAGE_COLLECTD_PING),liboping) \
+	$(if $(BR2_PACKAGE_COLLECTD_POSTGRESQL),postgresql) \
 	$(if $(BR2_PACKAGE_COLLECTD_RIEMANN),protobuf-c) \
 	$(if $(BR2_PACKAGE_COLLECTD_RRDTOOL),rrdtool) \
 	$(if $(BR2_PACKAGE_COLLECTD_SENSORS),lm-sensors) \
@@ -134,6 +147,9 @@ endif
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
 	COLLECTD_DEPENDENCIES += libgcrypt
 	COLLECTD_CONF_OPTS += --with-libgcrypt=$(STAGING_DIR)/usr
+	COLLECTD_CONF_ENV += LIBGCRYPT_CONFIG=$(STAGING_DIR)/usr/bin/libgcrypt-config
+else
+	COLLECTD_CONF_OPTS += --with-libgcrypt=no
 endif
 
 # released software should not break on minor warnings

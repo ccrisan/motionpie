@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-FFMPEG_VERSION = 2.4.3
+FFMPEG_VERSION = 2.5.4
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VERSION).tar.bz2
 FFMPEG_SITE = http://ffmpeg.org/releases
 FFMPEG_INSTALL_STAGING = YES
@@ -23,7 +23,6 @@ FFMPEG_CONF_OPTS = \
 	--enable-logging \
 	--enable-optimizations \
 	--disable-extra-warnings \
-	--disable-ffprobe \
 	--enable-avdevice \
 	--enable-avcodec \
 	--enable-avformat \
@@ -50,7 +49,6 @@ FFMPEG_CONF_OPTS = \
 	--disable-libopencv \
 	--disable-libdc1394 \
 	--disable-libfaac \
-	--disable-libfreetype \
 	--disable-libgsm \
 	--disable-libmp3lame \
 	--disable-libnut \
@@ -102,6 +100,12 @@ ifeq ($(BR2_PACKAGE_FFMPEG_AVRESAMPLE),y)
 FFMPEG_CONF_OPTS += --enable-avresample
 else
 FFMPEG_CONF_OPTS += --disable-avresample
+endif
+
+ifeq ($(BR2_PACKAGE_FFMPEG_FFPROBE),y)
+FFMPEG_CONF_OPTS += --enable-ffprobe
+else
+FFMPEG_CONF_OPTS += --disable-ffprobe
 endif
 
 ifeq ($(BR2_PACKAGE_FFMPEG_POSTPROC),y)
@@ -229,6 +233,23 @@ else
 FFMPEG_CONF_OPTS += --disable-libvpx
 endif
 
+# ffmpeg freetype support require fenv.h which is only
+# available/working on glibc.
+# The microblaze variant doesn't provide the needed exceptions
+ifeq ($(BR2_PACKAGE_FREETYPE)$(BR2_TOOLCHAIN_USES_GLIBC)x$(BR2_microblaze),yyx)
+FFMPEG_CONF_OPTS += --enable-libfreetype
+FFMPEG_DEPENDENCIES += freetype
+else
+FFMPEG_CONF_OPTS += --disable-libfreetype
+endif
+
+ifeq ($(BR2_PACKAGE_FONTCONFIG),y)
+FFMPEG_CONF_OPTS += --enable-fontconfig
+FFMPEG_DEPENDENCIES += fontconfig
+else
+FFMPEG_CONF_OPTS += --disable-fontconfig
+endif
+
 ifeq ($(BR2_PACKAGE_X264)$(BR2_PACKAGE_FFMPEG_GPL),yy)
 FFMPEG_CONF_OPTS += --enable-libx264
 FFMPEG_DEPENDENCIES += x264
@@ -332,7 +353,7 @@ else
 FFMPEG_CONF_OPTS += --disable-altivec
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),)
+ifeq ($(BR2_STATIC_LIBS),)
 FFMPEG_CONF_OPTS += --enable-pic
 else
 FFMPEG_CONF_OPTS += --disable-pic

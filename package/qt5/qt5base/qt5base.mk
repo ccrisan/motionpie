@@ -34,7 +34,7 @@ else
 QT5BASE_CONFIGURE_OPTS += -release
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 QT5BASE_CONFIGURE_OPTS += -static
 else
 # We apparently can't build both the shared and static variants of the
@@ -50,8 +50,8 @@ endif
 
 ifeq ($(BR2_PACKAGE_QT5BASE_LICENSE_APPROVED),y)
 QT5BASE_CONFIGURE_OPTS += -opensource -confirm-license
-QT5BASE_LICENSE = LGPLv2.1 or GPLv3.0
-QT5BASE_LICENSE_FILES = LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
+QT5BASE_LICENSE = LGPLv2.1 with exception or LGPLv3
+QT5BASE_LICENSE_FILES = LICENSE.LGPLv21 LGPL_EXCEPTION.txt LICENSE.LGPLv3
 else
 QT5BASE_LICENSE = Commercial license
 QT5BASE_REDISTRIBUTE = NO
@@ -67,8 +67,7 @@ QT5BASE_CONFIGURE_OPTS += -no-sql-mysql
 endif
 
 ifeq ($(BR2_PACKAGE_QT5BASE_PSQL),y)
-QT5BASE_CONFIGURE_OPTS += -plugin-sql-psql
-QT5BASE_CONFIGURE_ENV  += PSQL_LIBS=-L$(STAGING_DIR)/usr/lib
+QT5BASE_CONFIGURE_OPTS += -plugin-sql-psql -psql_config $(STAGING_DIR)/usr/bin/pg_config
 QT5BASE_DEPENDENCIES   += postgresql
 else
 QT5BASE_CONFIGURE_OPTS += -no-sql-psql
@@ -189,13 +188,12 @@ define QT5BASE_CONFIGURE_CMDS
 		-examplesdir /usr/lib/qt/examples \
 		-no-rpath \
 		-nomake tests \
-		-device rasp-pi \
+		-device buildroot \
 		-device-option CROSS_COMPILE="$(TARGET_CROSS)" \
 		-device-option BR_CCACHE="$(CCACHE)" \
 		-device-option BR_COMPILER_CFLAGS="$(TARGET_CFLAGS)" \
 		-device-option BR_COMPILER_CXXFLAGS="$(TARGET_CXXFLAGS)" \
 		-device-option EGLFS_PLATFORM_HOOKS_SOURCES="$(QT5BASE_EGLFS_PLATFORM_HOOKS_SOURCES)" \
-		-no-c++11 \
 		$(QT5BASE_CONFIGURE_OPTS) \
 	)
 endef
@@ -211,7 +209,7 @@ endef
 
 define QT5BASE_INSTALL_TARGET_LIBS
 	for lib in $(QT5BASE_INSTALL_LIBS_y); do \
-		cp -dpf $(STAGING_DIR)/usr/lib/lib$${lib}.so.* $(TARGET_DIR)/usr/lib ; \
+		cp -dpf $(STAGING_DIR)/usr/lib/lib$${lib}.so.* $(TARGET_DIR)/usr/lib || exit 1 ; \
 	done
 endef
 
@@ -236,7 +234,7 @@ define QT5BASE_INSTALL_TARGET_EXAMPLES
 	fi
 endef
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 define QT5BASE_INSTALL_TARGET_CMDS
 	$(QT5BASE_INSTALL_TARGET_FONTS)
 	$(QT5BASE_INSTALL_TARGET_EXAMPLES)

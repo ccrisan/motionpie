@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OMNIORB_VERSION = 4.1.6
+OMNIORB_VERSION = 4.2.0
 OMNIORB_SITE = http://downloads.sourceforge.net/project/omniorb/omniORB/omniORB-$(OMNIORB_VERSION)
 OMNIORB_SOURCE = omniORB-$(OMNIORB_VERSION).tar.bz2
 OMNIORB_INSTALL_STAGING = YES
@@ -12,7 +12,6 @@ OMNIORB_LICENSE = GPL2+ LGPLv2.1+
 OMNIORB_LICENSE_FILES = COPYING COPYING.LIB
 OMNIORB_DEPENDENCIES = host-omniorb
 HOST_OMNIORB_DEPENDENCIES = host-python
-OMNIORB_INSTALL_TARGET = YES
 
 # 0001-uclinux-is-also-linux.patch touches configure.ac
 OMNIORB_AUTORECONF = YES
@@ -37,14 +36,14 @@ HOST_OMNIORB_CONF_OPTS += --disable-longdouble
 # required.  The tools however are host related and should never
 # be required on target.
 define OMNIORB_ENABLE_EXTRA_APPS
-$(SED) 's:SUBDIRS += lib:SUBDIRS += lib appl services:g' $(@D)/src/dir.mk
+	$(SED) 's:SUBDIRS += lib:SUBDIRS += lib appl services:g' $(@D)/src/dir.mk
 endef
 
 ifeq ($(BR2_PACKAGE_OMNIORB_WITH_APPS),y)
 OMNIORB_POST_PATCH_HOOKS += OMNIORB_ENABLE_EXTRA_APPS
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 define OMNIORB_DISABLE_SHARED
 	echo "BuildSharedLibrary =" >> $(@D)/mk/beforeauto.mk
 endef

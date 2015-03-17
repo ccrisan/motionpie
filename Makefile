@@ -934,6 +934,4 @@ release:
 print-version:
 	@echo $(BR2_VERSION_FULL)
 
--include $(BR2_EXTERNAL)/docs/*/*.mk
-
 .PHONY: $(noconfig_targets)

@@ -124,7 +124,7 @@ def download(version):
     try:
         logging.info('decompressing %s...' % _DOWNLOAD_FILE_NAME)
 
-        subprocess.check_call(['/usr/bin/gunzip', _DOWNLOAD_FILE_NAME])
+        subprocess.check_call(['/bin/gunzip', _DOWNLOAD_FILE_NAME])
 
     except Exception as e:
         logging.error('could not decompress archive: %s' % e)

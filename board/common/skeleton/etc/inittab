@@ -22,6 +22,7 @@ null::sysinit:/sbin/remountrw
 null::sysinit:/sbin/loadmodules
 # now run any rc scripts
 ::sysinit:/etc/init.d/rcS
+::sysinit:/sbin/userinit
 
 # Put a getty on the serial port
 tty1::respawn:/sbin/getty -L tty1 115200 vt100

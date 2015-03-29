@@ -191,6 +191,18 @@ def _set_motioneye_settings(s):
             f.write(line)
 
 
+def _get_motion_log():
+    return '<a href="javascript:downloadFile(\'log/motion/\');">motion.log</a>'
+
+
+def _get_motion_eye_log():
+    return '<a href="javascript:downloadFile(\'log/motioneye/\');">motioneye.log</a>'
+
+
+def _get_messages_log():
+    return '<a href="javascript:downloadFile(\'log/messages/\');">messages</a>'
+
+
 @additional_config
 def extraDateSeparator():
     return {
@@ -331,4 +343,44 @@ def debug():
         'get_set_dict': True
     }
 
+
+@additional_config
+def extraLogsSeparator():
+    return {
+        'type': 'separator',
+        'section': 'expertSettings',
+        'advanced': True
+    }
+
+
+@additional_config
+def motionLog():
+    return {
+        'label': 'Log Files',
+        'description': 'download the log files and include them with any issue you want to report',
+        'type': 'html',
+        'section': 'expertSettings',
+        'advanced': True,
+        'get': _get_motion_log,
+    }
+
+
+@additional_config
+def motionEyeLog():
+    return {
+        'type': 'html',
+        'section': 'expertSettings',
+        'advanced': True,
+        'get': _get_motion_eye_log,
+    }
+
+
+@additional_config
+def messagesLog():
+    return {
+        'type': 'html',
+        'section': 'expertSettings',
+        'advanced': True,
+        'get': _get_messages_log,
+    }
 

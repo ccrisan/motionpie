@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = 88db129
-MOTIONPIE_VERSION = 20150317
+MOTIONEYE_VERSION = d2f1f4f
+MOTIONPIE_VERSION = 20150329
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -47,6 +47,15 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     
     # additional config
     sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept:\n    pass/' $(DST_DIR)/src/config.py
+    
+    # log files
+    lineno=$$(grep -n -m1 LOGS $(DST_DIR)/src/handlers.py | cut -d ':' -f 1); \
+    head -n $$(($$lineno + 1)) $(DST_DIR)/src/handlers.py > /tmp/handlers.py.new; \
+    echo "        'motioneye': ('/var/log/motioneye.log', 'motioneye.log')," >> /tmp/handlers.py.new; \
+    echo "        'messages': ('/var/log/messages', 'messages')," >> /tmp/handlers.py.new; \
+    tail -n +$$(($$lineno + 2)) $(DST_DIR)/src/handlers.py >> /tmp/handlers.py.new
+    mv /tmp/handlers.py.new $(DST_DIR)/src/handlers.py
 endef
 
 $(eval $(generic-package))
+

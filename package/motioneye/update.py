@@ -20,6 +20,7 @@ import logging
 import os.path
 import re
 import shutil
+import ssl
 import subprocess
 import time
 import urllib2
@@ -53,7 +54,9 @@ def get_all_versions():
         logging.debug('board is %s' % _BOARD)
         logging.debug('fetching %s...' % url)
 
-        response = urllib2.urlopen(url, timeout=settings.REMOTE_REQUEST_TIMEOUT)
+        context = ssl._create_unverified_context()
+
+        response = urllib2.urlopen(url, timeout=settings.REMOTE_REQUEST_TIMEOUT, context=context)
         releases = json.load(response)
 
         versions = []

@@ -15,7 +15,7 @@ cp $TARGET/../build/linux-*/System.map $TARGET/System.map
 mkdir -p $BOOT_DIR
 
 cp $IMG_DIR/uImage $BOOT_DIR
-cp $IMG_DIR/script.bin $BOOT_DIR
+cp $IMG_DIR/sun7i-a20-cubietruck.dtb $BOOT_DIR
 
 mkimage -C none -A arm -T script -d $BOARD_DIR/boot.cmd $BOOT_DIR/boot.scr
 

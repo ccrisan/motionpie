@@ -1,29 +1,31 @@
 #!/bin/sh
 
 export TARGET="$1"
-export BOARD=$(dirname $0)
-export COMMON=$BOARD/../common
+
+BOARD_DIR=$(dirname $0)
+COMMON_DIR=$BOARD_DIR/../common
+BOOT_DIR=$TARGET/../images/boot/
+IMG_DIR=$TARGET/../images
+RPI_FW_DIR=$TARGET/../images/rpi-firmware
 
 # copy System.map
 cp $TARGET/../build/linux-*/System.map $TARGET/System.map
 
-# boot
-BOOT=$TARGET/../images/boot/
-RPI_FW=$TARGET/../images/rpi-firmware
+# boot directory
+mkdir -p $BOOT_DIR
 
-mkdir -p $BOOT
+cp $BOARD_DIR/config.txt $BOOT_DIR
+cp $BOARD_DIR/cmdline.txt $BOOT_DIR
+cp $BOARD_DIR/fwupdater.gz $BOOT_DIR
+cp $IMG_DIR/zImage $BOOT_DIR/kernel.img
+cp $RPI_FW_DIR/bootcode.bin $BOOT_DIR
+cp $RPI_FW_DIR/start.elf $BOOT_DIR
+cp $RPI_FW_DIR/fixup.dat $BOOT_DIR
 
-cp $BOARD/config.txt $BOOT
-cp $BOARD/cmdline.txt $BOOT
-cp $BOARD/fwupdater.gz $BOOT
-cp $TARGET/../images/zImage $BOOT/kernel.img
-cp $RPI_FW/bootcode.bin $BOOT
-cp $RPI_FW/start.elf $BOOT
-cp $RPI_FW/fixup.dat $BOOT
+$COMMON_DIR/startup-scripts.sh
+$COMMON_DIR/cleanups.sh
 
-$COMMON/startup-scripts.sh
-$COMMON/cleanups.sh
-
+# extra cleanups
 rm -rf $TARGET/opt/vc/src
 rm -rf $TARGET/opt/vc/include
 

@@ -109,7 +109,7 @@ losetup -f $DISK_IMG
 
 msg "partitioning disk"
 set +e
-fdisk -uc $loop_dev <<END
+fdisk -u=sectors $loop_dev <<END
 o
 n
 p
@@ -133,8 +133,8 @@ set -e
 sync
 
 msg "reading partition offsets"
-boot_offs=$(fdisk -uc -l $loop_dev | grep -E 'loop[[:digit:]]p1' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
-root_offs=$(fdisk -uc -l $loop_dev | grep -E 'loop[[:digit:]]p2' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
+boot_offs=$(fdisk -u=sectors -l $loop_dev | grep -E 'loop[[:digit:]]p1' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
+root_offs=$(fdisk -u=sectors -l $loop_dev | grep -E 'loop[[:digit:]]p2' | tr -d '*' | tr -s ' ' | cut -d ' ' -f 2)
 
 msg "destroying disk loop device"
 losetup -d $loop_dev

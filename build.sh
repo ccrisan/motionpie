@@ -41,9 +41,11 @@ if [ "$target" == "mkimage" ]; then
     $boarddir/mkimage.sh
 elif [ "$target" == "mkrelease" ]; then
     $boarddir/mkimage.sh
-    rm -f $outputdir/images/motionPie.img.gz
-    which pigz &>/dev/null && pigz $outputdir/images/motionPie.img || gzip $outputdir/images/motionPie.img
-    mv $outputdir/images/motionPie.img.gz  $basedir/motionpie-$board-$(date +%Y%m%d).img.gz
+    cp $outputdir/images/motionpie-$board.img $basedir
+    date=$(date +%Y%m%d)
+    mv $basedir/motionpie-$board.img  $basedir/motionpie-$board-$date.img
+    rm -f $basedir/motionpie-$board-$date.img.gz
+    gzip $basedir/motionpie-$board-$date.img
 elif [ -n "$target" ]; then
     make O=$outputdir $target
 else

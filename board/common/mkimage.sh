@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-if [ -z "$IMG_DIR" ]; then
+if [ -z "$IMG_DIR" ] || [ -z "$BOARD" ]; then
     echo "this script must be invoked from board specific mkimage.sh"
     exit 1
 fi
@@ -163,8 +163,8 @@ msg "destroying root loop device"
 losetup -d $loop_dev
 sync
 
-mv $DISK_IMG $(dirname $DISK_IMG)/motionPie.img
-DISK_IMG=$(dirname $DISK_IMG)/motionPie.img
+mv $DISK_IMG $(dirname $DISK_IMG)/motionpie-$BOARD.img
+DISK_IMG=$(dirname $DISK_IMG)/motionpie-$BOARD.img
 
 msg "$(realpath "$DISK_IMG") is ready"
 

@@ -71,8 +71,11 @@ start() {
             echo "Setting custom root/admin password"
         fi
 
-        echo -en "$password\n$password\n" | passwd &>/dev/null
-        echo -en "$password\n$password\n" | passwd admin &>/dev/null
+        rm -f /data/etc/shadow+
+
+        echo -en "$password\n$password\n" | passwd &>/dev/null # root
+        echo -en "$password\n$password\n" | passwd admin &>/dev/null # admin
+        
         sed -r -i 's/root:([^:]+):[[:digit:]]+:/root:\1::/' /data/etc/shadow # removes pwd expiration
         sed -r -i 's/admin:([^:]+):[[:digit:]]+:/admin:\1::/' /data/etc/shadow # removes pwd expiration
 

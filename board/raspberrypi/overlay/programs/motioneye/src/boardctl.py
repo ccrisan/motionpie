@@ -80,6 +80,10 @@ def _set_board_settings(s):
     s.setdefault('overclock', '700|250|400|0')
     s.setdefault('cameraLed', True)
     
+    old_settings = _get_board_settings()
+    if s == old_settings:
+        return # nothing has changed
+
     seen = set()
 
     logging.debug('writing board settings to %s: ' % CONFIG_TXT + 

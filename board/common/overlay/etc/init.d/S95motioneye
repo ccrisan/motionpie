@@ -2,6 +2,7 @@
 
 watch_timeout=120
 conf="/data/etc/motioneye.conf"
+dev_v4l_by_id="/dev/v4l/by-id/"
 
 def_port=$(cat /programs/motioneye/settings.py | grep PORT | tr -d ' ' | cut -d '=' -f 2)
 
@@ -38,6 +39,24 @@ watch() {
     done
 }
 
+find_persistent_device() {
+    device=$1
+
+    if ! [ -d $dev_v4l_by_id ]; then
+        echo $device
+        return
+    fi
+
+    for p in $dev_v4l_by_id/*; do
+        if [ $(realpath "$p") == $device ]; then
+            echo $p
+            return
+        fi
+    done
+    
+    echo $device
+}
+
 start() {
     echo -n "Starting motioneye: "
     /usr/bin/python2.7 /programs/motioneye/motioneye.py >>/var/log/motioneye.log $opts 2>&1 &
@@ -70,6 +89,7 @@ start() {
                 output_dir="/data/output/"
             fi
             uri="/config/add/?_username=admin"
+            device=$(find_persistent_device $device)
             body="{\"uri\": \"$device\", \"proto\": \"v4l2\"}"
             signature=$(echo -n "POST:$uri:$body:" | sha1sum | cut -d ' ' -f 1)
 

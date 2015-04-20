@@ -2,6 +2,7 @@
 
 set +e
 /usr/bin/killall watchdog
+sleep 1
 /bin/echo -e '\0' > /dev/watchdog
 /bin/busybox reboot
 

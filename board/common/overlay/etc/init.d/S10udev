@@ -7,7 +7,7 @@ source /etc/udev/udev.conf
 start() {
     echo -n "Starting eudev: "
     echo '\000\000\000\000' > /proc/sys/kernel/hotplug
-    /sbin/udevd -d
+    /sbin/udevd --daemon
     [ $? == 0 ] && echo "done" || echo "failed"
     /sbin/udevadm trigger --type=subsystems --action=add
     /sbin/udevadm trigger --type=devices --action=add

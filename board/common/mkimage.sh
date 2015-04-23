@@ -101,8 +101,8 @@ fi
 # disk image
 msg "creating disk loop device"
 dd if=/dev/zero of=$DISK_IMG bs=1M count=$DISK_SIZE
-if [ -n "$UBOOT_BIN" ]; then
-    dd conv=notrunc if=$UBOOT_BIN of=$DISK_IMG bs=1024 seek=8
+if [ -n "$UBOOT_BIN" ] && [ -n "$UBOOT_SEEK" ]; then
+    dd conv=notrunc if=$UBOOT_BIN of=$DISK_IMG bs=1024 seek=$UBOOT_SEEK
 fi
 loop_dev=$(losetup -f)
 losetup -f $DISK_IMG

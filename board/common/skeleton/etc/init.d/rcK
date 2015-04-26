@@ -1,14 +1,17 @@
 #!/bin/sh
 
+BOOT_LOG=/var/log/boot.log
+PID_FILE=/tmp/rc.pid
 
-# Stop all init scripts in /etc/init.d
-# executing them in reversed numerical order.
-#
-for i in $(ls -r /etc/init.d/S??*) ;do
+echo "---- shutting down ----" >> $BOOT_LOG
+
+# stop all init scripts in /etc/init.d
+# executing them in numerical order.
+(for i in /etc/init.d/S??*; do
     [ ! -f "$i" ] && continue
     [ -f /data/etc/no_$(basename $i) ] && continue
 
-     case "$i" in
+    case "$i" in
         *.sh) # Source shell script for speed.
             (
             trap - INT QUIT TSTP
@@ -20,5 +23,10 @@ for i in $(ls -r /etc/init.d/S??*) ;do
             $i stop
             ;;
     esac
+done& echo $! > $PID_FILE) | tee -a $BOOT_LOG &
+
+pid=$(cat $PID_FILE)
+while kill -0 $pid 2>/dev/null; do
+    sleep 1
 done
 

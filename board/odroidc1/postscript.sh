@@ -19,8 +19,7 @@ mkdir -p $BOOT_DIR
 cp $IMG_DIR/uImage $BOOT_DIR
 cp $IMG_DIR/meson8b_odroidc.dtb $BOOT_DIR
 cp $UBOOT_DIR/sd_fuse/bl1.bin.hardkernel $IMG_DIR
-
-$UBOOT_HOST_DIR/tools/mkimage -C none -A arm -T script -d $BOARD_DIR/boot.cmd $BOOT_DIR/boot.scr
+cp $BOARD_DIR/boot.ini $BOOT_DIR
 
 # disable software updating
 sed -i 's/enable_update=True/enable_update=False/' $TARGET/programs/motioneye/src/handlers.py

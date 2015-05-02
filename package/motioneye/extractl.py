@@ -203,6 +203,10 @@ def _get_messages_log():
     return '<a href="javascript:downloadFile(\'log/messages/\');">messages</a>'
 
 
+def _get_boot_log():
+    return '<a href="javascript:downloadFile(\'log/boot/\');">boot.log</a>'
+
+
 @additional_config
 def extraDateSeparator():
     return {
@@ -382,5 +386,15 @@ def messagesLog():
         'section': 'expertSettings',
         'advanced': True,
         'get': _get_messages_log,
+    }
+
+
+@additional_config
+def bootLog():
+    return {
+        'type': 'html',
+        'section': 'expertSettings',
+        'advanced': True,
+        'get': _get_boot_log,
     }
 

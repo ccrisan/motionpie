@@ -7,7 +7,6 @@ fi
 
 test "root" != "$USER" && exec sudo -E $0 "$@"
 
-echo $IMG_DIR
 function msg() {
     echo ":: $1"
 }

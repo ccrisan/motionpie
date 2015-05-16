@@ -3,7 +3,8 @@
 start() {
     echo -n "Setting hostname: "
 
-    sn="cubietruck"
+    sn=$(cat /sys/class/net/eth0/address | tr -d ':')
+    sn=${sn: -8}
     echo $sn > /var/cache/serial_number
     hostname="mp-$sn"
     /bin/hostname $hostname

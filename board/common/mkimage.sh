@@ -101,6 +101,7 @@ fi
 msg "creating disk loop device"
 dd if=/dev/zero of=$DISK_IMG bs=1M count=$DISK_SIZE
 if [ -n "$UBOOT_BIN" ] && [ -n "$UBOOT_SEEK" ]; then
+    msg "copying u-boot image"
     dd conv=notrunc if=$UBOOT_BIN of=$DISK_IMG bs=512 seek=$UBOOT_SEEK
 fi
 loop_dev=$(losetup -f)

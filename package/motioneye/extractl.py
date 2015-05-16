@@ -207,6 +207,10 @@ def _get_boot_log():
     return '<a href="javascript:downloadFile(\'log/boot/\');">boot.log</a>'
 
 
+def _get_dmesg_log():
+    return '<a href="javascript:downloadFile(\'log/dmesg/\');">dmesg.log</a>'
+
+
 @additional_config
 def extraDateSeparator():
     return {
@@ -396,5 +400,15 @@ def bootLog():
         'section': 'expertSettings',
         'advanced': True,
         'get': _get_boot_log,
+    }
+
+
+@additional_config
+def dmesgLog():
+    return {
+        'type': 'html',
+        'section': 'expertSettings',
+        'advanced': True,
+        'get': _get_dmesg_log,
     }
 

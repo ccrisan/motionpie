@@ -200,7 +200,7 @@ def _get_motion_eye_log():
 
 
 def _get_messages_log():
-    return '<a href="javascript:downloadFile(\'log/messages/\');">messages</a>'
+    return '<a href="javascript:downloadFile(\'log/messages/\');">messages.log</a>'
 
 
 def _get_boot_log():

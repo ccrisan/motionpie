@@ -61,7 +61,7 @@ def get_all_versions():
 
         versions = []
         for release in releases:
-            if release.get('prerelease') and not getattr(settings, 'PRERELEASES', False):
+            if release.get('prerelease') and not os.path.exists('/data/etc/prereleases'):
                 continue
             
             for asset in release.get('assets', []):

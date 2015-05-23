@@ -99,6 +99,7 @@ def _get_motioneye_settings():
     port = 80
     motion_binary = '/usr/bin/motion'
     debug = False
+    prereleases = False
 
     if os.path.exists(MOTIONEYE_CONF):
         logging.debug('reading motioneye settings from %s' % MOTIONEYE_CONF)
@@ -126,13 +127,16 @@ def _get_motioneye_settings():
                 elif name == 'log-level':
                     debug = value == 'debug'
 
+    prereleases =  os.path.exists('/data/etc/prereleases')
+
     s = {
         'port': port,
         'motionBinary': motion_binary,
-        'debug': debug
+        'debug': debug,
+        'prereleases': prereleases
     }
 
-    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s' % s)
+    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s, prereleases=%(prereleases)s' % s)
 
     return s
 
@@ -142,9 +146,10 @@ def _set_motioneye_settings(s):
     s.setdefault('port', 80)
     s.setdefault('motionBinary', '/usr/bin/motion')
     s.setdefault('debug', False)
+    s.setdefault('prereleases', False)
     
     logging.debug('writing motioneye settings to %s: ' % MOTIONEYE_CONF +
-            'port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s' % s)
+            'port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s, prereleases=%(prereleases)s' % s)
 
     lines = []
     if os.path.exists(MOTIONEYE_CONF):
@@ -181,6 +186,17 @@ def _set_motioneye_settings(s):
 
     if 'debug' in s:
         lines.append('log-level %s' % ['info', 'debug'][s.pop('debug')])
+        
+    if s['prereleases']:
+        with open('/data/etc/prereleases', 'w'):
+            pass
+            
+    else:
+        try:
+            os.remove('/data/etc/prereleases')
+        
+        except:
+            pass
 
     with open(MOTIONEYE_CONF, 'w') as f:
         for line in lines:
@@ -346,6 +362,20 @@ def debug():
         'section': 'expertSettings',
         'advanced': True,
         'reboot': True,
+        'get': _get_motioneye_settings,
+        'set': _set_motioneye_settings,
+        'get_set_dict': True
+    }
+
+
+@additional_config
+def prereleases():
+    return {
+        'label': 'Enable Prereleases',
+        'description': 'turning this option on will allow updating to prereleases (untested, possibly unstable versions)',
+        'type': 'bool',
+        'section': 'expertSettings',
+        'advanced': True,
         'get': _get_motioneye_settings,
         'set': _set_motioneye_settings,
         'get_set_dict': True

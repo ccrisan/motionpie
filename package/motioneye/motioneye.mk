@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = b221448
-MOTIONPIE_VERSION = 20150516
+MOTIONEYE_VERSION = 89eb9b6
+MOTIONPIE_VERSION = 20150524
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -59,4 +59,3 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
-

@@ -196,7 +196,7 @@ def _set_motioneye_settings(s):
     if 'debug' in s:
         lines.append('log-level %s' % ['info', 'debug'][s.pop('debug')])
         
-    if 'mjpg-client-idle-timeout' in s:
+    if 'motionKeepAlive' in s:
         lines.append('mjpg-client-idle-timeout %s' % [10, 0][s.pop('motionKeepAlive')])
 
     if s['prereleases']:

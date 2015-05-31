@@ -62,7 +62,7 @@ start() {
 
         # set root and admin passwords
         if [ -f /data/etc/motion.conf ]; then
-            password=$(cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3)
+            password=$(cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3-)
         fi
         if [ -z "$password" ]; then
     		password=$(cat /var/cache/serial_number)

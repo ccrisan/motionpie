@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = 89eb9b6
-MOTIONPIE_VERSION = 20150524
+MOTIONEYE_VERSION = 4944a50
+MOTIONPIE_VERSION = 20150531
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -42,6 +42,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%motionEye is up to date%motionPie is up to date%" $(DST_DIR)/static/js/main.js
     sed -i "s%motionEye was successfully updated%motionPie was successfully updated%" $(DST_DIR)/static/js/main.js
     sed -i "s%motioneye-config.tar.gz%motionpie-config.tar.gz%" $(DST_DIR)/src/handlers.py
+    sed -i "s%this is motionEye%this is motionPie%" $(DST_DIR)/motioneye.py
     sed -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/src/handlers.py
     
     # additional config

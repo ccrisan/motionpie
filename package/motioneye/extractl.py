@@ -100,6 +100,7 @@ def _get_motioneye_settings():
     motion_binary = '/usr/bin/motion'
     debug = False
     prereleases = False
+    motion_keep_alive = False
 
     if os.path.exists(MOTIONEYE_CONF):
         logging.debug('reading motioneye settings from %s' % MOTIONEYE_CONF)
@@ -127,16 +128,20 @@ def _get_motioneye_settings():
                 elif name == 'log-level':
                     debug = value == 'debug'
 
+                elif name == 'mjpg-client-idle-timeout':
+                    motion_keep_alive = value == '0'
+
     prereleases =  os.path.exists('/data/etc/prereleases')
 
     s = {
         'port': port,
         'motionBinary': motion_binary,
+        'motionKeepAlive': motion_keep_alive,
         'debug': debug,
         'prereleases': prereleases
     }
 
-    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s, prereleases=%(prereleases)s' % s)
+    logging.debug('motioneye settings: port=%(port)s, motion_binary=%(motionBinary)s, motion_keep_alive=%(motionKeepAlive)s, debug=%(debug)s, prereleases=%(prereleases)s' % s)
 
     return s
 
@@ -147,9 +152,10 @@ def _set_motioneye_settings(s):
     s.setdefault('motionBinary', '/usr/bin/motion')
     s.setdefault('debug', False)
     s.setdefault('prereleases', False)
+    s.setdefault('motion_keep_alive', False)
     
     logging.debug('writing motioneye settings to %s: ' % MOTIONEYE_CONF +
-            'port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s, prereleases=%(prereleases)s' % s)
+            'port=%(port)s, motion_binary=%(motionBinary)s, debug=%(debug)s, prereleases=%(prereleases)s, motion_keep_alive=%(motionKeepAlive)s' % s)
 
     lines = []
     if os.path.exists(MOTIONEYE_CONF):
@@ -177,6 +183,9 @@ def _set_motioneye_settings(s):
     
             elif name == 'log-level':
                 lines[i] = 'log-level %s' % ['info', 'debug'][s.pop('debug')]
+                
+            elif name == 'mjpg-client-idle-timeout':
+                lines[i] = 'mjpg-client-idle-timeout %s' % [10, 0][s.pop('motionKeepAlive')]
 
     if 'port' in s:
         lines.append('port %s' % s.pop('port'))
@@ -187,6 +196,9 @@ def _set_motioneye_settings(s):
     if 'debug' in s:
         lines.append('log-level %s' % ['info', 'debug'][s.pop('debug')])
         
+    if 'mjpg-client-idle-timeout' in s:
+        lines.append('mjpg-client-idle-timeout %s' % [10, 0][s.pop('motionKeepAlive')])
+
     if s['prereleases']:
         with open('/data/etc/prereleases', 'w'):
             pass
@@ -347,6 +359,21 @@ def motionBinary():
         'advanced': True,
         'reboot': True,
         'required': True,
+        'get': _get_motioneye_settings,
+        'set': _set_motioneye_settings,
+        'get_set_dict': True
+    }
+
+
+@additional_config
+def motionKeepAlive():
+    return {
+        'label': 'Motion Keep-alive',
+        'description': 'enables continuous motion daemon hang detection (at the expense of a slightly higher CPU usage)',
+        'type': 'bool',
+        'section': 'expertSettings',
+        'advanced': True,
+        'reboot': True,
         'get': _get_motioneye_settings,
         'set': _set_motioneye_settings,
         'get_set_dict': True

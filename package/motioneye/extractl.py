@@ -99,7 +99,6 @@ def _get_motioneye_settings():
     port = 80
     motion_binary = '/usr/bin/motion'
     debug = False
-    prereleases = False
     motion_keep_alive = False
 
     if os.path.exists(MOTIONEYE_CONF):

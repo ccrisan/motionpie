@@ -229,3 +229,6 @@ def overclock():
         'get_set_dict': True
     }
 
+
+import streameyectl
+

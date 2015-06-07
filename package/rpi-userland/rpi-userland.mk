@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RPI_USERLAND_VERSION = d8f146af05c2b9cd92f9a426148376b349f744fd
+RPI_USERLAND_VERSION = 8f542a1647e6f88f254eadd9ad6929301c81913b
 RPI_USERLAND_SITE = $(call github,raspberrypi,userland,$(RPI_USERLAND_VERSION))
 RPI_USERLAND_LICENSE = BSD-3c
 RPI_USERLAND_LICENSE_FILES = LICENCE
@@ -24,7 +24,7 @@ endif
 define RPI_USERLAND_POST_TARGET_CLEANUP
 	rm -f $(TARGET_DIR)/etc/init.d/vcfiled
 	rm -f $(TARGET_DIR)/usr/share/install/vcfiled
-	rm -rf $(TARGET_DIR)/usr/share/install
+	rmdir --ignore-fail-on-non-empty $(TARGET_DIR)/usr/share/install
 	rm -Rf $(TARGET_DIR)/usr/src
 endef
 RPI_USERLAND_POST_INSTALL_TARGET_HOOKS += RPI_USERLAND_POST_TARGET_CLEANUP

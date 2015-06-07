@@ -4,7 +4,7 @@ choice
 	prompt "Toolchain"
 
 comment "(e)glibc toolchains only available with shared lib support"
-	depends on BR2_PREFER_STATIC_LIB
+	depends on BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_EXTERNAL_LINARO_ARM
 	bool "Linaro ARM 2014.09"
@@ -12,7 +12,7 @@ config BR2_TOOLCHAIN_EXTERNAL_LINARO_ARM
 	depends on BR2_ARM_CPU_ARMV7A
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on BR2_ARM_EABIHF
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -30,7 +30,7 @@ config BR2_TOOLCHAIN_EXTERNAL_LINARO_ARM
 comment "Linaro toolchains available for Cortex-A + EABIhf"
 	depends on BR2_arm
 	depends on !BR2_ARM_CPU_ARMV7A || !BR2_ARM_EABIHF
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_EXTERNAL_LINARO_ARMEB
 	bool "Linaro armeb 2014.09"
@@ -38,7 +38,7 @@ config BR2_TOOLCHAIN_EXTERNAL_LINARO_ARMEB
 	depends on BR2_ARM_CPU_ARMV7A
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on BR2_ARM_EABIHF
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -56,14 +56,14 @@ config BR2_TOOLCHAIN_EXTERNAL_LINARO_ARMEB
 comment "Linaro toolchains available for Cortex-A + EABIhf"
 	depends on BR2_armeb
 	depends on !BR2_ARM_CPU_ARMV7A || !BR2_ARM_EABIHF
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_ARM201405
 	bool "Sourcery CodeBench ARM 2014.05"
 	depends on BR2_arm
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on BR2_ARM_EABI
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -90,7 +90,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_ARM201311
 	depends on BR2_arm
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on BR2_ARM_EABI
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_HAS_GCC_BUG_58595 # based-on gcc-4.8.1
 	select BR2_TOOLCHAIN_HAS_GCC_BUG_58854 # based-on gcc-4.8.1
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
@@ -119,7 +119,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_ARM201305
 	depends on BR2_arm
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on BR2_ARM_EABI
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_HAS_GCC_BUG_58595 # based-on gcc-4.7.3
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
@@ -145,7 +145,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_ARM201305
 comment "Sourcery CodeBench toolchains available for the EABI ABI"
 	depends on BR2_arm
 	depends on !BR2_ARM_EABI
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_EXTERNAL_ARAGO_ARMV7A_201109
 	bool "Arago ARMv7 2011.09"
@@ -154,7 +154,7 @@ config BR2_TOOLCHAIN_EXTERNAL_ARAGO_ARMV7A_201109
 	depends on BR2_ARM_CPU_ARMV7A
 	depends on BR2_ARM_EABI
 	depends on BR2_ARM_CPU_HAS_VFPV3 || BR2_ARM_CPU_MAYBE_HAS_VFPV3
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -176,7 +176,7 @@ config BR2_TOOLCHAIN_EXTERNAL_ARAGO_ARMV5TE_201109
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on !BR2_ARM_CPU_ARMV4
 	depends on BR2_ARM_EABI
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -188,12 +188,182 @@ config BR2_TOOLCHAIN_EXTERNAL_ARAGO_ARMV5TE_201109
 
 	  This toolchain uses software-floating point.
 
+config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201505
+	bool "Sourcery CodeBench MIPS 2015.05"
+	depends on BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
+	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
+	depends on !BR2_MIPS_NABI32
+	depends on !BR2_STATIC_LIBS
+	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
+	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
+	select BR2_INSTALL_LIBSTDCPP
+	select BR2_HOSTARCH_NEEDS_IA32_LIBS
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_19
+	help
+	  Sourcery CodeBench toolchain for the MIPS architecture, from
+	  Mentor Graphics. It uses gcc 4.9.2, binutils 2.24.51, glibc
+	  2.21, uClibc 0.9.30 and gdb 7.7.50, kernel headers 3.19. It
+	  has support for the following variants:
+	    - MIPS32r2 - Big-Endian, 2008 NaN, O32
+	      Select MIPS (big endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mnan=2008
+	    - MIPS32r2 - Big-Endian, O32
+	      Select MIPS (big endian) core
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS32r2 - Big-Endian, O32, MIPS16
+	      Select MIPS (big endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Big-Endian, Soft-Float, O32
+	      Select MIPS (big endian) core
+	      Select BR2_SOFT_FLOAT
+	    - MIPS32r2 - Big-Endian, Soft-Float, O32, MIPS16
+	      Select MIPS (big endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, 2008 NaN, O32
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mnan=2008
+	    - MIPS32r2 - Little-Endian, O32
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS32r2 - Little-Endian, O32, MIPS16
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32, MIPS16
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32, microMIPS
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mmicromips
+	    - MIPS32r2 - uClibc, Big-Endian, 2008 NaN, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Big-Endian, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Big-Endian, Soft-Float, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, 2008 NaN, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, Soft-Float, O32
+	      Not usable in Buildroot yet.
+	    - MIPS64r2 - Big-Endian, N64
+	      Select MIPS64 (big endian) core
+	      Select the n64 ABI
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS64r2 - Big-Endian, Soft-Float, N64
+	      Select MIPS64 (big endian) core
+	      Select the n64 ABI
+	      Select BR2_SOFT_FLOAT
+	    - MIPS64r2 - Little-Endian, N64
+	      Select MIPS64 (little endian) core
+	      Select the n64 ABI
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS64r2 - Little-Endian, Soft-Float, N64
+	      Select MIPS64 (little endian) core
+	      Select the n64 ABI
+	      Select BR2_SOFT_FLOAT
+
+config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201411
+	bool "Sourcery CodeBench MIPS 2014.11"
+	depends on BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
+	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
+	depends on !BR2_MIPS_NABI32
+	depends on !BR2_STATIC_LIBS
+	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
+	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
+	select BR2_INSTALL_LIBSTDCPP
+	select BR2_HOSTARCH_NEEDS_IA32_LIBS
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_16
+	help
+	  Sourcery CodeBench toolchain for the MIPS architecture, from
+	  Mentor Graphics. It uses gcc 4.9.1, binutils 2.24.51, glibc
+	  2.20, uClibc 0.9.30 and gdb 7.7.50, kernel headers 3.16.2. It
+	  has support for the following variants:
+	    - MIPS32r2 - Big-Endian, 2008 NaN, O32
+	      Select MIPS (big endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mnan=2008
+	    - MIPS32r2 - Big-Endian, O32
+	      Select MIPS (big endian) core
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS32r2 - Big-Endian, O32, MIPS16
+	      Select MIPS (big endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Big-Endian, Soft-Float, O32
+	      Select MIPS (big endian) core
+	      Select BR2_SOFT_FLOAT
+	    - MIPS32r2 - Big-Endian, Soft-Float, O32, MIPS16
+	      Select MIPS (big endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, 2008 NaN, O32
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mnan=2008
+	    - MIPS32r2 - Little-Endian, O32
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS32r2 - Little-Endian, O32, MIPS16
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32, MIPS16
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32, microMIPS
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mmicromips
+	    - MIPS32r2 - uClibc, Big-Endian, 2008 NaN, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Big-Endian, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Big-Endian, Soft-Float, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, 2008 NaN, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, Soft-Float, O32
+	      Not usable in Buildroot yet.
+	    - MIPS64r2 - Big-Endian, N64
+	      Select MIPS64 (big endian) core
+	      Select the n64 ABI
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS64r2 - Big-Endian, Soft-Float, N64
+	      Select MIPS64 (big endian) core
+	      Select the n64 ABI
+	      Select BR2_SOFT_FLOAT
+	    - MIPS64r2 - Little-Endian, N64
+	      Select MIPS64 (little endian) core
+	      Select the n64 ABI
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS64r2 - Little-Endian, Soft-Float, N64
+	      Select MIPS64 (little endian) core
+	      Select the n64 ABI
+	      Select BR2_SOFT_FLOAT
+
 config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201405
 	bool "Sourcery CodeBench MIPS 2014.05"
 	depends on BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	depends on !BR2_MIPS_NABI32
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -202,208 +372,86 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201405
 	help
 	  Sourcery CodeBench toolchain for the MIPS architecture, from
 	  Mentor Graphics. It uses gcc 4.8.3, binutils 2.24.51, glibc
-	  2.18, uClibc 0.9.30 and gdb 7.7.50, kernel headers
-	  3.13. It has support for the following variants:
-	    - MIPS32 O32 big endian glibc
-	      Select a MIPS generic core
+	  2.18, uClibc 0.9.30 and gdb 7.7.50, kernel headers 3.13. It
+	  has support for the following variants:
+	    - MIPS32r2 - Big-Endian, 2008 NaN, O32
+	      Select MIPS (big endian) core
 	      Disable BR2_SOFT_FLOAT
-	    - MIPS64 big endian glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
+	      Set BR2_TARGET_OPTIMIZATION to -mnan=2008
+	    - MIPS32r2 - Big-Endian, O32
+	      Select MIPS (big endian) core
 	      Disable BR2_SOFT_FLOAT
-	    - MIPS32 O32 little endian glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS64 little endian glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS32 big endian soft float glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	    - MIPS64 big endian soft float glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Select BR2_SOFT_FLOAT
-	    - MIPS32 little endian soft float glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	    - MIPS64 little endian soft float glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Select BR2_SOFT_FLOAT
-	    - MIPS32 big endian microMIPS glibc
-	      Select a MIPS generic core
+	    - MIPS32r2 - Big-Endian, O32, MIPS16
+	      Select MIPS (big endian) core
 	      Disable BR2_SOFT_FLOAT
 	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 little endian microMIPS glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 big endian soft float microMIPS glibc
-	      Select a MIPS generic core
+	    - MIPS32r2 - Big-Endian, Soft-Float, O32
+	      Select MIPS (big endian) core
+	      Select BR2_SOFT_FLOAT
+	    - MIPS32r2 - Big-Endian, Soft-Float, O32, MIPS16
+	      Select MIPS (big endian) core
 	      Select BR2_SOFT_FLOAT
 	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 little endian soft float microMIPS glibc
-	      Select a MIPS generic core
+	    - MIPS32r2 - Little-Endian, 2008 NaN, O32
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mnan=2008
+	    - MIPS32r2 - Little-Endian, O32
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	    - MIPS32r2 - Little-Endian, O32, MIPS16
+	      Select MIPS (little endian) core
+	      Disable BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mips16
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32, MIPS16
+	      Select MIPS (little endian) core
 	      Select BR2_SOFT_FLOAT
 	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 big endian uclibc
+	    - MIPS32r2 - Little-Endian, Soft-Float, O32, microMIPS
+	      Select MIPS (little endian) core
+	      Select BR2_SOFT_FLOAT
+	      Set BR2_TARGET_OPTIMIZATION to -mmicromips
+	    - MIPS32r2 - uClibc, Big-Endian, 2008 NaN, O32
 	      Not usable in Buildroot yet.
-	    - MIPS32 little endian uclibc
+	    - MIPS32r2 - uClibc, Big-Endian, O32
 	      Not usable in Buildroot yet.
-	    - MIPS32 big endian soft float uclibc
+	    - MIPS32r2 - uClibc, Big-Endian, Soft-Float, O32
 	      Not usable in Buildroot yet.
-	    - MIPS32 little endian soft float uclibc
+	    - MIPS32r2 - uClibc, Little-Endian, 2008 NaN, O32
 	      Not usable in Buildroot yet.
-
-config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201311
-	bool "Sourcery CodeBench MIPS 2013.11"
-	depends on BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
-	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_MIPS_NABI32
-	depends on !BR2_PREFER_STATIC_LIB
-	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	select BR2_INSTALL_LIBSTDCPP
-	select BR2_HOSTARCH_NEEDS_IA32_LIBS
-	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_11
-	help
-	  Sourcery CodeBench toolchain for the MIPS architecture, from
-	  Mentor Graphics. It uses gcc 4.8.1, binutils 2.23.52, glibc
-	  2.18, uClibc 0.9.30 and gdb 7.6.50, kernel headers
-	  3.11. It has support for the following variants:
-	    - MIPS32 O32 big endian glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS64 big endian glibc
-	      Select a MIPS64 generic core
+	    - MIPS32r2 - uClibc, Little-Endian, O32
+	      Not usable in Buildroot yet.
+	    - MIPS32r2 - uClibc, Little-Endian, Soft-Float, O32
+	      Not usable in Buildroot yet.
+	    - MIPS64r2 - Big-Endian, N64
+	      Select MIPS64 (big endian) core
 	      Select the n64 ABI
 	      Disable BR2_SOFT_FLOAT
-	    - MIPS32 O32 little endian glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS64 little endian glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS32 big endian soft float glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	    - MIPS64 big endian soft float glibc
-	      Select a MIPS64 generic core
+	    - MIPS64r2 - Big-Endian, Soft-Float, N64
+	      Select MIPS64 (big endian) core
 	      Select the n64 ABI
 	      Select BR2_SOFT_FLOAT
-	    - MIPS32 little endian soft float glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	    - MIPS64 little endian soft float glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Select BR2_SOFT_FLOAT
-	    - MIPS32 big endian microMIPS glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 little endian microMIPS glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 big endian soft float microMIPS glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 little endian soft float microMIPS glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 big endian uclibc
-	      Not usable in Buildroot yet.
-	    - MIPS32 little endian uclibc
-	      Not usable in Buildroot yet.
-	    - MIPS32 big endian soft float uclibc
-	      Not usable in Buildroot yet.
-	    - MIPS32 little endian soft float uclibc
-	      Not usable in Buildroot yet.
-
-config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201305
-	bool "Sourcery CodeBench MIPS 2013.05"
-	depends on BR2_mips || BR2_mipsel || BR2_mips64 || BR2_mips64el
-	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_MIPS_NABI32
-	depends on !BR2_PREFER_STATIC_LIB
-	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	select BR2_INSTALL_LIBSTDCPP
-	select BR2_HOSTARCH_NEEDS_IA32_LIBS
-	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8
-	help
-	  Sourcery CodeBench toolchain for the MIPS architecture, from
-	  Mentor Graphics. It uses gcc 4.7.3, binutils 2.23.52, glibc
-	  2.17, uClibc 0.9.30 and gdb 7.4.50, kernel headers
-	  3.8.2. It has support for the following variants:
-	    - MIPS32 O32 big endian glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS64 big endian glibc
-	      Select a MIPS64 generic core
+	    - MIPS64r2 - Little-Endian, N64
+	      Select MIPS64 (little endian) core
 	      Select the n64 ABI
 	      Disable BR2_SOFT_FLOAT
-	    - MIPS32 O32 little endian glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS64 little endian glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Disable BR2_SOFT_FLOAT
-	    - MIPS32 big endian soft float glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	    - MIPS64 big endian soft float glibc
-	      Select a MIPS64 generic core
+	    - MIPS64r2 - Little-Endian, Soft-Float, N64
+	      Select MIPS64 (little endian) core
 	      Select the n64 ABI
 	      Select BR2_SOFT_FLOAT
-	    - MIPS32 little endian soft float glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	    - MIPS64 little endian soft float glibc
-	      Select a MIPS64 generic core
-	      Select the n64 ABI
-	      Select BR2_SOFT_FLOAT
-	    - MIPS32 big endian microMIPS glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 little endian microMIPS glibc
-	      Select a MIPS generic core
-	      Disable BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 big endian soft float microMIPS glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 little endian soft float microMIPS glibc
-	      Select a MIPS generic core
-	      Select BR2_SOFT_FLOAT
-	      Set BR2_TARGET_OPTIMIZATION to -mips16
-	    - MIPS32 big endian uclibc
-	      Not usable in Buildroot yet.
-	    - MIPS32 little endian uclibc
-	      Not usable in Buildroot yet.
-	    - MIPS32 big endian soft float uclibc
-	      Not usable in Buildroot yet.
-	    - MIPS32 little endian soft float uclibc
-	      Not usable in Buildroot yet.
 
 comment "Sourcery CodeBench toolchains are only available for MIPS/MIPS64 o32 and n64"
 	depends on BR2_MIPS_NABI32
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_NIOSII201405
 	bool "Sourcery CodeBench Nios-II 2014.05"
 	depends on BR2_nios2
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -418,7 +466,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_NIOSII201305
 	bool "Sourcery CodeBench Nios-II 2013.05"
 	depends on BR2_nios2
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -434,7 +482,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201203
 	depends on BR2_powerpc
 	depends on BR2_powerpc_SPE
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -451,7 +499,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201103
 	bool "Sourcery CodeBench PowerPC 2011.03"
 	depends on BR2_powerpc
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -483,7 +531,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201009
 	bool "Sourcery CodeBench PowerPC 2010.09"
 	depends on BR2_powerpc
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -515,7 +563,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_SH201209
 	bool "Sourcery CodeBench SH 2012.09"
 	depends on BR2_sh4a || BR2_sh4aeb
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -539,7 +587,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_SH201203
 	bool "Sourcery CodeBench SH 2012.03"
 	depends on BR2_sh4a || BR2_sh4aeb
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_INSTALL_LIBSTDCPP
 	select BR2_HOSTARCH_NEEDS_IA32_LIBS
@@ -562,7 +610,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_SH201103
 	bool "Sourcery CodeBench SH 2011.03"
 	depends on BR2_sh4a || BR2_sh4aeb
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -582,52 +630,36 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_SH201103
 	    - SH4A, uClibc, big endian
 	      Not usable in Buildroot yet.
 
-config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_SH2A_201103
-	bool "Sourcery CodeBench SH 2011.03"
-	depends on BR2_sh2a
+config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_AMD64_201405
+	bool "Sourcery CodeBench AMD64 2014.05"
+	depends on BR2_x86_64
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	select BR2_TOOLCHAIN_EXTERNAL_UCLIBC
-	select BR2_LARGEFILE
+	depends on !BR2_STATIC_LIBS
+	depends on BR2_x86_jaguar || BR2_x86_steamroller
+	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	select BR2_USE_WCHAR
-	select BR2_TOOLCHAIN_HAS_THREADS
-	select BR2_TOOLCHAIN_HAS_THREADS_DEBUG
 	select BR2_INSTALL_LIBSTDCPP
 	select BR2_HOSTARCH_NEEDS_IA32_LIBS
-	# kernel headers: 2.6.38
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_13
 	help
-	  Sourcery CodeBench toolchain for the SuperH architecture,
-	  from Mentor Graphics. It uses gcc 4.5.2, binutils 2.20,
-	  uClibc 0.9.30, gdb 7.2.50 and kernel headers 2.6.38. It has
-	  support for the following variants:
-	    - SH2A, uClibc, big endian
-
-config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_SH2A_201009
-	bool "Sourcery CodeBench SH 2010.09"
-	depends on BR2_sh2a
-	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	select BR2_TOOLCHAIN_EXTERNAL_UCLIBC
-	select BR2_LARGEFILE
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	select BR2_USE_WCHAR
-	select BR2_TOOLCHAIN_HAS_THREADS
-	select BR2_TOOLCHAIN_HAS_THREADS_DEBUG
-	select BR2_INSTALL_LIBSTDCPP
-	select BR2_HOSTARCH_NEEDS_IA32_LIBS
-	# kernel headers: 2.6.35
-	help
-	  Sourcery CodeBench toolchain for the SuperH architecture,
-	  from Mentor Graphics. It uses gcc 4.5.1, binutils 2.20,
-	  uClibc 0.9.30, gdb 7.2.50 and kernel headers 2.6.35.2. It
-	  has support for the following variants:
-	    - SH2A, uClibc, big endian
+	  Sourcery CodeBench toolchain for the amd64 (x86_64)
+	  architectures, from Mentor Graphics. It uses gcc 4.8.3,
+	  binutils 2.24.51, glibc 2.18, gdb 7.7.50 and kernel headers
+	  3.13.0. It has support for the following variants:
+	    - AMD Puma/Jaguar (family 16h), glibc
+	    Default for x86_64, nothing special to do.
+	    - AMD Steamroller (family 15h), glibc
+	    Select a steamroller core.
+	  No other architecture variants are supported since glibc
+	  is optimized for one of these two baselines.
 
 config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_X86_201209
 	bool "Sourcery CodeBench x86/x86_64 2012.09"
 	depends on BR2_i386 || BR2_x86_64
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	depends on !BR2_x86_jaguar
+	depends on !BR2_x86_steamroller
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -653,8 +685,9 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_X86_201203
 	bool "Sourcery CodeBench x86/x86_64 2012.03"
 	depends on BR2_i386 || BR2_x86_64
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	depends on !BR2_x86_jaguar
+	depends on !BR2_x86_steamroller
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_INSTALL_LIBSTDCPP
 	select BR2_HOSTARCH_NEEDS_IA32_LIBS
@@ -679,8 +712,9 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_X86_201109
 	bool "Sourcery CodeBench x86/x86_64 2011.09"
 	depends on BR2_i386 || BR2_x86_64
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	depends on !BR2_x86_jaguar
+	depends on !BR2_x86_steamroller
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_INSTALL_LIBSTDCPP
@@ -708,8 +742,6 @@ config BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2014R1
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	select BR2_TOOLCHAIN_EXTERNAL_UCLIBC
 	select BR2_INSTALL_LIBSTDCPP
-	select BR2_LARGEFILE
-	select BR2_INET_IPV6
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_USE_WCHAR
 	select BR2_TOOLCHAIN_HAS_THREADS
@@ -726,8 +758,6 @@ config BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2013R1
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	select BR2_TOOLCHAIN_EXTERNAL_UCLIBC
 	select BR2_INSTALL_LIBSTDCPP
-	select BR2_LARGEFILE
-	select BR2_INET_IPV6
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_USE_WCHAR
 	select BR2_TOOLCHAIN_HAS_THREADS
@@ -744,8 +774,6 @@ config BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2012R2
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
 	select BR2_TOOLCHAIN_EXTERNAL_UCLIBC
 	select BR2_INSTALL_LIBSTDCPP
-	select BR2_LARGEFILE
-	select BR2_INET_IPV6
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
 	select BR2_USE_WCHAR
 	select BR2_TOOLCHAIN_HAS_THREADS
@@ -756,67 +784,11 @@ config BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2012R2
 	  Toolchain for the Blackfin architecture, from
 	  http://blackfin.uclinux.org.
 
-config BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEEL_14_3
-	bool "Xilinx Little Endian Microblaze GNU Tools 14.3"
-	depends on BR2_microblazeel
-	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
-	depends on BR2_DEPRECATED_SINCE_2014_02
-	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	select BR2_HOSTARCH_NEEDS_IA32_LIBS
-	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_3
-	help
-	  Toolchain for the Microblaze architecture, from
-	  http://git.xilinx.com/?p=microblaze-gnu.git;a=tree;f=binaries. It
-	  uses gcc 4.6.2, binutils 2.21.53, glibc 2.14 and gdb 7.4.50.
-
-config BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEEL_V2
-	bool "Xilinx Little Endian Microblaze GNU Tools v2"
-	depends on BR2_microblazeel
-	depends on BR2_HOSTARCH = "x86_64"
-	depends on !BR2_PREFER_STATIC_LIB
-	depends on BR2_DEPRECATED_SINCE_2014_02
-	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	# kernel headers: 2.6.37
-	help
-	  Toolchain for the Microblaze architecture, from
-	  http://wiki.xilinx.com/mb-gnu-tools
-
-config BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEBE_14_3
-	bool "Xilinx Big Endian Microblaze GNU Tools"
-	depends on BR2_microblazebe
-	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
-	depends on BR2_DEPRECATED_SINCE_2014_02
-	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	select BR2_HOSTARCH_NEEDS_IA32_LIBS
-	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_3
-	help
-	  Toolchain for the Microblaze architecture, from
-	  http://git.xilinx.com/?p=microblaze-gnu.git;a=tree;f=binaries. It
-	  uses gcc 4.6.2, binutils 2.21.53, glibc 2.14 and gdb 7.4.50.
-
-config BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEBE_V2
-	bool "Xilinx Big Endian Microblaze GNU Tools"
-	depends on BR2_microblazebe
-	depends on BR2_HOSTARCH = "x86_64"
-	depends on !BR2_PREFER_STATIC_LIB
-	depends on BR2_DEPRECATED_SINCE_2014_02
-	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
-	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
-	# kernel headers: 2.6.37
-	help
-	  Toolchain for the Microblaze architecture, from
-	  http://wiki.xilinx.com/mb-gnu-tools
-
 config BR2_TOOLCHAIN_EXTERNAL_LINARO_AARCH64
 	bool "Linaro AArch64 14.09"
 	depends on BR2_aarch64
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_INSTALL_LIBSTDCPP
 	select BR2_HOSTARCH_NEEDS_IA32_LIBS
@@ -830,7 +802,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_AARCH64
 	bool "CodeSourcery AArch64 2014.05"
 	depends on BR2_aarch64
 	depends on BR2_HOSTARCH = "x86_64" || BR2_HOSTARCH = "x86"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	select BR2_INSTALL_LIBSTDCPP
 	select BR2_HOSTARCH_NEEDS_IA32_LIBS
@@ -842,7 +814,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_AARCH64
 	  glibc 2.18, gdb 7.7.50 and kernel headers 3.13.
 
 config BR2_TOOLCHAIN_EXTERNAL_MUSL_CROSS
-	bool "Musl 1.1.1 toolchain"
+	bool "Musl 1.1.6 toolchain (experimental)"
 	depends on (BR2_arm && BR2_ARM_EABI) || (BR2_armeb && BR2_ARM_EABI) || \
 		(BR2_i386 && !BR2_x86_i386) || BR2_microblazebe || BR2_mips || \
 		BR2_mipsel || (BR2_powerpc && BR2_powerpc_CLASSIC) || BR2_x86_64
@@ -853,13 +825,33 @@ config BR2_TOOLCHAIN_EXTERNAL_MUSL_CROSS
 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_12
 	help
 	  Toolchain based on the Musl C library, provided by the
-	  musl-cross project. It uses gcc 4.8.3, binutils 2.24 and
-	  musl 1.1.1. It does not have a cross debugger included.
+	  musl-cross project. It uses gcc 4.9.2, binutils 2.25 and
+	  musl 1.1.6. It does not have a cross debugger included.
 
 	  The ARM toolchain is built for ARMv4t, soft-float.
 	  The x86 toolchain is built for i486.
 
 	  http://musl.codu.org/
+
+config BR2_TOOLCHAIN_EXTERNAL_SYNOPSYS_ARC_2014_12
+	bool "Synopsys ARC 2014.12 toolchain"
+	depends on BR2_arc
+	depends on BR2_HOSTARCH = "x86_64"
+	# does not provide IPv6, and lacks many uClibc features
+	# expected by Buildroot. The next Synopsys toolchain version
+	# should fix those problems.
+	depends on BROKEN
+	select BR2_TOOLCHAIN_EXTERNAL_UCLIBC
+	select BR2_INSTALL_LIBSTDCPP
+	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
+	select BR2_ENABLE_LOCALE
+	select BR2_USE_WCHAR
+	select BR2_TOOLCHAIN_HAS_THREADS
+	select BR2_TOOLCHAIN_HAS_THREADS_DEBUG
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_13
+	help
+	  Toolchain for the ARC cores, from
+	  https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/releases
 
 config BR2_TOOLCHAIN_EXTERNAL_CUSTOM
 	bool "Custom toolchain"
@@ -911,6 +903,8 @@ config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX
 
 config BR2_TOOLCHAIN_EXTERNAL_PREFIX
 	string
+	default "arc-linux"		 if BR2_TOOLCHAIN_EXTERNAL_SYNOPSYS_ARC_2014_12 && BR2_arcle
+	default "arceb-linux"		 if BR2_TOOLCHAIN_EXTERNAL_SYNOPSYS_ARC_2014_12 && BR2_arceb
 	default "arm-linux-gnueabihf"	 if BR2_TOOLCHAIN_EXTERNAL_LINARO_ARM
 	default "armeb-linux-gnueabihf"	 if BR2_TOOLCHAIN_EXTERNAL_LINARO_ARMEB
 	default "arm-none-linux-gnueabi" if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_ARM201305
@@ -920,13 +914,9 @@ config BR2_TOOLCHAIN_EXTERNAL_PREFIX
 	default "arm-arago-linux-gnueabi" if BR2_TOOLCHAIN_EXTERNAL_ARAGO_ARMV5TE_201109
 	default "aarch64-linux-gnu"      if BR2_TOOLCHAIN_EXTERNAL_LINARO_AARCH64
 	default "aarch64-linux-gnu"      if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_AARCH64
-	default "microblazeel-unknown-linux-gnu" if BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEEL_14_3
-	default "microblazeel-unknown-linux-gnu" if BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEEL_V2
-	default "microblaze-unknown-linux-gnu" if BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEBE_14_3
-	default "microblaze-unknown-linux-gnu" if BR2_TOOLCHAIN_EXTERNAL_XILINX_MICROBLAZEBE_V2
-	default "mips-linux-gnu"         if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201305
-	default "mips-linux-gnu"         if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201311
 	default "mips-linux-gnu"         if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201405
+	default "mips-linux-gnu"         if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201411
+	default "mips-linux-gnu"         if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201505
 	default "nios2-linux-gnu"        if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_NIOSII201305
 	default "nios2-linux-gnu"        if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_NIOSII201405
 	default "powerpc-linux-gnu"      if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_POWERPC201009
@@ -940,6 +930,7 @@ config BR2_TOOLCHAIN_EXTERNAL_PREFIX
 	default "i686-pc-linux-gnu"	 if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_X86_201109
 	default "i686-pc-linux-gnu"	 if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_X86_201203
 	default "i686-pc-linux-gnu"	 if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_X86_201209
+	default "x86_64-amd-linux-gnu"   if BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_AMD64_201405
 	default "bfin-uclinux"		 if BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2012R2 && BR2_BINFMT_FLAT
 	default "bfin-linux-uclibc"	 if BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2012R2 && BR2_BINFMT_FDPIC
 	default "bfin-uclinux"		 if BR2_TOOLCHAIN_EXTERNAL_BLACKFIN_UCLINUX_2013R1 && BR2_BINFMT_FLAT
@@ -1003,8 +994,8 @@ config BR2_TOOLCHAIN_EXTERNAL_HEADERS_3_18
 	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_18
 
 config BR2_TOOLCHAIN_EXTERNAL_HEADERS_3_17
-        bool "3.17.x"
-        select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17
+	bool "3.17.x"
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_17
 
 config BR2_TOOLCHAIN_EXTERNAL_HEADERS_3_16
 	bool "3.16.x"
@@ -1095,7 +1086,7 @@ config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_UCLIBC
 
 config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC
 	bool "glibc/eglibc"
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_EXTERNAL_GLIBC
 	help
 	  Select this option if your external toolchain uses the GNU C
@@ -1108,10 +1099,10 @@ config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC
 	  cause build failures to some packages.
 
 comment "(e)glibc only available with shared lib support"
-	depends on BR2_PREFER_STATIC_LIB
+	depends on BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_MUSL
-	bool "musl"
+	bool "musl (experimental)"
 	select BR2_TOOLCHAIN_EXTERNAL_MUSL
 	help
 	  Select this option if your external toolchain uses the
@@ -1120,22 +1111,6 @@ config BR2_TOOLCHAIN_EXTERNAL_CUSTOM_MUSL
 endchoice
 
 if BR2_TOOLCHAIN_EXTERNAL_CUSTOM_UCLIBC
-
-config BR2_TOOLCHAIN_EXTERNAL_LARGEFILE
-	bool "Toolchain has large file support?"
-	select BR2_LARGEFILE
-	help
-	  Select this option if your external toolchain supports
-	  largefile. If you don't know, leave the default value,
-	  Buildroot will tell you if it's correct or not.
-
-config BR2_TOOLCHAIN_EXTERNAL_INET_IPV6
-	bool "Toolchain has IPv6 support?"
-	select BR2_INET_IPV6
-	help
-	  Select this option if your external toolchain supports
-	  IPv6. If you don't know, leave the default value, Buildroot
-	  will tell you if it's correct or not.
 
 config BR2_TOOLCHAIN_EXTERNAL_WCHAR
 	bool "Toolchain has WCHAR support?"

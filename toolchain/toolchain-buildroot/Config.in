@@ -23,16 +23,17 @@ source "package/linux-headers/Config.in.host"
 choice
 	prompt "C library"
 	default BR2_TOOLCHAIN_UCLIBC
-	default BR2_TOOLCHAIN_BUILDROOT_EGLIBC if BR2_mips64 || BR2_mips64el
+	default BR2_TOOLCHAIN_BUILDROOT_GLIBC if BR2_aarch64 || BR2_microblaze \
+		|| BR2_mips64 || BR2_mips64el || BR2_powerpc64
 
 config BR2_TOOLCHAIN_BUILDROOT_UCLIBC
 	bool "uClibc"
 	select BR2_TOOLCHAIN_USES_UCLIBC
 	depends on BR2_arcle   || BR2_arceb  || BR2_arm    || BR2_armeb    || \
-		   BR2_avr32   || BR2_bfin   || BR2_i386   || BR2_m68k     || \
+		   BR2_bfin    || BR2_i386   || BR2_m68k   || \
 		   BR2_mips    || BR2_mipsel || BR2_mips64 || BR2_mips64el || \
-		   BR2_powerpc || BR2_sh     || BR2_sparc  || BR2_xtensa   || \
-		   BR2_x86_64
+		   BR2_powerpc || BR2_sh2a   || BR2_sh4	   || BR2_sh4eb    || \
+		   BR2_sparc   || BR2_xtensa || BR2_x86_64
 	help
 	  This option selects uClibc as the C library for the
 	  cross-compilation toolchain.
@@ -47,7 +48,7 @@ config BR2_TOOLCHAIN_BUILDROOT_EGLIBC
 		   BR2_sh     || BR2_sh64     || BR2_sparc   || \
 		   BR2_x86_64 || BR2_microblaze || BR2_powerpc64
 	depends on BR2_USE_MMU
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	select BR2_TOOLCHAIN_USES_GLIBC
 	# our eglibc.mk enables RPC support
 	select BR2_TOOLCHAIN_HAS_NATIVE_RPC
@@ -64,9 +65,9 @@ config BR2_TOOLCHAIN_BUILDROOT_GLIBC
 		   BR2_mips64      || BR2_mips64el || BR2_powerpc || \
 		   BR2_powerpc64   || BR2_powerpc64le || BR2_sh   || \
 		   BR2_sh64        || BR2_sparc    || BR2_x86_64  || \
-		   BR2_microblaze
+		   BR2_microblaze  || BR2_nios2
 	depends on BR2_USE_MMU
-	depends on !BR2_PREFER_STATIC_LIB
+	depends on !BR2_STATIC_LIBS
 	depends on !BR2_powerpc_SPE
 	select BR2_TOOLCHAIN_USES_GLIBC
 	# our glibc.mk enables RPC support
@@ -78,12 +79,13 @@ config BR2_TOOLCHAIN_BUILDROOT_GLIBC
 	  http://www.gnu.org/software/libc/
 
 comment "(e)glibc only available with shared lib support"
-	depends on BR2_PREFER_STATIC_LIB
+	depends on BR2_STATIC_LIBS
 
 config BR2_TOOLCHAIN_BUILDROOT_MUSL
 	bool "musl (experimental)"
-	depends on BR2_arm || BR2_armeb || BR2_i386 || BR2_microblaze || \
-		BR2_mips || BR2_mipsel || BR2_powerpc || BR2_x86_64
+	depends on BR2_aarch64 || BR2_arm || BR2_armeb || BR2_i386 || \
+		BR2_microblaze || BR2_mips || BR2_mipsel || BR2_powerpc || \
+		BR2_sh || BR2_x86_64
 	depends on !BR2_powerpc_SPE # not supported, build breaks
 	select BR2_TOOLCHAIN_USES_MUSL
 	help

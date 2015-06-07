@@ -4,11 +4,10 @@
 #
 ################################################################################
 
-NGINX_VERSION = 1.6.2
+NGINX_VERSION = 1.6.3
 NGINX_SITE = http://nginx.org/download
 NGINX_LICENSE = BSD-2c
 NGINX_LICENSE_FILES = LICENSE
-NGINX_DEPENDENCIES = nginx-http-auth-digest
 
 NGINX_CONF_OPTS = \
 	--crossbuild=Linux::$(BR2_ARCH) \
@@ -16,8 +15,7 @@ NGINX_CONF_OPTS = \
 	--with-cpp="$(TARGET_CC)" \
 	--with-cc-opt="$(TARGET_CFLAGS)" \
 	--with-ld-opt="$(TARGET_LDFLAGS)" \
-	--error-log-path=stderr \
-	--http-log-path=stderr
+	--with-ipv6
 
 # www-data user and group are used for nginx. Because these user and group
 # are already set by buildroot, it is not necessary to redefine them.
@@ -40,7 +38,7 @@ NGINX_CONF_ENV += \
 	ngx_force_have_libatomic=no \
 	ngx_force_have_epoll=yes \
 	ngx_force_have_sendfile=yes \
-	ngx_force_have_sendfile64=$(if $(BR2_LARGEFILE),yes,no) \
+	ngx_force_have_sendfile64=yes \
 	ngx_force_have_pr_set_dumpable=yes \
 	ngx_force_have_timer_event=yes \
 	ngx_force_have_map_anon=yes \
@@ -66,8 +64,7 @@ NGINX_CONF_OPTS += \
 	--http-uwsgi-temp-path=/var/tmp/nginx/uwsgi
 
 NGINX_CONF_OPTS += \
-	$(if $(BR2_PACKAGE_NGINX_FILE_AIO),--with-file-aio) \
-	$(if $(BR2_INET_IPV6),--with-ipv6)
+	$(if $(BR2_PACKAGE_NGINX_FILE_AIO),--with-file-aio)
 
 ifeq ($(BR2_PACKAGE_PCRE),y)
 NGINX_DEPENDENCIES += pcre
@@ -224,9 +221,10 @@ define NGINX_BUILD_CMDS
 endef
 
 define NGINX_INSTALL_TARGET_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
-	$(INSTALL) -D -m 0755 $(@D)/objs/nginx $(TARGET_DIR)/usr/sbin/nginx
-	$(TARGET_STRIP) $(TARGET_DIR)/usr/sbin/nginx
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install
+	-$(RM) $(TARGET_DIR)/usr/bin/nginx.old
+	$(INSTALL) -D -m 0664 package/nginx/nginx.logrotate \
+		$(TARGET_DIR)/etc/logrotate.d/nginx
 endef
 
 define NGINX_INSTALL_INIT_SYSTEMD

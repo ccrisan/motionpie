@@ -37,6 +37,11 @@ endef
 $(eval $(call caseconvert-helper,UPPERCASE,$(join $(addsuffix :,$([FROM])),$([TO]))))
 $(eval $(call caseconvert-helper,LOWERCASE,$(join $(addsuffix :,$([TO])),$([FROM]))))
 
+# Sanitize macro cleans up generic strings so it can be used as a filename
+# and in rules. Particularly useful for VCS version strings, that can contain
+# slashes, colons (OK in filenames but not in rules), and spaces.
+sanitize = $(subst $(space),_,$(subst :,_,$(subst /,_,$(strip $(1)))))
+
 #
 # Manipulation of .config files based on the Kconfig
 # infrastructure. Used by the BusyBox package, the Linux kernel
@@ -60,7 +65,7 @@ endef
 
 # Helper functions to determine the name of a package and its
 # directory from its makefile directory, using the $(MAKEFILE_LIST)
-# variable provided by make. This is used by the *TARGETS macros to
+# variable provided by make. This is used by the *-package macros to
 # automagically find where the package is located.
 pkgdir = $(dir $(lastword $(MAKEFILE_LIST)))
 pkgname = $(lastword $(subst /, ,$(pkgdir)))

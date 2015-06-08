@@ -98,4 +98,5 @@ rm -f $TARGET/usr/libexec/ssh-pkcs11-helper
 rm -f $TARGET/usr/libexec/rmt
 
 rm -rf $TARGET/usr/share/locale/*
+rm -rf $TARGET/var/empty
 

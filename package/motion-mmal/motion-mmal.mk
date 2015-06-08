@@ -10,7 +10,7 @@ MOTION_MMAL_DEPENDENCIES = rpi-firmware rpi-userland
 
 define MOTION_MMAL_BUILD_CMDS
     cd $(@D); \
-    USERLANDPATH="$$(ls -d $(BUILD_DIR)/rpi-userland-*)" TOOLPREFIX="arm-linux-" TOOLPATH="$(HOST_DIR)/usr" ROOTFSPATH="$(STAGING_DIR)" cmake .; \
+    USERLANDPATH="$$(ls -d $(BUILD_DIR)/rpi-userland-*)" TOOLPREFIX="arm-linux-" TOOLPATH="$(HOST_DIR)/usr" ROOTFSPATH="$(STAGING_DIR)" $(HOST_DIR)/usr/bin/cmake .; \
     make
 endef
 

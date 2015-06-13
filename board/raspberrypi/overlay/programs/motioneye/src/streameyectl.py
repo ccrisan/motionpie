@@ -30,8 +30,7 @@ from config import additional_config
 
 MOTIONEYE_CONF = '/data/etc/motioneye.conf'
 RASPIMJPEG_CONF = '/data/etc/raspimjpeg.conf'
-NGINX_CONF = '/data/etc/nginx.conf'
-NGINX_AUTH = '/data/etc/nginx.auth'
+STREAMEYE_CONF = '/data/etc/streameye.conf'
 
 EXPOSURE_CHOICES = [
     ('off', 'Off'),
@@ -129,52 +128,55 @@ ROTATION_CHOICES = [
 AUTH_CHOICES = [
     ('disabled', 'Disabled'),
     ('basic', 'Basic'),
-    ('digest', 'Digest')
 ]
 
-_stream_eye_enabled = None
+_streameye_enabled = None
 
 
-def _get_stream_eye_enabled():
-    global _stream_eye_enabled
+def _get_streameye_enabled():
+    global _streameye_enabled
     
-    if _stream_eye_enabled is not None:
-        return _stream_eye_enabled
+    if _streameye_enabled is not None:
+        return _streameye_enabled
 
     camera_ids = config.get_camera_ids(filter_valid=False) # filter_valid prevents infinte recursion
     if len(camera_ids) != 1:
-        _stream_eye_enabled = False
+        _streameye_enabled = False
         return False
     
     camera_config = config.get_camera(camera_ids[0], as_lines=True) # as_lines prevents infinte recursion
     camera_config = config._conf_to_dict(camera_config)
     if camera_config.get('@proto') != 'mjpeg':
-        _stream_eye_enabled = False
+        _streameye_enabled = False
         return False
     if '127.0.0.1:' not in camera_config.get('@url', ''):
-        _stream_eye_enabled = False
+        _streameye_enabled = False
         return False
 
-    _stream_eye_enabled = True
+    _streameye_enabled = True
     return True
 
 
-def _set_stream_eye_enabled(enabled):
-    was_enabled = _get_stream_eye_enabled()
+def _set_streameye_enabled(enabled):
+    was_enabled = _get_streameye_enabled()
     if enabled and not was_enabled:
         io_loop = IOLoop.instance()
-        io_loop.add_callback(_set_stream_eye_enabled_deferred, True)
+        io_loop.add_callback(_set_streameye_enabled_deferred, True)
         
+        # this will force updating streameye settings whenever the surveillance credentials are changed
+        streameye_settings = _get_streameye_settings(1)
+        _set_streameye_settings(1, streameye_settings)
+
     elif not enabled and was_enabled:
         io_loop = IOLoop.instance()
-        io_loop.add_callback(_set_stream_eye_enabled_deferred, False)
+        io_loop.add_callback(_set_streameye_enabled_deferred, False)
         
-    # this will force updating nginx settings whenever the surveillance credentials are changed
-    nginx_settings = _get_nginx_settings(1)
-    _set_nginx_settings(1, nginx_settings)
+        # this will force updating streameye settings whenever the surveillance credentials are changed
+        streameye_settings = _get_streameye_settings(1)
+        _set_streameye_settings(1, streameye_settings)
 
 
-def _set_stream_eye_enabled_deferred(enabled):
+def _set_streameye_enabled_deferred(enabled):
     if enabled:
         logging.debug('disabling all cameras')
         for camera_id in config.get_camera_ids():
@@ -191,8 +193,8 @@ def _set_stream_eye_enabled_deferred(enabled):
         device_details = {
             'proto': 'mjpeg',
             'host': '127.0.0.1',
-            'port': '8081',
-            'username': 'username', # will be replaced by nginx settings
+            'port': '8081', # will be replaced by streameye settings
+            'username': 'username', # will be replaced by streameye settings
             'password': 'password',
             'scheme': 'http',
             'uri': '/'
@@ -354,36 +356,34 @@ def _set_raspimjpeg_settings(camera_id, s):
             f.write(line)
 
 
-def _get_nginx_settings(camera_id):
+def _get_streameye_settings(camera_id):
     s = {
         'seAuthMode': 'disabled',
         'sePort': 8081,
     }
     
-    if os.path.exists(NGINX_CONF):
-        logging.debug('reading nginx settings from %s' % NGINX_CONF)
+    if os.path.exists(STREAMEYE_CONF):
+        logging.debug('reading streameye settings from %s' % STREAMEYE_CONF)
 
-        with open(NGINX_CONF) as f:
+        with open(STREAMEYE_CONF) as f:
             for line in f:
                 line = line.strip()
                 if not line:
                     continue
 
-                m = re.findall('listen (\d+)', line)
+                m = re.findall('PORT="?(\d+)"?', line)
                 if m:
                     s['sePort'] = int(m[0])
                     continue
                     
-                if line.count('auth_basic'):
-                    s['seAuthMode'] = 'basic'
-                    
-                elif line.count('auth_digest'):
-                    s['seAuthMode'] = 'digest'
+                m = re.findall('AUTH="?(\w+)"?', line)
+                if m:
+                    s['seAuthMode'] = m[0]
 
     return s
 
 
-def _set_nginx_settings(camera_id, s):
+def _set_streameye_settings(camera_id, s):
     s = dict(s)
     s.setdefault('sePort', 8081)
     s.setdefault('seAuthMode', 'disabled')
@@ -393,56 +393,26 @@ def _set_nginx_settings(camera_id, s):
     password = main_config['@normal_password']
     realm = 'motionPie'
 
-    logging.debug('writing nginx settings to %s' % NGINX_CONF)
+    logging.debug('writing streameye settings to %s' % STREAMEYE_CONF)
     
-    lines = [];
-    lines.append('user root root;')
-    lines.append('worker_processes 1;')
-    lines.append('pid /var/run/nginx.pid;')
+    lines = [
+        'PORT="%s"' % s['sePort'],
+        'AUTH="%s"' % s['seAuthMode'],
+        'CREDENTIALS="%s:%s:%s"' % (username, password, realm)
+    ]
 
-    lines.append('events {')
-    lines.append('    worker_connections 128;')
-    lines.append('}')
-
-    lines.append('http {')
-    lines.append('    default_type application/octet-stream;')
-
-    lines.append('    server {')
-    lines.append('        listen %s;' % s['sePort'])
-    
-    if s['seAuthMode'] == 'basic':
-        lines.append('        auth_basic "%s";' % realm)
-        lines.append('        auth_basic_user_file %s;' % NGINX_AUTH)
-        with open(NGINX_AUTH, 'w') as f:
-            f.write('%s:{PLAIN}%s' % (username, password))
-
-    elif s['seAuthMode'] == 'digest':
-        lines.append('        auth_digest "%s";' % realm)
-        lines.append('        auth_digest_user_file %s;' % NGINX_AUTH)
-        with open(NGINX_AUTH, 'w') as f:
-            pwd_hash = hashlib.md5(':'.join([username, realm, password])).hexdigest()
-            f.write('%s:%s:%s' % (username, realm, pwd_hash))
-
-    else: # disabled
-        try:
-            os.remove(NGINX_AUTH)
-        
-        except:
-            pass
-
-    lines.append('        location / {')
-    lines.append('            proxy_pass http://127.0.0.1:8080;')
-    lines.append('        }')
-    lines.append('    }')
-    lines.append('}')
-
-    with open(NGINX_CONF, 'w') as f:
+    with open(STREAMEYE_CONF, 'w') as f:
         for line in lines:
             f.write(line + '\n')
-    
+
     # a workaround to update the camera username and password
     # since we cannot call set_camera() from here
-    url = 'http://%s:%s@127.0.0.1:%s/' % (username, password, s['sePort'])
+    if s['seAuthMode'] == 'basic':
+        url = 'http://%s:%s@127.0.0.1:%s/' % (username, password, s['sePort'])
+    
+    else:
+        url = 'http://127.0.0.1:%s/' % s['sePort']
+    
     if 1 in config._camera_config_cache:
         logging.debug('updating streaming authentication in config cache')
         config._camera_config_cache[1]['@url'] = url
@@ -457,7 +427,7 @@ def _set_nginx_settings(camera_id, s):
     with open(config_file, 'w') as f:
         for line in lines:
             f.write(line + '\n')
-    
+
     if os.system('streameye.sh restart'):
         logging.error('streameye restart failed')
 
@@ -481,8 +451,8 @@ def streamEye():
         'section': 'expertSettings',
         'advanced': True,
         'reboot': True,
-        'get': _get_stream_eye_enabled,
-        'set': _set_stream_eye_enabled,
+        'get': _get_streameye_enabled,
+        'set': _set_streameye_enabled,
     }
 
 
@@ -498,7 +468,7 @@ def streamEyeCameraSeparator1():
  
 @additional_config
 def seBrightness():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -523,7 +493,7 @@ def seBrightness():
 
 @additional_config
 def seContrast():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -548,7 +518,7 @@ def seContrast():
 
 @additional_config
 def seSaturation():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -573,7 +543,7 @@ def seSaturation():
 
 @additional_config
 def seSharpness():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -609,7 +579,7 @@ def streamEyeCameraSeparator2():
  
 @additional_config
 def seResolution():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -629,7 +599,7 @@ def seResolution():
 
 @additional_config
 def seRotation():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -649,7 +619,7 @@ def seRotation():
 
 @additional_config
 def seVflip():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -668,7 +638,7 @@ def seVflip():
 
 @additional_config
 def seHflip():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -687,7 +657,7 @@ def seHflip():
 
 @additional_config
 def seFramerate():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -711,14 +681,14 @@ def seFramerate():
 
 @additional_config
 def seQuality():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
         'label': 'Image Quality',
         'description': 'sets the JPEG image quality (higher values produce a better image quality but require more storage space and bandwidth)',
         'type': 'range',
-        'min': 0,
+        'min': 1,
         'max': 100,
         'snap': 2,
         'ticksnum': 5,
@@ -746,7 +716,7 @@ def streamEyeCameraSeparator3():
  
 @additional_config
 def seIso():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -771,7 +741,7 @@ def seIso():
 
 @additional_config
 def seEv():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -796,7 +766,7 @@ def seEv():
 
 @additional_config
 def seShutter():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -828,7 +798,7 @@ def streamEyeCameraSeparator4():
  
 @additional_config
 def seExposure():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -848,7 +818,7 @@ def seExposure():
 
 @additional_config
 def seAwb():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -868,7 +838,7 @@ def seAwb():
 
 @additional_config
 def seMetering():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -888,7 +858,7 @@ def seMetering():
 
 @additional_config
 def seDrc():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -908,7 +878,7 @@ def seDrc():
 
 @additional_config
 def seVstab():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -927,7 +897,7 @@ def seVstab():
 
 @additional_config
 def seImxfx():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -947,7 +917,7 @@ def seImxfx():
 
 @additional_config
 def sePort():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -960,15 +930,15 @@ def sePort():
         'advanced': True,
         'camera': True,
         'required': True,
-        'get': _get_nginx_settings,
-        'set': _set_nginx_settings,
+        'get': _get_streameye_settings,
+        'set': _set_streameye_settings,
         'get_set_dict': True
     }
 
 
 @additional_config
 def seAuthMode():
-    if not _get_stream_eye_enabled():
+    if not _get_streameye_enabled():
         return None
 
     return {
@@ -980,8 +950,8 @@ def seAuthMode():
         'advanced': True,
         'camera': True,
         'required': True,
-        'get': _get_nginx_settings,
-        'set': _set_nginx_settings,
+        'get': _get_streameye_settings,
+        'set': _set_streameye_settings,
         'get_set_dict': True
     }
 

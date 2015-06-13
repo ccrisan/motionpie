@@ -1,35 +1,20 @@
 #!/bin/bash
 
-NGINX_PID=/var/run/nginx.pid
-NGINX_CONF=/data/etc/nginx.conf
 RASPIMJPEG_CONF=/data/etc/raspimjpeg.conf
+RASPIMJPEG_LOG=/var/log/raspimjpeg.log
 MOTIONEYE_CONF=/data/etc/motioneye.conf
-STREAMEYE_PORT=8080
+STREAMEYE_CONF=/data/etc/streameye.conf
 STREAMEYE_LOG=/var/log/streameye.log
 
-function start_nginx() {
-    mkdir -p /var/tmp/nginx
-    if ! [ -r $NGINX_CONF ]; then
+test -r $RASPIMJPEG_CONF || exit 1
+test -r $STREAMEYE_CONF || exit 1
+
+function start() {
+    pid=$(ps | grep raspimjpeg.py | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1)
+    if [ -n "$pid" ]; then
         return
     fi
 
-    nginx -c $NGINX_CONF
-}
-
-function stop_nginx() {
-    if [ -r $NGINX_PID ]; then
-        pid=$(cat $NGINX_PID)
-        kill -TERM "$pid" &>/dev/null
-        count=0
-        while kill -0 "$pid" &>/dev/null && [ $count -lt 5 ]; do
-            sleep 1
-            count=$(($count + 1))
-        done
-        kill -KILL "$pid" &>/dev/null
-    fi
-}
-
-function start_raspimjpeg() {
     raspimjpeg_opts=""
     while read line; do
         if echo "$line" | grep false &>/dev/null; then
@@ -40,17 +25,22 @@ function start_raspimjpeg() {
         fi
         raspimjpeg_opts="$raspimjpeg_opts --$line"
     done < $RASPIMJPEG_CONF
-    
-    streameye_opts="-l -p $STREAMEYE_PORT"
+
+    source $STREAMEYE_CONF
+    streameye_opts="-p $PORT"
+    if [ -n "$CREDENTIALS" ] && [ "$AUTH" = "basic" ]; then
+        streameye_opts="$streameye_opts -a basic -c $CREDENTIALS"
+    fi
+
     if [ -r $MOTIONEYE_CONF ] && grep 'log-level debug' $MOTIONEYE_CONF >/dev/null; then
         raspimjpeg_opts="$raspimjpeg_opts -d"
         streameye_opts="$streameye_opts -d"
     fi
 
-    raspimjpeg.py $raspimjpeg_opts 2>$STREAMEYE_LOG | streameye $streameye_opts &>$STREAMEYE_LOG &
+    raspimjpeg.py $raspimjpeg_opts 2>$RASPIMJPEG_LOG | streameye $streameye_opts &>$STREAMEYE_LOG &
 }
 
-function stop_raspimjpeg() {
+function stop() {
     pid=$(ps | grep raspimjpeg.py | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1)
     if [ -z "$pid" ]; then
         return
@@ -67,20 +57,16 @@ function stop_raspimjpeg() {
 
 case "$1" in
     start)
-        start_nginx
-        start_raspimjpeg
+        start
         ;;
 
     stop)
-        stop_nginx
-        stop_raspimjpeg
+        stop
         ;;
 
-    restart|reload)
-        stop_nginx
-        stop_raspimjpeg
-        start_nginx
-        start_raspimjpeg
+    restart)
+        stop
+        start
         ;;
 
     *)

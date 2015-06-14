@@ -157,32 +157,34 @@ def _get_streameye_enabled():
     return True
 
 
-def _set_streameye_enabled(enabled):
+def _set_streameye_enabled_deferred(enabled):
     was_enabled = _get_streameye_enabled()
     if enabled and not was_enabled:
         io_loop = IOLoop.instance()
-        io_loop.add_callback(_set_streameye_enabled_deferred, True)
+        io_loop.add_callback(_set_streameye_enabled, True)
         
-        # this will force updating streameye settings whenever the surveillance credentials are changed
-        streameye_settings = _get_streameye_settings(1)
-        _set_streameye_settings(1, streameye_settings)
-
     elif not enabled and was_enabled:
         io_loop = IOLoop.instance()
-        io_loop.add_callback(_set_streameye_enabled_deferred, False)
+        io_loop.add_callback(_set_streameye_enabled, False)
         
+    if enabled:
         # this will force updating streameye settings whenever the surveillance credentials are changed
         streameye_settings = _get_streameye_settings(1)
         _set_streameye_settings(1, streameye_settings)
 
 
-def _set_streameye_enabled_deferred(enabled):
+def _set_streameye_enabled(enabled):
+    global _streameye_enabled
+    
     if enabled:
-        logging.debug('disabling all cameras')
-        for camera_id in config.get_camera_ids():
-            camera_config = config.get_camera(camera_id)
-            camera_config['@enabled'] = False
-            config.set_camera(camera_id, camera_config)
+        logging.debug('removing all cameras from cache')
+        config._camera_config_cache = {}
+        config._camera_ids_cache = []
+        
+        logging.debug('disabling all cameras in motion.conf')
+        cmd = 'sed -r -i "s/^thread (.*)/#thread \1/" /data/etc/motion.conf &>/dev/null'
+        if os.system(cmd):
+            logging.error('failed to disable cameras in motion.conf')
         
         logging.debug('renaming thread files')
         for name in os.listdir(settings.CONF_PATH):
@@ -190,19 +192,32 @@ def _set_streameye_enabled_deferred(enabled):
                 os.rename(os.path.join(settings.CONF_PATH, name), os.path.join(settings.CONF_PATH, name + '.bak'))
 
         logging.debug('adding simple mjpeg camera')
+        
+        streameye_settings = _get_streameye_settings(1)
+        main_config = config.get_main()
+        
         device_details = {
             'proto': 'mjpeg',
             'host': '127.0.0.1',
-            'port': '8081', # will be replaced by streameye settings
-            'username': 'username', # will be replaced by streameye settings
-            'password': 'password',
+            'port': streameye_settings['sePort'],
+            'username': '',
+            'password': '',
             'scheme': 'http',
             'uri': '/'
         }
+
+        if streameye_settings['seAuthMode'] == 'basic':
+            device_details['username'] = main_config['@normal_username']
+            device_details['password'] = main_config['@normal_password']
+
+        _streameye_enabled = True
+        config._additional_structure_cache = {}
         camera_config = config.add_camera(device_details)
         
+        # call set_camera again so that the streamEye-related defaults are saved
+        config.set_camera(camera_config['@id'], camera_config)
+        
         _set_motioneye_add_remove_cameras(False)
-
 
     else: # disabled
         logging.debug('removing simple mjpeg camera')
@@ -216,6 +231,7 @@ def _set_streameye_enabled_deferred(enabled):
             if re.match('^thread-\d+.conf.bak$', name):
                 os.rename(os.path.join(settings.CONF_PATH, name), os.path.join(settings.CONF_PATH, name[:-4]))
         
+        _streameye_enabled = False
         config.invalidate()
 
         logging.debug('enabling all cameras')
@@ -418,9 +434,9 @@ def _set_streameye_settings(camera_id, s):
         config._camera_config_cache[1]['@url'] = url
 
     lines = config.get_camera(1, as_lines=True)
-    for line in lines:
+    for i, line in enumerate(lines):
         if line.startswith('# @url'):
-            line = '# @url %s' % url
+            lines[i] = '# @url %s' % url
 
     config_file = os.path.join(settings.CONF_PATH, config._CAMERA_CONFIG_FILE_NAME % {'id': 1})
     logging.debug('updating streaming authentication in camera config file %s' % config_file)
@@ -428,6 +444,7 @@ def _set_streameye_settings(camera_id, s):
         for line in lines:
             f.write(line + '\n')
 
+    logging.debug('restarting streameye')
     if os.system('streameye.sh restart'):
         logging.error('streameye restart failed')
 
@@ -452,7 +469,7 @@ def streamEye():
         'advanced': True,
         'reboot': True,
         'get': _get_streameye_enabled,
-        'set': _set_streameye_enabled,
+        'set': _set_streameye_enabled_deferred,
     }
 
 
@@ -468,6 +485,7 @@ def streamEyeCameraSeparator1():
  
 @additional_config
 def seBrightness():
+    logging.error('HHH %s': _get_streameye_enabled())
     if not _get_streameye_enabled():
         return None
 

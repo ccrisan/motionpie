@@ -20,6 +20,8 @@ import os.path
 
 from config import additional_config
 
+import streameyectl
+
 
 CONFIG_TXT = '/boot/config.txt'
 
@@ -228,7 +230,4 @@ def overclock():
         'set': _set_board_settings,
         'get_set_dict': True
     }
-
-
-import streameyectl
 

@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = 09a869c
-MOTIONPIE_VERSION = 20150619
+MOTIONEYE_VERSION = 43aaca6
+MOTIONPIE_VERSION = 20150620
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
@@ -46,7 +46,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/src/handlers.py
     
     # additional config
-    echo -e 'import ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept:\n    pass/' >> $(DST_DIR)/src/config.py
+    echo -e 'import ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept ImportError:\n    pass' >> $(DST_DIR)/src/config.py
     
     # log files
     lineno=$$(grep -n -m1 LOGS $(DST_DIR)/src/handlers.py | cut -d ':' -f 1); \
@@ -60,3 +60,4 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(generic-package))
+

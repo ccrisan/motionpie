@@ -221,7 +221,7 @@ def ftpAuth():
 @additional_config
 def ftpWritable():
     return {
-        'label': 'FTP Write Enabled',
+        'label': 'Enable FTP Write Support',
         'description': 'enable this if you want to allow creating, editing or removing files/directories through FTP (i.e. to disable read-only mode)',
         'type': 'bool',
         'section': 'services',
@@ -277,7 +277,7 @@ def smbAuth():
 @additional_config
 def smbWritable():
     return {
-        'label': 'Samba Write Enabled',
+        'label': 'Enable Samba Write Support',
         'description': 'enable this if you want to allow creating, editing or removing files/directories on your motionPie from the local network',
         'type': 'bool',
         'section': 'services',

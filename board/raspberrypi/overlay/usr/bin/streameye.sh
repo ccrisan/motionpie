@@ -9,6 +9,17 @@ STREAMEYE_LOG=/var/log/streameye.log
 test -r $RASPIMJPEG_CONF || exit 1
 test -r $STREAMEYE_CONF || exit 1
 
+watch() {
+    count=0
+    while true; do
+        sleep 5
+        if ! ps aux | grep raspimjpeg.py | grep -v grep &>/dev/null; then
+            logger -t streameye -s "not running, respawning"
+            start
+        fi
+    done
+}
+
 function start() {
     pid=$(ps | grep raspimjpeg.py | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1)
     if [ -n "$pid" ]; then
@@ -41,6 +52,7 @@ function start() {
 }
 
 function stop() {
+    # stop the raspimjpeg process
     pid=$(ps | grep raspimjpeg.py | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1)
     if [ -z "$pid" ]; then
         return
@@ -53,11 +65,15 @@ function stop() {
         count=$(($count + 1))
     done
     kill -KILL "$pid" &>/dev/null
+
+    # stop the streameye background watch process
+    ps | grep streameye | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
 }
 
 case "$1" in
     start)
         start
+        watch &
         ;;
 
     stop)

@@ -449,6 +449,32 @@ def _set_streameye_settings(camera_id, s):
         logging.error('streameye restart failed')
 
 
+# make streameye-related log files downloadable
+
+if _get_streameye_enabled():
+    import handlers
+    handlers.LogHandler.LOGS['streameye'] = (os.path.join(settings.LOG_PATH, 'streameye.log'),  'streameye.log')
+    handlers.LogHandler.LOGS['raspimjpeg'] = (os.path.join(settings.LOG_PATH, 'raspimjpeg.log'),  'raspimjpeg.log')
+
+    @additional_config
+    def streamEyeLog():
+        return {
+            'type': 'html',
+            'section': 'expertSettings',
+            'advanced': True,
+            'get': lambda: '<a href="javascript:downloadFile(\'log/streameye/\');">streameye.log</a>',
+        }
+
+    @additional_config
+    def raspiMjpegLog():
+        return {
+            'type': 'html',
+            'section': 'expertSettings',
+            'advanced': True,
+            'get': lambda: '<a href="javascript:downloadFile(\'log/raspimjpeg/\');">raspimjpeg.log</a>',
+        }
+
+
 @additional_config
 def streamEyeMainSeparator():
     return {
@@ -485,7 +511,6 @@ def streamEyeCameraSeparator1():
  
 @additional_config
 def seBrightness():
-    logging.error('HHH %s': _get_streameye_enabled())
     if not _get_streameye_enabled():
         return None
 

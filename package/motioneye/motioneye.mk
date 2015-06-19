@@ -46,7 +46,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/src/handlers.py
     
     # additional config
-    sed -i 's/\(import tzctl .*\)/\1\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept:\n    pass/' $(DST_DIR)/src/config.py
+    echo -e 'import ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept:\n    pass/' >> $(DST_DIR)/src/config.py
     
     # log files
     lineno=$$(grep -n -m1 LOGS $(DST_DIR)/src/handlers.py | cut -d ':' -f 1); \

@@ -83,6 +83,7 @@ case "$1" in
     restart)
         stop
         start
+        watch &
         ;;
 
     *)

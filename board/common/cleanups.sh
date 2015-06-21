@@ -140,4 +140,7 @@ rm -f $TARGET/usr/bin/testparm
 rm -f $TARGET/usr/bin/tvservice
 rm -f $TARGET/usr/bin/wbinfo
 rm -f $TARGET/usr/lib/python2.7/site-packages/samba
+rm -f $TARGET/usr/sbin/ctdb*
+rm -f $TARGET/usr/sbin/winbindd
+rm -f $TARGET/usr/share/perl5
 

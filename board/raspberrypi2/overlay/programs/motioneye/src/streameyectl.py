@@ -734,7 +734,7 @@ def seQuality():
         'min': 1,
         'max': 100,
         'snap': 2,
-        'ticksnum': 5,
+        'ticks': '1|25|50|75|100',
         'decimals': 0,
         'unit': '%',
         'section': 'device',

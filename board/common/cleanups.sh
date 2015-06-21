@@ -10,6 +10,10 @@ rm -rf $TARGET/etc/dhcp/
 rm -rf $TARGET/etc/ssh/
 rm -rf $TARGET/etc/rc_keymaps
 rm -rf $TARGET/etc/default
+rm -rf $TARGET/etc/ctdb
+rm -rf $TARGET/etc/sudoers.d
+rm -rf $TARGET/usr/share/locale/*
+
 rm -f $TARGET/etc/rc_maps.cfg
 rm -f $TARGET/etc/udev/hwdb.d/20-pci-vendor-model.hwdb
 rm -f $TARGET/etc/motion-dist.conf
@@ -97,5 +101,43 @@ rm -f $TARGET/usr/libexec/ssh-keysign
 rm -f $TARGET/usr/libexec/ssh-pkcs11-helper
 rm -f $TARGET/usr/libexec/rmt
 
-rm -rf $TARGET/usr/share/locale/*
+# samba4 unneeded stuff
+rm -f $TARGET/usr/bin/cifsdd
+rm -f $TARGET/usr/bin/containers_*
+rm -f $TARGET/usr/bin/ctdb*
+rm -f $TARGET/usr/bin/dbwrap_tool
+rm -f $TARGET/usr/bin/eventlogadm
+rm -f $TARGET/usr/bin/gentest
+rm -f $TARGET/usr/bin/ldb*
+rm -f $TARGET/usr/bin/locktest
+rm -f $TARGET/usr/bin/ltdbtool
+rm -f $TARGET/usr/bin/masktest
+rm -f $TARGET/usr/bin/ndrdump
+rm -f $TARGET/usr/bin/net
+rm -f $TARGET/usr/bin/ntdb*
+rm -f $TARGET/usr/bin/ntlm_auth
+rm -f $TARGET/usr/bin/oLschema2ldif
+rm -f $TARGET/usr/bin/onnode
+rm -f $TARGET/usr/bin/pdbedit
+rm -f $TARGET/usr/bin/pidl
+rm -f $TARGET/usr/bin/ping_pong
+rm -f $TARGET/usr/bin/profiles
+rm -f $TARGET/usr/bin/reg*
+rm -f $TARGET/usr/bin/rpcclient
+rm -f $TARGET/usr/bin/sharesec
+rm -f $TARGET/usr/bin/smbcacls
+rm -f $TARGET/usr/bin/smbcontrol
+rm -f $TARGET/usr/bin/smbcquotas
+rm -f $TARGET/usr/bin/smbget
+rm -f $TARGET/usr/bin/smbspool
+rm -f $TARGET/usr/bin/smbstatus
+rm -f $TARGET/usr/bin/smbta-util
+rm -f $TARGET/usr/bin/smbtar
+rm -f $TARGET/usr/bin/smbtree
+rm -f $TARGET/usr/bin/smnotify
+rm -f $TARGET/usr/bin/tdb*
+rm -f $TARGET/usr/bin/testparm
+rm -f $TARGET/usr/bin/tvservice
+rm -f $TARGET/usr/bin/wbinfo
+rm -f $TARGET/usr/lib/python2.7/site-packages/samba
 

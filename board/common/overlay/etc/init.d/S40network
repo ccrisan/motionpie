@@ -157,7 +157,7 @@ start() {
     # if wifi or ppp connection configured, start eth in background
     ssid=$(cat /data/etc/wpa_supplicant.conf 2>&1 | grep ssid | grep -v scan_ssid | cut -d '"' -f 2)
     if [ -n "$ssid" ] || [ -r /data/etc/ppp/modem ]; then
-        start_eth &
+        start_eth &>/dev/null &
     else
         start_eth
     fi

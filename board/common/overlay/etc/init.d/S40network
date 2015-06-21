@@ -68,6 +68,11 @@ start_lo() {
 }
 
 start_wlan() {
+    if ! ifconfig $wlan >/dev/null 2>&1; then
+        echo "$wlan: no device"
+        return
+    fi
+
     if [ "$(cat /sys/class/net/$wlan/carrier 2>/dev/null)" != "1" ]; then
         echo "$wlan: no link"
         return

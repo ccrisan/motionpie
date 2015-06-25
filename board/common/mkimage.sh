@@ -150,11 +150,15 @@ sync
 msg "destroying boot loop device"
 losetup -d $loop_dev
 
+losetup -l
+
 msg "creating root loop device"
 loop_dev=$(losetup -f)
 losetup -f -o $(($root_offs * 512)) $DISK_IMG
 sync
-
+losetup -l
+sleep 1
+losetup --l
 msg "copying root image"
 dd if=$ROOT_IMG of=$loop_dev
 sync

@@ -67,7 +67,7 @@ function stop() {
     kill -KILL "$pid" &>/dev/null
 
     # stop the streameye background watch process
-    ps | grep streameye | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
+    ps | grep streameye | grep -v $$ | grep -v S94streameye| grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
 }
 
 case "$1" in

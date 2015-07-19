@@ -1,8 +1,6 @@
 #!/bin/bash
 
 set +e
-/usr/bin/killall watchdog
-sleep 1
-/bin/echo -e '\0' > /dev/watchdog
+(sleep 10 && /usr/bin/killall -STOP watchdog) &
 /bin/busybox reboot
 

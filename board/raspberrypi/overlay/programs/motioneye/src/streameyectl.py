@@ -302,7 +302,7 @@ def _get_raspimjpeg_settings(camera_id):
         'vflip': False,
         'hflip': False,
         'framerate': 15,
-        'quality': 50
+        'quality': 25
     }
     
     if os.path.exists(RASPIMJPEG_CONF):

@@ -10,9 +10,6 @@ start() {
     if [ -f /data/etc/motion.conf ]; then
         password=$(cat /data/etc/motion.conf | grep admin_password | cut -d ' ' -f 3)
     fi
-    if [ -z "$password" ]; then
-	    password=$(cat /var/cache/serial_number)
-    fi
     echo -e "$password\n$password\n" | /usr/bin/smbpasswd -a admin -s > /dev/null
     [ $? == 0 ] && echo "done" || echo "failed"
 

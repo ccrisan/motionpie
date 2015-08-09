@@ -24,11 +24,6 @@
 ## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##
 
-## Note about python2.
-##
-## This script can currently only be run using python2 interpreter due to
-## its kconfiglib dependency (which is not yet python3 friendly).
-
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -99,7 +94,7 @@ def get_symbol_parents(item, root=None, enable_choice=False):
         if parent.is_menu():
             parents.append(parent.get_title())
         elif enable_choice and parent.is_choice():
-            parents.append(parent.prompts[0][0])
+            parents.append(parent.get_prompts()[0])
         parent = parent.get_parent()
     if isinstance(root, kconfiglib.Menu) or \
             (enable_choice and isinstance(root, kconfiglib.Choice)):
@@ -183,7 +178,7 @@ class Buildroot:
         'deprecated': {
             'filename': "deprecated-list",
             'root_menu': None,
-            'filter': "_is_deprecated",
+            'filter': "_is_deprecated_feature",
             'format': "_format_symbol_prompt_location",
             'sorted': False,
         },
@@ -193,11 +188,9 @@ class Buildroot:
         self.base_dir = os.environ.get("TOPDIR")
         self.output_dir = os.environ.get("O")
         self.package_dir = os.path.join(self.base_dir, self.package_dirname)
-        # The kconfiglib requires an environment variable named "srctree" to
-        # load the configuration, so set it.
-        os.environ.update({'srctree': self.base_dir})
         self.config = kconfiglib.Config(os.path.join(self.base_dir,
-                                                     self.root_config))
+                                                     self.root_config),
+                                        self.base_dir)
         self._deprecated = self.config.get_symbol(self.deprecated_symbol)
 
         self.gen_date = datetime.datetime.utcnow()
@@ -236,9 +229,9 @@ class Buildroot:
         """
         if not symbol.is_symbol():
             return False
-        if type == 'real' and not symbol.prompts:
+        if type == 'real' and not symbol.get_prompts():
             return False
-        if type == 'virtual' and symbol.prompts:
+        if type == 'virtual' and symbol.get_prompts():
             return False
         if not self.re_pkg_prefix.match(symbol.get_name()):
             return False
@@ -285,6 +278,9 @@ class Buildroot:
     def _is_virtual_package(self, symbol):
         return self._is_package(symbol, 'virtual')
 
+    def _is_deprecated_feature(self, symbol):
+        return symbol.get_prompts() and self._is_deprecated(symbol)
+
     def _exists_virt_symbol(self, pkg_name):
         """ Return True if a symbol exists that defines the package as
         a virtual package, False otherwise
@@ -317,7 +313,7 @@ class Buildroot:
         :param mark_deprecated: Append a 'deprecated' to the label
 
         """
-        label = symbol.prompts[0][0]
+        label = symbol.get_prompts()[0]
         if self._is_deprecated(symbol) and mark_deprecated:
             label += " *(deprecated)*"
         return label
@@ -396,7 +392,7 @@ class Buildroot:
                     continue
                 for s in selects:
                     if s == symbol:
-                        if sym.prompts:
+                        if sym.get_prompts():
                             l = self._get_symbol_label(sym,False)
                             parent_pkg = _get_parent_package(sym)
                             if parent_pkg is not None:

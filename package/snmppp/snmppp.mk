@@ -4,13 +4,11 @@
 #
 ################################################################################
 
-SNMPPP_VERSION = 3.3.4
+SNMPPP_VERSION = 3.3.5
 SNMPPP_SOURCE = snmp++-$(SNMPPP_VERSION).tar.gz
 SNMPPP_SITE = http://www.agentpp.com/download
 SNMPPP_DEPENDENCIES = host-pkgconf
 SNMPPP_INSTALL_STAGING = YES
-# no configure script in tarball
-SNMPPP_AUTORECONF = YES
 SNMPPP_CONF_OPTS = $(if $(BR2_PACKAGE_SNMPPP_LOGGING),--enable-logging,--disable-logging)
 SNMPPP_LICENSE = SNMP++
 SNMPPP_LICENSE_FILES = src/v3.cpp

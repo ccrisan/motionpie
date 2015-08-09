@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SQLITE_VERSION = 3081002
+SQLITE_VERSION = 3081101
 SQLITE_SOURCE = sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 SQLITE_SITE = http://www.sqlite.org/2015
 SQLITE_LICENSE = Public domain
@@ -53,3 +53,4 @@ SQLITE_CONF_OPTS += --disable-readline
 endif
 
 $(eval $(autotools-package))
+$(eval $(host-autotools-package))

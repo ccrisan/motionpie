@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MONO_VERSION = 4.0.0
+MONO_VERSION = 4.0.2.5
 MONO_SITE = http://download.mono-project.com/sources/mono
 MONO_SOURCE = mono-$(MONO_VERSION).tar.bz2
 MONO_LICENSE = GPLv2 or MIT (compiler, tools), LGPLv2 (runtime libs), MIT (class libs) or commercial
@@ -35,6 +35,10 @@ define MONO_INSTALL_LIBS
 endef
 
 MONO_POST_INSTALL_TARGET_HOOKS += MONO_INSTALL_LIBS
+
+ifeq ($(BR2_PACKAGE_LIBICONV),y)
+MONO_DEPENDENCIES += libiconv
+endif
 
 MONO_DEPENDENCIES += host-mono
 

@@ -4,11 +4,15 @@
 #
 ################################################################################
 
-TVHEADEND_VERSION = 14f03b8efbc40b840eda8e203a6002d6c3f24250
+TVHEADEND_VERSION = d9cf931f9f7242f070ae990c4765cbdd5276fd66
 TVHEADEND_SITE = $(call github,tvheadend,tvheadend,$(TVHEADEND_VERSION))
 TVHEADEND_LICENSE = GPLv3+
 TVHEADEND_LICENSE_FILES = LICENSE.md
-TVHEADEND_DEPENDENCIES = host-pkgconf $(if $(BR2_PACKAGE_PYTHON3),host-python3,host-python) openssl
+TVHEADEND_DEPENDENCIES = \
+	host-gettext \
+	host-pkgconf \
+	$(if $(BR2_PACKAGE_PYTHON3),host-python3,host-python) \
+	openssl
 
 ifeq ($(BR2_PACKAGE_AVAHI),y)
 TVHEADEND_DEPENDENCIES += avahi

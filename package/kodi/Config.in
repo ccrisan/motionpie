@@ -1,11 +1,11 @@
 config BR2_PACKAGE_KODI_ARCH_SUPPORTS
 	bool
-	default y if (BR2_arm || BR2_i386 || BR2_x86_64) && BR2_PACKAGE_BOOST_ARCH_SUPPORTS
+	default y if (BR2_arm || (BR2_mipsel && BR2_TOOLCHAIN_USES_GLIBC) || BR2_i386 || BR2_x86_64) && BR2_PACKAGE_BOOST_ARCH_SUPPORTS
 
-
-comment "kodi needs a toolchain w/ C++, threads, wchar"
+comment "kodi needs a toolchain w/ C++, threads, wchar, dynamic library"
 	depends on BR2_PACKAGE_KODI_ARCH_SUPPORTS
-	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS || !BR2_USE_WCHAR
+	depends on !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HAS_THREADS \
+		|| !BR2_USE_WCHAR || BR2_STATIC_LIBS
 	depends on BR2_USE_MMU
 
 config BR2_PACKAGE_KODI_EGL_GLES
@@ -51,14 +51,12 @@ menuconfig BR2_PACKAGE_KODI
 	select BR2_PACKAGE_LIBGLEW if BR2_PACKAGE_KODI_GL
 	select BR2_PACKAGE_LIBGLU if BR2_PACKAGE_KODI_GL
 	select BR2_PACKAGE_LIBGCRYPT
-	select BR2_PACKAGE_LIBID3TAG
-	select BR2_PACKAGE_LIBMAD
-	select BR2_PACKAGE_LIBMODPLUG
 	select BR2_PACKAGE_LIBMPEG2
 	select BR2_PACKAGE_LIBOGG
 	select BR2_PACKAGE_LIBPLIST
 	select BR2_PACKAGE_LIBPNG
 	select BR2_PACKAGE_LIBSAMPLERATE
+	select BR2_PACKAGE_LIBSQUISH
 	select BR2_PACKAGE_LIBVORBIS
 	select BR2_PACKAGE_LIBXML2
 	select BR2_PACKAGE_LIBXSLT
@@ -78,9 +76,6 @@ menuconfig BR2_PACKAGE_KODI
 	select BR2_PACKAGE_PYTHON_UNICODEDATA
 	select BR2_PACKAGE_PYTHON_ZLIB
 	select BR2_PACKAGE_READLINE
-	select BR2_PACKAGE_SDL if BR2_PACKAGE_KODI_GL
-	select BR2_PACKAGE_SDL_X11 if BR2_PACKAGE_KODI_GL
-	select BR2_PACKAGE_SDL_IMAGE if BR2_PACKAGE_KODI_GL
 	select BR2_PACKAGE_SQLITE
 	select BR2_PACKAGE_TAGLIB
 	select BR2_PACKAGE_TIFF
@@ -97,6 +92,7 @@ menuconfig BR2_PACKAGE_KODI
 	depends on BR2_PACKAGE_KODI_EGL_GLES || BR2_PACKAGE_KODI_GL
 	depends on BR2_USE_MMU # python
 	depends on BR2_USE_WCHAR
+	depends on !BR2_STATIC_LIBS # python
 	depends on BR2_PACKAGE_KODI_ARCH_SUPPORTS
 	help
 	  Kodi is an award-winning free and open source (GPL) software
@@ -105,6 +101,8 @@ menuconfig BR2_PACKAGE_KODI
 	  http://kodi.tv
 
 if BR2_PACKAGE_KODI
+
+source "package/kodi-platform/Config.in"
 
 config BR2_PACKAGE_KODI_ALSA_LIB
 	bool "alsa"
@@ -167,6 +165,11 @@ config BR2_PACKAGE_KODI_LIBCEC
 
 comment "hdmi cec support needs udev /dev management and a toolchain w/ dynamic library"
 	depends on BR2_STATIC_LIBS || !BR2_PACKAGE_HAS_UDEV
+
+config BR2_PACKAGE_KODI_LIRC
+	bool "lirc"
+	help
+	  Enable lirc support
 
 config BR2_PACKAGE_KODI_LIBMICROHTTPD
 	bool "web server"
@@ -244,24 +247,60 @@ config BR2_PACKAGE_KODI_WAVPACK
 	  Select this if you want to play back WV files.
 
 config BR2_PACKAGE_KODI_OPTICALDRIVE
-	bool "optical drive"
-	help
-	  Enable support for optical drives
+	bool
 
-if BR2_PACKAGE_KODI_OPTICALDRIVE
+menu "Audio decoder addons"
+	source "package/kodi-audiodecoder-modplug/Config.in"
+	source "package/kodi-audiodecoder-nosefart/Config.in"
+	source "package/kodi-audiodecoder-sidplay/Config.in"
+	source "package/kodi-audiodecoder-snesapu/Config.in"
+	source "package/kodi-audiodecoder-stsound/Config.in"
+	source "package/kodi-audiodecoder-timidity/Config.in"
+	source "package/kodi-audiodecoder-vgmstream/Config.in"
+endmenu
 
-comment "Kodi audioencoder addons"
+menu "Audio encoder addons"
+	source "package/kodi-audioencoder-flac/Config.in"
+	source "package/kodi-audioencoder-lame/Config.in"
+	source "package/kodi-audioencoder-vorbis/Config.in"
+	source "package/kodi-audioencoder-wav/Config.in"
+endmenu
 
-source "package/kodi-audioencoder-flac/Config.in"
-source "package/kodi-audioencoder-lame/Config.in"
-source "package/kodi-audioencoder-vorbis/Config.in"
-source "package/kodi-audioencoder-wav/Config.in"
+menu "PVR addons"
+	source "package/kodi-addon-xvdr/Config.in"
+	source "package/kodi-pvr-argustv/Config.in"
+	source "package/kodi-pvr-dvblink/Config.in"
+	source "package/kodi-pvr-dvbviewer/Config.in"
+	source "package/kodi-pvr-filmon/Config.in"
+	source "package/kodi-pvr-hts/Config.in"
+	source "package/kodi-pvr-iptvsimple/Config.in"
+	source "package/kodi-pvr-mediaportal-tvserver/Config.in"
+	source "package/kodi-pvr-mythtv/Config.in"
+	source "package/kodi-pvr-nextpvr/Config.in"
+	source "package/kodi-pvr-njoy/Config.in"
+	source "package/kodi-pvr-pctv/Config.in"
+	source "package/kodi-pvr-stalker/Config.in"
+	source "package/kodi-pvr-vbox/Config.in"
+	source "package/kodi-pvr-vdr-vnsi/Config.in"
+	source "package/kodi-pvr-vuplus/Config.in"
+	source "package/kodi-pvr-wmc/Config.in"
+endmenu
 
-endif # BR2_PACKAGE_KODI_OPTICALDRIVE
+menu "Screensavers"
+	source "package/kodi-screensaver-asteroids/Config.in"
+	source "package/kodi-screensaver-biogenesis/Config.in"
+	source "package/kodi-screensaver-crystalmorph/Config.in"
+	source "package/kodi-screensaver-greynetic/Config.in"
+	source "package/kodi-screensaver-pingpong/Config.in"
+	source "package/kodi-screensaver-pyro/Config.in"
+	source "package/kodi-screensaver-stars/Config.in"
+endmenu
 
-comment "Kodi PVR addons"
-
-source "package/kodi-addon-xvdr/Config.in"
-source "package/kodi-pvr-addons/Config.in"
+menu "Visualisations"
+	source "package/kodi-visualisation-shadertoy/Config.in"
+	source "package/kodi-visualisation-spectrum/Config.in"
+	source "package/kodi-visualisation-waveforhue/Config.in"
+	source "package/kodi-visualisation-waveform/Config.in"
+endmenu
 
 endif # BR2_PACKAGE_KODI

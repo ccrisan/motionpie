@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-TOR_VERSION = 0.2.5.12
+TOR_VERSION = 0.2.6.9
 TOR_SITE = https://dist.torproject.org
 TOR_LICENSE = BSD-3c
 TOR_LICENSE_FILES = LICENSE
@@ -31,5 +31,8 @@ TOR_DEPENDENCIES += libseccomp
 else
 TOR_CONF_OPTS += --disable-seccomp
 endif
+
+# uses gnu extensions
+TOR_CONF_ENV = ac_cv_prog_cc_c99='-std=gnu99'
 
 $(eval $(autotools-package))

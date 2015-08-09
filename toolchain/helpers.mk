@@ -139,7 +139,7 @@ copy_toolchain_sysroot = \
 	SUPPORT_LIB_DIR="$(strip $5)" ; \
 	for i in etc $${ARCH_LIB_DIR} sbin usr usr/$${ARCH_LIB_DIR}; do \
 		if [ -d $${ARCH_SYSROOT_DIR}/$$i ] ; then \
-			rsync -au --chmod=Du+w --exclude 'usr/lib/locale' \
+			rsync -au --chmod=u=rwX,go=rX --exclude 'usr/lib/locale' \
 				--exclude lib --exclude lib32 --exclude lib64 \
 				$${ARCH_SYSROOT_DIR}/$$i/ $(STAGING_DIR)/$$i/ ; \
 		fi ; \
@@ -172,6 +172,36 @@ copy_toolchain_sysroot = \
 check_kernel_headers_version = \
 	if ! support/scripts/check-kernel-headers.sh $(1) $(2); then \
 		exit 1; \
+	fi
+
+#
+# Check the specific gcc version actually matches the version in the
+# toolchain
+#
+# $1: path to gcc
+# $2: expected gcc version
+#
+# Some details about the sed expression:
+# - 1!d
+#   - delete if not line 1
+#
+# - s/^[^)]+\) ([^[:space:]]+).*/\1/
+#   - eat all until the first ')' character followed by a space
+#   - match as many non-space chars as possible
+#   - eat all the remaining chars on the line
+#   - replace by the matched expression
+#
+# - s/\.[[:digit:]]+$//
+#   - eat a dot followed by as many digits as possible up to the end
+#     of line
+#   - replace with nothing
+#
+check_gcc_version = \
+	expected_version="$(strip $2)" ; \
+	real_version=`$(1) --version | sed -r -e '1!d; s/^[^)]+\) ([^[:space:]]+).*/\1/; s/\.[[:digit:]]+$$//;'` ; \
+	if [ "$${real_version}" != "$${expected_version}" ] ; then \
+		echo "Incorrect selection of gcc version: expected $${expected_version}, got $${real_version}" ; \
+		exit 1 ; \
 	fi
 
 #
@@ -308,12 +338,14 @@ check_arm_abi = \
 		echo "External toolchain uses the unsuported OABI" ; \
 		exit 1 ; \
 	fi ; \
-	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o /dev/null - ; then \
+	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o $(BUILD_DIR)/.br-toolchain-test.tmp - ; then \
+		rm -f $(BUILD_DIR)/.br-toolchain-test.tmp*; \
 		abistr_$(BR2_ARM_EABI)='EABI'; \
 		abistr_$(BR2_ARM_EABIHF)='EABIhf'; \
 		echo "Incorrect ABI setting: $${abistr_y} selected, but toolchain is incompatible"; \
 		exit 1 ; \
-	fi
+	fi ; \
+	rm -f $(BUILD_DIR)/.br-toolchain-test.tmp*
 
 #
 # Check that the external toolchain supports C++

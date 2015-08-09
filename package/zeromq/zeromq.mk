@@ -4,14 +4,13 @@
 #
 ################################################################################
 
-ZEROMQ_VERSION = 4.0.5
+ZEROMQ_VERSION = 4.1.2
 ZEROMQ_SITE = http://download.zeromq.org
 ZEROMQ_INSTALL_STAGING = YES
 ZEROMQ_DEPENDENCIES = util-linux
 ZEROMQ_LICENSE = LGPLv3+ with exceptions
 ZEROMQ_LICENSE_FILES = COPYING COPYING.LESSER
-# For 0001-tests-disable-test_fork-if-fork-is-not-available.patch
-# and 0002-acinclude.m4-make-kernel-specific-flags-cacheable.patch
+# For 0001-acinclude.m4-make-kernel-specific-flags-cacheable.patch
 ZEROMQ_AUTORECONF = YES
 
 # Assume these flags are always available. It is true, at least for
@@ -32,6 +31,14 @@ endif
 ifeq ($(BR2_PACKAGE_ZEROMQ_PGM),y)
 ZEROMQ_DEPENDENCIES += host-pkgconf openpgm
 ZEROMQ_CONF_OPTS += --with-system-pgm
+endif
+
+# ZeroMQ uses libsodium if it's available.
+ifeq ($(BR2_PACKAGE_LIBSODIUM),y)
+ZEROMQ_DEPENDENCIES += libsodium
+ZEROMQ_CONF_OPTS += --with-libsodium="$(STAGING_DIR)/usr"
+else
+ZEROMQ_CONF_OPTS += --without-libsodium
 endif
 
 $(eval $(autotools-package))

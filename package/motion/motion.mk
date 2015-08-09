@@ -10,5 +10,8 @@ MOTION_VERSION = r561
 MOTION_CONF_OPTS = --without-pgsql --without-sdl --without-sqlite3 --without-mysql --with-ffmpeg=$(STAGING_DIR)/usr/lib \
         --with-ffmpeg-headers=$(STAGING_DIR)/usr/include
 
-$(eval $(autotools-package))
+define MOTION_INSTALL_TARGET_CMDS
+    cp $(@D)/motion $(TARGET_DIR)/usr/bin/motion-svn
+endef
 
+$(eval $(autotools-package))

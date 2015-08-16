@@ -79,8 +79,8 @@ start() {
         sed -r -i 's/admin:([^:]+):[[:digit:]]+:/admin:\1::/' /data/etc/shadow # removes pwd expiration
 
         # mount binds
-        mount --bind /data/output /home/ftp/sdcard
-        mount --bind /data/media /home/ftp/storage
+        mount --rbind /data/output /home/ftp/sdcard
+        mount --rbind /data/media /home/ftp/storage
         
         # copy common sys config files
         if [ -f /etc/watch.conf ] && ! [ -f /data/etc/watch.conf ]; then

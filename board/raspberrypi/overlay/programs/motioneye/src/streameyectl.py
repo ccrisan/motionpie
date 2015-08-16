@@ -182,7 +182,7 @@ def _set_streameye_enabled(enabled):
         config._camera_ids_cache = []
         
         logging.debug('disabling all cameras in motion.conf')
-        cmd = 'sed -r -i "s/^thread (.*)/#thread \1/" /data/etc/motion.conf &>/dev/null'
+        cmd = 'sed -r -i "s/^thread (.*)/#thread \\1/" /data/etc/motion.conf &>/dev/null'
         if os.system(cmd):
             logging.error('failed to disable cameras in motion.conf')
         

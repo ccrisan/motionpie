@@ -52,6 +52,9 @@ function start() {
 }
 
 function stop() {
+    # stop the streameye background watch process
+    ps | grep streameye | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
+
     # stop the raspimjpeg process
     pid=$(ps | grep raspimjpeg.py | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1)
     if [ -z "$pid" ]; then
@@ -65,9 +68,6 @@ function stop() {
         count=$(($count + 1))
     done
     kill -KILL "$pid" &>/dev/null
-
-    # stop the streameye background watch process
-    ps | grep streameye | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
 }
 
 case "$1" in

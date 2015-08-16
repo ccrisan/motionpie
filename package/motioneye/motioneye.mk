@@ -4,8 +4,8 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = a19375d
-MOTIONPIE_VERSION = 20150719
+MOTIONEYE_VERSION = 6af892f
+MOTIONPIE_VERSION = 20150816
 MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3

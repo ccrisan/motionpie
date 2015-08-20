@@ -17,6 +17,7 @@
 null::sysinit:/bin/mount -t proc proc /proc
 null::sysinit:/bin/mkdir -p /dev/pts
 null::sysinit:/bin/mkdir -p /dev/shm
+null::sysinit:/bin/mount --make-shared /
 null::sysinit:/bin/mount -a
 null::sysinit:/sbin/remountrw
 null::sysinit:/sbin/loadmodules

@@ -1,17 +1,21 @@
 #!/bin/sh
 
-watch_timeout=120
+sys_conf="/etc/motioneye.conf"
 conf="/data/etc/motioneye.conf"
+watch_timeout=120
 dev_v4l_by_id="/dev/v4l/by-id/"
 
-def_port=$(cat /programs/motioneye/settings.py | grep PORT | tr -d ' ' | cut -d '=' -f 2)
+if [ -f $sys_conf ] && ! [ -f $conf ]; then
+    mkdir -p $(dirname $conf)
+    cp $sys_conf $conf
+fi
 
 if [ -f "$conf" ]; then
     opts=$(cat "$conf" | while read line; do echo "--$line"; done)
     port=$(echo "$opts" | grep -oE 'port [[:digit:]]+' | cut -d ' ' -f 2)
 else
-    echo "port $def_port" > "$conf"
-    port=$def_port
+    echo "configuration file not present"
+    exit 0
 fi
 
 responsive() {
@@ -59,7 +63,7 @@ find_persistent_device() {
 
 start() {
     echo -n "Starting motioneye: "
-    /usr/bin/python2.7 /programs/motioneye/motioneye.py >>/var/log/motioneye.log $opts 2>&1 &
+    meyectl startserver -b -c $conf -l
 
     count=0
     while true; do
@@ -88,12 +92,12 @@ start() {
             else
                 output_dir="/data/output/"
             fi
-            uri="/config/add/?_username=admin"
+            loc="/config/add/?_username=admin"
             device=$(find_persistent_device $device)
-            body="{\"uri\": \"$device\", \"proto\": \"v4l2\"}"
-            signature=$(echo -n "POST:$uri:$body:" | sha1sum | cut -d ' ' -f 1)
+            body="{\"path\": \"$device\", \"proto\": \"v4l2\"}"
+            signature=$(echo -n "POST:$loc:$body:" | sha1sum | cut -d ' ' -f 1)
 
-            curl -s -m 60 --data "$body" "http://127.0.0.1:$port$uri&_signature=$signature" > /dev/null
+            curl -s -m 60 --data "$body" "http://127.0.0.1:$port$loc&_signature=$signature" > /dev/null
             index=$(($index + 1))
         done
     fi
@@ -105,8 +109,7 @@ start() {
 
 stop() {
     echo -n "Shutting down motioneye: "
-    ps | grep motioneye | grep -v $$ | grep -v grep | tr -s ' ' | sed -e 's/^\s//' | cut -d ' ' -f 1 | xargs -r kill
-    echo "done"
+    meyectl stopserver &>/dev/null && echo "done" || echo "failed"
 }
 
 restart() {

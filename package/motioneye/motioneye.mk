@@ -4,60 +4,53 @@
 #
 #############################################################
 
-MOTIONEYE_VERSION = 6af892f
-MOTIONPIE_VERSION = 20150816
-MOTIONEYE_SITE = https://bitbucket.org/ccrisan/motioneye/get/
+MOTIONEYE_VERSION = 5998cf6
+MOTIONPIE_VERSION = 20150920
+MOTIONEYE_SITE = $(call github,ccrisan,motioneye,$(MOTIONEYE_VERSION))
 MOTIONEYE_SOURCE = $(MOTIONEYE_VERSION).tar.gz
 MOTIONEYE_LICENSE = GPLv3
 MOTIONEYE_LICENSE_FILES = LICENCE
 MOTIONEYE_INSTALL_TARGET = YES
+MOTIONEYE_SETUP_TYPE = setuptools
 
-DST_DIR = $(TARGET_DIR)/programs/motioneye
+DST_DIR = $(TARGET_DIR)/usr/lib/python2.7/site-packages/motioneye
+SHARE_DIR = $(TARGET_DIR)/usr/share/motioneye
 
-define MOTIONEYE_INSTALL_TARGET_CMDS
-    mkdir -p $(DST_DIR)
-    cp -r $(@D)/* $(DST_DIR)/
-    cp package/motioneye/update.py $(DST_DIR)/src/
-    cp package/motioneye/ipctl.py $(DST_DIR)/src/
-    cp package/motioneye/servicectl.py $(DST_DIR)/src/
-    cp package/motioneye/watchctl.py $(DST_DIR)/src/
-    cp package/motioneye/extractl.py $(DST_DIR)/src/
 
-    # settings
-    mv $(DST_DIR)/settings_default.py $(DST_DIR)/settings.py
-    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'conf'))%'/data/etc'%" $(DST_DIR)/settings.py
-    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'run'))%'/tmp'%" $(DST_DIR)/settings.py
-    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'log'))%'/var/log'%" $(DST_DIR)/settings.py
-    sed -i "s%os.path.abspath(os.path.join(PROJECT_PATH, 'media'))%'/data/output'%" $(DST_DIR)/settings.py
-    sed -i "s%8765%80%" $(DST_DIR)/settings.py
-    sed -i "s%WPA_SUPPLICANT_CONF = None%WPA_SUPPLICANT_CONF = '/data/etc/wpa_supplicant.conf'%" $(DST_DIR)/settings.py
-    sed -i "s%LOCAL_TIME_FILE = None%LOCAL_TIME_FILE = '/data/etc/localtime'%" $(DST_DIR)/settings.py
-    sed -i "s%SMB_SHARES = False%SMB_SHARES = True%" $(DST_DIR)/settings.py
-    sed -i "s%SMB_MOUNT_ROOT = '/media'%SMB_MOUNT_ROOT = '/data/media'%" $(DST_DIR)/settings.py
-    sed -i "s%ENABLE_REBOOT = False%ENABLE_REBOOT = True%" $(DST_DIR)/settings.py
-
-    # version & name
-    sed -r -i "s%VERSION = '[a-bA-B0-9.]+'%VERSION = '$(MOTIONPIE_VERSION)'%" $(DST_DIR)/motioneye.py
-    sed -i "s%>motionEye<%>motionPie<%" $(DST_DIR)/templates/main.html
-    sed -i "s%motionEye is up to date%motionPie is up to date%" $(DST_DIR)/static/js/main.js
-    sed -i "s%motionEye was successfully updated%motionPie was successfully updated%" $(DST_DIR)/static/js/main.js
-    sed -i "s%motioneye-config.tar.gz%motionpie-config.tar.gz%" $(DST_DIR)/src/handlers.py
-    sed -i "s%this is motionEye%this is motionPie%" $(DST_DIR)/motioneye.py
-    sed -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/src/handlers.py
-    
-    # additional config
-    echo -e 'import ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept ImportError:\n    pass' >> $(DST_DIR)/src/config.py
+define MOTIONEYE_POST_INSTALL_CMDS
+    # additional config modules
+    cp package/motioneye/update.py $(DST_DIR)
+    cp package/motioneye/ipctl.py $(DST_DIR)
+    cp package/motioneye/servicectl.py $(DST_DIR)
+    cp package/motioneye/watchctl.py $(DST_DIR)
+    cp package/motioneye/extractl.py $(DST_DIR)
+    grep servicectl $(DST_DIR)/config.py &>/dev/null || echo -e '\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept ImportError:\n    pass' >> $(DST_DIR)/config.py
     
     # log files
-    lineno=$$(grep -n -m1 LOGS $(DST_DIR)/src/handlers.py | cut -d ':' -f 1); \
-    head -n $$(($$lineno + 1)) $(DST_DIR)/src/handlers.py > /tmp/handlers.py.new; \
-    echo "        'motioneye': ('/var/log/motioneye.log', 'motioneye.log')," >> /tmp/handlers.py.new; \
-    echo "        'messages': ('/var/log/messages', 'messages.log')," >> /tmp/handlers.py.new; \
-    echo "        'boot': ('/var/log/boot.log', 'boot.log')," >> /tmp/handlers.py.new; \
-    echo "        'dmesg': ('dmesg', 'dmesg.log')," >> /tmp/handlers.py.new; \
-    tail -n +$$(($$lineno + 2)) $(DST_DIR)/src/handlers.py >> /tmp/handlers.py.new
-    mv /tmp/handlers.py.new $(DST_DIR)/src/handlers.py
+    if ! grep 'motioneye.log' $(DST_DIR)/handlers.py &>/dev/null; then \
+        lineno=$$(grep -n -m1 LOGS $(DST_DIR)/handlers.py | cut -d ':' -f 1); \
+        head -n $$(($$lineno + 1)) $(DST_DIR)/handlers.py > /tmp/handlers.py.new; \
+        echo "        'motioneye': ('/var/log/motioneye.log', 'motioneye.log')," >> /tmp/handlers.py.new; \
+        echo "        'messages': ('/var/log/messages', 'messages.log')," >> /tmp/handlers.py.new; \
+        echo "        'boot': ('/var/log/boot.log', 'boot.log')," >> /tmp/handlers.py.new; \
+        echo "        'dmesg': ('dmesg', 'dmesg.log')," >> /tmp/handlers.py.new; \
+        tail -n +$$(($$lineno + 2)) $(DST_DIR)/handlers.py >> /tmp/handlers.py.new; \
+        mv /tmp/handlers.py.new $(DST_DIR)/handlers.py; \
+    fi
+
+    # version & update
+    sed -r -i "s%VERSION = .*%VERSION = '$(MOTIONPIE_VERSION)'%" $(DST_DIR)/__init__.py
+    sed -r -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/handlers.py
+    
+    # meyectl
+    echo -e '#!/bin/bash\n/usr/bin/python $(DST_DIR)/meyectl.pyc' > $(TARGET_DIR)/usr/bin/meyectl
+    chmod +x $(TARGET_DIR)/usr/bin/meyectl
+
+    # cleanups
+    rm -rf $(SHARE_DIR)/extra
 endef
 
-$(eval $(generic-package))
+MOTIONEYE_INSTALL_TARGET_CMDS += $(MOTIONEYE_POST_INSTALL_CMDS)
+
+$(eval $(python-package))
 

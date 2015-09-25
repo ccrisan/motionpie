@@ -17,7 +17,14 @@ DST_DIR = $(TARGET_DIR)/usr/lib/python2.7/site-packages/motioneye
 SHARE_DIR = $(TARGET_DIR)/usr/share/motioneye
 
 
-define MOTIONEYE_POST_INSTALL_CMDS
+define MOTIONEYE_INSTALL_TARGET_CMDS
+    # setuptools install
+    (cd $($(PKG)_BUILDDIR)/; \
+        $($(PKG)_BASE_ENV) $($(PKG)_ENV) \
+        $($(PKG)_PYTHON_INTERPRETER) setup.py install \
+        $($(PKG)_BASE_INSTALL_TARGET_OPTS) \
+        $($(PKG)_INSTALL_TARGET_OPTS))
+
     # additional config modules
     cp package/motioneye/update.py $(DST_DIR)
     cp package/motioneye/ipctl.py $(DST_DIR)
@@ -49,8 +56,6 @@ define MOTIONEYE_POST_INSTALL_CMDS
     # cleanups
     rm -rf $(SHARE_DIR)/extra
 endef
-
-MOTIONEYE_INSTALL_TARGET_CMDS += $(MOTIONEYE_POST_INSTALL_CMDS)
 
 $(eval $(python-package))
 

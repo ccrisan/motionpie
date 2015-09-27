@@ -50,7 +50,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -r -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/handlers.py
     
     # meyectl
-    echo -e '#!/bin/bash\n/usr/bin/python /usr/bin/python /usr/lib/python2.7/site-packages/motioneye/meyectl.pyc "$@"' > $(TARGET_DIR)/usr/bin/meyectl
+    echo -e '#!/bin/bash\n/usr/bin/python /usr/bin/python /usr/lib/python2.7/site-packages/motioneye/meyectl.pyc "$$@"' > $(TARGET_DIR)/usr/bin/meyectl
     chmod +x $(TARGET_DIR)/usr/bin/meyectl
 
     # cleanups

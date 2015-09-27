@@ -203,7 +203,7 @@ def _set_streameye_enabled(enabled):
             'username': '',
             'password': '',
             'scheme': 'http',
-            'uri': '/'
+            'path': '/'
         }
 
         if streameye_settings['seAuthMode'] == 'basic':

@@ -15,6 +15,8 @@ MOTIONEYE_SETUP_TYPE = setuptools
 
 DST_DIR = $(TARGET_DIR)/usr/lib/python2.7/site-packages/motioneye
 SHARE_DIR = $(TARGET_DIR)/usr/share/motioneye
+BOARD = $(shell basename $(BASE_DIR))
+BOARD_DIR = $(BASE_DIR)/../../board/$(BOARD)
 
 
 define MOTIONEYE_INSTALL_TARGET_CMDS
@@ -31,6 +33,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     cp package/motioneye/servicectl.py $(DST_DIR)
     cp package/motioneye/watchctl.py $(DST_DIR)
     cp package/motioneye/extractl.py $(DST_DIR)
+    test -d $(BOARD_DIR)/motioneye-modules && cp $(BOARD_DIR)/motioneye-modules/*.py $(DST_DIR)
     grep servicectl $(DST_DIR)/config.py &>/dev/null || echo -e '\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept ImportError:\n    pass' >> $(DST_DIR)/config.py
     
     # log files
@@ -49,8 +52,11 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     sed -r -i "s%VERSION = .*%VERSION = '$(MOTIONPIE_VERSION)'%" $(DST_DIR)/__init__.py
     sed -r -i "s%enable_update=False%enable_update=True%" $(DST_DIR)/handlers.py
     
+    # (re)compile all python modules
+    $($(PKG)_PYTHON_INTERPRETER) -m compileall -f $(DST_DIR)/*.py
+
     # meyectl
-    echo -e '#!/bin/bash\n/usr/bin/python /usr/bin/python /usr/lib/python2.7/site-packages/motioneye/meyectl.pyc "$$@"' > $(TARGET_DIR)/usr/bin/meyectl
+    echo -e '#!/bin/bash\n/usr/bin/python /usr/lib/python2.7/site-packages/motioneye/meyectl.pyc "$$@"' > $(TARGET_DIR)/usr/bin/meyectl
     chmod +x $(TARGET_DIR)/usr/bin/meyectl
 
     # cleanups

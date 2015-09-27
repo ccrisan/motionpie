@@ -53,7 +53,7 @@ find_persistent_device() {
 
     for p in $dev_v4l_by_id/*; do
         if [ $(realpath "$p") == $device ]; then
-            echo $p
+            echo $p | sed 's#//*#/#g'
             return
         fi
     done

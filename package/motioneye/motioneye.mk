@@ -33,7 +33,7 @@ define MOTIONEYE_INSTALL_TARGET_CMDS
     cp package/motioneye/servicectl.py $(DST_DIR)
     cp package/motioneye/watchctl.py $(DST_DIR)
     cp package/motioneye/extractl.py $(DST_DIR)
-    test -d $(BOARD_DIR)/motioneye-modules && cp $(BOARD_DIR)/motioneye-modules/*.py $(DST_DIR)
+    test -d $(BOARD_DIR)/motioneye-modules && cp $(BOARD_DIR)/motioneye-modules/*.py $(DST_DIR) || true
     grep servicectl $(DST_DIR)/config.py &>/dev/null || echo -e '\nimport ipctl\nimport servicectl\nimport watchctl\nimport extractl\ntry:\n    import boardctl\nexcept ImportError:\n    pass' >> $(DST_DIR)/config.py
     
     # log files

@@ -5,6 +5,9 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+# some line
+# some other line
+
 set -e # exit at first error
 
 board=$1

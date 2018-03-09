@@ -6,6 +6,7 @@ if [ -z "$1" ]; then
 fi
 
 # some line
+# some other line
 
 set -e # exit at first error
 

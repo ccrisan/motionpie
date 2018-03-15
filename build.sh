@@ -8,6 +8,7 @@ fi
 set -e # exit at first error
 
 # change on dev
+# another change
 
 board=$1
 target=${*:2}

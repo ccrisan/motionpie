@@ -7,6 +7,8 @@ fi
 
 set -e # exit at first error
 
+# change on dev
+
 board=$1
 target=${*:2}
 cd $(dirname $0)
